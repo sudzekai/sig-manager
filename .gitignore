@@ -1,0 +1,28 @@
+# GLOBAL
+
+.env
+
+# ide
+.vs/
+*.user
+*.suo
+
+.vscode/
+
+# .net
+
+**/Properties/launchSettings.json
+**/bin/
+**/obj/
+
+# front
+
+node_modules/
+dist/
+coverage/
+
+# build artifacts
+
+*.exe
+*.dll
+*.pdb
