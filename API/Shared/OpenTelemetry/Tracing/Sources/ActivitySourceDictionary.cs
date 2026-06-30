@@ -49,6 +49,7 @@ namespace Shared.OpenTelemetry.Tracing.Sources
             public static readonly ActivitySource CommandProcessor = new($"{source}.{nameof(CommandProcessor)}");
             public static readonly ActivitySource Users = new($"{source}.{nameof(Users)}");
             public static readonly ActivitySource Shifts = new($"{source}.{nameof(Shifts)}");
+            public static readonly ActivitySource Cars = new($"{source}.{nameof(Cars)}");
         }
         public static class Services
         {
@@ -57,6 +58,7 @@ namespace Shared.OpenTelemetry.Tracing.Sources
             public static readonly ActivitySource CommandProcessor = new($"{source}.{nameof(CommandProcessor)}");
             public static readonly ActivitySource Users = new($"{source}.{nameof(Users)}");
             public static readonly ActivitySource Shifts = new($"{source}.{nameof(Shifts)}");
+            public static readonly ActivitySource Cars = new($"{source}.{nameof(Cars)}");
         }
 
         public static class Repositories
@@ -65,6 +67,7 @@ namespace Shared.OpenTelemetry.Tracing.Sources
 
             public static readonly ActivitySource Users = new($"{source}.{nameof(Users)}");
             public static readonly ActivitySource Shifts = new($"{source}.{nameof(Shifts)}");
+            public static readonly ActivitySource Cars = new($"{source}.{nameof(Cars)}");
         }
         public static class Filters
         {

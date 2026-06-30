@@ -21,7 +21,7 @@ namespace Domain.Models
             ChangePasswordHash(passwordHash);
             ChangeRoleId(roleId);
 
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = DateTime.Now;
             UpdatedAt = CreatedAt;
         }
 
@@ -216,7 +216,7 @@ namespace Domain.Models
 
         private void Touch()
         {
-            UpdatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.Now;
         }
     }
 }

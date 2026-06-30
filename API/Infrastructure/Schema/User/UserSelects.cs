@@ -26,18 +26,6 @@
             UserSchema.RoleId
         ];
 
-        public static readonly IReadOnlyList<string> AdminInfo = [
-            UserSchema.Id, 
-            UserSchema.Username, 
-            UserSchema.FullName, 
-            UserSchema.PhoneNumber, 
-            UserSchema.Email, 
-            UserSchema.VerificationCode, 
-            UserSchema.CreatedAt, 
-            UserSchema.UpdatedAt, 
-            UserSchema.RoleId
-        ];
-
         public static readonly IReadOnlyList<string> Info = [
             UserSchema.Id, 
             UserSchema.Username, 

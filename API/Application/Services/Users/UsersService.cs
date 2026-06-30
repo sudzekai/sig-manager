@@ -35,7 +35,7 @@ namespace Application.Services.Users
 
             var id = await _repository.CreateAsync(user);
 
-            var created = await _repository.GetByIdAsync(id);
+            var created = await _repository.GetInfoByIdAsync(id);
 
             return new(created.Id, created.Username, created.FullName, created.Email, created.PhoneNumber);
         }
@@ -57,7 +57,7 @@ namespace Application.Services.Users
 
         public async Task<UserInfoDto> GetById(int id)
         {
-            var user = await _repository.GetByIdAsync(id) ??
+            var user = await _repository.GetInfoByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден");
 
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
@@ -65,7 +65,7 @@ namespace Application.Services.Users
 
         public async Task<UserInfoDto> GetByUsernameAsync(string username)
         {
-            var user = await _repository.GetByUsernameAsync(username) ??
+            var user = await _repository.GetInfoByUsernameAsync(username) ??
                 throw new NotFoundException("Пользователь с таким именем пользователя не найден");
 
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
@@ -116,7 +116,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsUserExistsAsync(int id)
         {
-            var existing = await _repository.GetByIdAsync(id);
+            var existing = await _repository.GetInfoByIdAsync(id);
 
             if (existing == null) return false;
 
@@ -125,7 +125,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsUsernameExistsAsync(string username, int? excludedId = null)
         {
-            var existing = await _repository.GetByUsernameAsync(username);
+            var existing = await _repository.GetInfoByUsernameAsync(username);
 
             if (existing == null) return false;
 
@@ -136,7 +136,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsEmailExistsAsync(string email, int? excludedId = null)
         {
-            var existing = await _repository.GetByEmailAsync(email);
+            var existing = await _repository.GetInfoByEmailAsync(email);
 
             if (existing == null) return false;
 
@@ -147,7 +147,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int? excludedId = null)
         {
-            var existing = await _repository.GetByPhoneNumberAsync(phoneNumber);
+            var existing = await _repository.GetInfoByPhoneNumberAsync(phoneNumber);
 
             if (existing == null) return false;
 

@@ -22,16 +22,16 @@ namespace Infrastructure.Repositories.Users
             return await _inner.GetAllAsync(request);
         }
 
-        public async Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetInfoByIdAsync(int id)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetByIdAsync));
-            return await _inner.GetByIdAsync(id);
+            using var activity = _activitySource.StartActivity(nameof(GetInfoByIdAsync));
+            return await _inner.GetInfoByIdAsync(id);
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetInfoByUsernameAsync(string username)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetByUsernameAsync));
-            return await _inner.GetByUsernameAsync(username);
+            using var activity = _activitySource.StartActivity(nameof(GetInfoByUsernameAsync));
+            return await _inner.GetInfoByUsernameAsync(username);
         }
 
         public async Task<int> CreateAsync(User user)
@@ -52,16 +52,16 @@ namespace Infrastructure.Repositories.Users
             await _inner.UpdateAsync(user);
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetInfoByEmailAsync(string email)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetByEmailAsync));
-            return await _inner.GetByEmailAsync(email);
+            using var activity = _activitySource.StartActivity(nameof(GetInfoByEmailAsync));
+            return await _inner.GetInfoByEmailAsync(email);
         }
 
-        public async Task<User?> GetByPhoneNumberAsync(string phoneNumber)
+        public async Task<User?> GetInfoByPhoneNumberAsync(string phoneNumber)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetByEmailAsync));
-            return await _inner.GetByEmailAsync(phoneNumber);
+            using var activity = _activitySource.StartActivity(nameof(GetInfoByEmailAsync));
+            return await _inner.GetInfoByEmailAsync(phoneNumber);
         }
 
         public async Task<User?> GetFullByIdAsync(int id)

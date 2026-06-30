@@ -39,5 +39,11 @@ namespace Domain.Tools
             if (value > max)
                 throw new DataValidationException($"{fieldName} должен быть меньше {max+1}");
         }
+
+        public static void OneOf(string value, List<string> enums, string fieldName)
+        {
+            if (!enums.Any(x => x.Equals(value, StringComparison.OrdinalIgnoreCase)))
+                throw new DataValidationException($"{fieldName} должен быть одним из {string.Join(", ", enums)}");
+        }
     }
 }

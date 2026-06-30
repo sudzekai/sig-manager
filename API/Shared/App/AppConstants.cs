@@ -7,11 +7,11 @@ namespace Shared.App
     {
         public const string CurrentVersion = "v0.1.1";
 
-        public const string ChangeLog = @"Добавлена фильтрация и сортировка пользователей, Argon2
-Реализована поддержка фильтрации, поиска и сортировки пользователей через GetUsersListRequest во всех слоях. 
-Добавлен сервис хеширования паролей на Argon2id (IHashService, HashService). 
-Изменены интерфейсы и DI-композиция, внедрён OneOfAttribute для валидации сортировки. 
-Улучшено логирование SQL и уровень логирования по умолчанию. Обновлены версии и DTO.";
+        public const string ChangeLog = @"(WIP) Добавлена инфраструктура для работы с автомобилями (Car)
+Введены модели, DTO и репозиторий для сущности Car, реализованы схемы и селекты для таблицы cars, добавлен декоратор с трассировкой. 
+Добавлен запрос GetCarsListRequest с фильтрацией и сортировкой. 
+В DataValidator добавлен метод OneOf. 
+Внесены изменения в работу с пользователями (методы GetInfoBy...), поля схемы пользователей объявлены как const";
 
         public static readonly string BaseDirectory = AppContext.BaseDirectory;
 

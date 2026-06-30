@@ -151,7 +151,7 @@ namespace Infrastructure.Repositories.Users
             return result;
         }
 
-        public async Task<User?> GetByEmailAsync(string email)
+        public async Task<User?> GetInfoByEmailAsync(string email)
         {
             var query = $@"
                 SELECT {string.Join(", ", UserSelects.Info)} 
@@ -170,7 +170,7 @@ namespace Infrastructure.Repositories.Users
             return result;
         }
 
-        public async Task<User?> GetByIdAsync(int id)
+        public async Task<User?> GetInfoByIdAsync(int id)
         {
             var query = $@"
                 SELECT {string.Join(", ", UserSelects.Info)} 
@@ -189,7 +189,7 @@ namespace Infrastructure.Repositories.Users
             return result;
         }
 
-        public async Task<User?> GetByPhoneNumberAsync(string phoneNumber)
+        public async Task<User?> GetInfoByPhoneNumberAsync(string phoneNumber)
         {
             var query = $@"
                 SELECT {string.Join(", ", UserSelects.Info)} 
@@ -208,7 +208,7 @@ namespace Infrastructure.Repositories.Users
             return result;
         }
 
-        public async Task<User?> GetByUsernameAsync(string username)
+        public async Task<User?> GetInfoByUsernameAsync(string username)
         {
             var query = $@"
                 SELECT {string.Join(", ", UserSelects.Info)} 
