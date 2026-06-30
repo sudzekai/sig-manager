@@ -1,5 +1,8 @@
 <Solution>
   <Project Path="Application/Application.csproj" />
+  <Project Path="CompositionRoot/CompositionRoot.csproj" Id="6659e95d-08de-4c78-82aa-123820f56658" />
+  <Project Path="Contracts/Contracts.csproj" Id="596a1c3d-908b-4931-a970-04f194cfaba5" />
+  <Project Path="Domain/Domain.csproj" Id="9d52f23c-d0ea-41b0-9b50-5c67f6c3a42b" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="Presentation/Presentation.csproj" />
   <Project Path="Shared/Shared.csproj" />

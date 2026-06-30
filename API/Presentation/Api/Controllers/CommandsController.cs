@@ -1,6 +1,7 @@
-﻿using Application.Objects.Dtos;
-using Application.Services.Command;
+﻿using Contracts.Interfaces.Application.Services;
+using Contracts.Objects.Dtos.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using Shared.OpenTelemetry.Tracing.Sources;
 
 namespace Presentation.Api.Controllers
@@ -17,9 +18,11 @@ namespace Presentation.Api.Controllers
         }
 
         [HttpPost]
+        [ValidateModelState]
         public async Task<string> Process([FromBody] CommandDto body)
         {
             using var activity = ActivitySourceDictionary.Controllers.CommandProcessor.StartActivity("Обработка запроса на выполнение команды");
+
             return await _commandProcessor.ProcessAsync(body);
         }
     }

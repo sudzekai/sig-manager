@@ -1,15 +1,13 @@
-using Application.DI;
-using Application.Services.ApplicationLifetime;
-using Infrastructure.DI;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using CompositionRoot;
 using Presentation.Api.Filters;
 using Presentation.Api.Middlewares;
 using Presentation.Configuration;
 using Presentation.DI;
-using Presentation.Extensions;
+using Presentation.Utilities.ExceptionsHandler;
+using Presentation.Utilities.Extensions;
 using Scalar.AspNetCore;
 using Shared.App;
-using Shared.OpenTelemetry.Logging.Extensions;
+using System.Text;
 using System.Text.Json;
 
 namespace Presentation
@@ -19,6 +17,7 @@ namespace Presentation
         public static async Task Main(string[] args)
         {
             await Configurator.ConfigureEnvironmentAsync();
+            GlobalExceptionHandler.Register();
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +28,8 @@ namespace Presentation
             builder.ConfigureOpenTelemetry();
 
             // infrastructure
-            builder.Services.AddDatabase("connString");
-            builder.Services.AddRepositories();
+            await builder.Services.AddSingletonDatabaseAsync(GetConnectionString(builder.Configuration));
+            builder.Services.AddScopedRepositories();
 
             // application
             builder.Services.AddApplicationServices();
@@ -43,6 +42,10 @@ namespace Presentation
             {
                 o.Filters.Add<ExceptionsFilter>();
                 o.Filters.Add<ResultFilter>();
+            })
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
             });
 
             builder.Services.AddOpenApi();
@@ -57,6 +60,7 @@ namespace Presentation
             app.UsePathBase(pathBase);
 
             app.MapOpenApi();
+
             app.MapScalarApiReference(o =>
             {
                 o.Title = "SiG Manager API";
@@ -73,6 +77,28 @@ namespace Presentation
             await LogStartAsync(builder, app);
 
             await app.WaitForShutdownAsync();
+        }
+
+        private static string GetConnectionString(ConfigurationManager config)
+        {
+            StringBuilder connectionString = new();
+
+            var hostname = config.TryGetString("DB_HOST");
+            connectionString.Append($"Server={hostname};");
+
+            var port = config.TryGetString("DB_PORT");
+            connectionString.Append($"Port={port};");
+
+            var database = config.TryGetString("DB_NAME");
+            connectionString.Append($"Database={database};");
+
+            var username = config.TryGetString("DB_USER");
+            connectionString.Append($"Uid={username};");
+
+            var password = config.TryGetString("DB_PASSWORD");
+            connectionString.Append($"Pwd={password};");
+
+            return connectionString.ToString();
         }
 
         private static async Task LogStartAsync(WebApplicationBuilder builder, WebApplication app)
@@ -102,7 +128,7 @@ namespace Presentation
 
             logger.LogInformation("Среда: {environment}", builder.Environment.EnvironmentName);
 
-            logger.LogInformation("Сервер прослушивает: \n{pad}- {host}",new string(' ', 27), string.Join($"\n{new string(' ', 27)}- ", app.Urls));
+            logger.LogInformation("Сервер прослушивает: \n{pad}- {host}", new string(' ', 27), string.Join($"\n{new string(' ', 27)}- ", app.Urls));
 
             logger.LogInformation("Базовый путь API: {pathBase}", app.Configuration["API_PATH_BASE"]);
         }

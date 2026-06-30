@@ -17,12 +17,11 @@
 
   <ItemGroup>
     <Folder Include="AppData\Logs\" />
-    <Folder Include="Attributes\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\CompositionRoot\CompositionRoot.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 

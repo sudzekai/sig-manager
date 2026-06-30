@@ -1,5 +1,5 @@
-﻿using Application.Types.Exceptions;
-using Shared.App;
+﻿using Shared.App;
+using Shared.Types.Exceptions;
 using System.Net;
 
 namespace Application.Services.Command.Handlers

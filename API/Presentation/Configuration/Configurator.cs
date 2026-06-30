@@ -1,9 +1,9 @@
-﻿using Application.Services.ApplicationLifetime;
-using DotNetEnv;
+﻿using DotNetEnv;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Presentation.Objects.Types.Exceptions;
 using Shared.App;
 using Shared.OpenTelemetry.Logging.Exporters;
 using Shared.OpenTelemetry.Tracing.Sources;
@@ -22,7 +22,7 @@ namespace Presentation.Configuration
         public static void ConfigureAPI(this WebApplicationBuilder builder)
         {
             var urls = builder.Configuration["API_ALLOWED_HOSTS"]
-                ?? throw new ArgumentNullException("API_ALLOWED_HOSTS");
+                ?? throw new MissingEnvironmentalVariableException("API_ALLOWED_HOSTS");
 
             builder.WebHost.UseUrls(urls);
         }

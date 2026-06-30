@@ -26,3 +26,28 @@ coverage/
 *.exe
 *.dll
 *.pdb
+
+# Secrets & credentials
+appsettings.*.json
+appsettings.local.json
+*.key
+*.pfx
+*.pem
+secrets.json
+
+# Azure & Cloud
+.azure/
+.awscredentials
+
+# Test coverage
+.nyc_output/
+*.lcov
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+logs/

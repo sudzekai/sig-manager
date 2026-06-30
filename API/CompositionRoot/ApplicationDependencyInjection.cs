@@ -1,0 +1,30 @@
+﻿using Application.Services;
+using Application.Services.Command;
+using Application.Services.Users;
+using Contracts.Interfaces.Application.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace CompositionRoot
+{
+    public static class ApplicationDependencyInjection
+    {
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        {
+            services.AddScoped<ICommandProcessor, CommandProcessor>();
+            services.AddSingleton<IBanIpService, BanIpService>();
+
+            services.AddSingleton<UsersService>();
+
+            services.AddSingleton<IUsersService>(sp =>
+            {
+                var inner = sp.GetRequiredService<UsersService>();
+                var logger = sp.GetRequiredService<ILogger<UsersService>>();
+
+                return new UsersServiceDecorator(inner, logger);
+            });
+
+            return services;
+        }
+    }
+}

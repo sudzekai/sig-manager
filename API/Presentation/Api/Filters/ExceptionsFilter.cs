@@ -1,13 +1,11 @@
-﻿using Application.Types.Exceptions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Presentation.Extensions;
-using Presentation.Responses;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Presentation.Objects.Responses;
+using Presentation.Utilities.Extensions;
 using Shared.OpenTelemetry.Logging.Extensions;
 
 namespace Presentation.Api.Filters
 {
-    internal class ExceptionsFilter : IExceptionFilter
+    public class ExceptionsFilter : IExceptionFilter
     {
         private readonly ILogger<ExceptionsFilter> _logger;
 
@@ -24,7 +22,7 @@ namespace Presentation.Api.Filters
                 return;
 
 
-            if (ex is IApplicationException exception)
+            if (ex is Shared.Types.Exceptions.ApplicationException exception)
             {
                 context.Result = ResponseEnvelope.FromError(exception).ToErroredObjectResult();
                 _logger.CustomLogError(
@@ -45,7 +43,8 @@ namespace Presentation.Api.Filters
                 {
                     ["response.code"] = 500,
                     ["response.message"] = ResponseEnvelope.InternalServerError.Error?.Message,
-                    ["exception.message"] = ex.Message
+                    ["exception.caller"] = ex.Source?.ToString(),
+                    ["exception.message"] = ex.ToString()
                 }
             );
         }

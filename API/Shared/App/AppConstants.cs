@@ -5,12 +5,21 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.0.1";
+        public const string CurrentVersion = "v0.1.0";
 
-        public const string ChangeLog = @"Многослойный каркас .NET 10, DI, OpenTelemetry, BanIp
-Добавлен базовый solution с проектами Application, Infrastructure, Presentation, Shared. 
-Реализованы сервисы команд, BanIp, фильтры, middleware, DI-расширения, интеграция OpenTelemetry, централизованная обработка ошибок и логирование. 
-Добавлены конфиги и шаблоны данных.";
+        public const string ChangeLog = @"Изменения несовместимые с предыдущей версией решения
+Рефакторинг архитектуры: слои, DI, пользователи, валидация
+
+- Введены слои Contracts, Domain, CompositionRoot для разделения интерфейсов, бизнес-логики и регистрации зависимостей
+- Сервисы Application переписаны под новые интерфейсы, добавлен UsersService с декоратором для логирования и трассировки
+- Реализован репозиторий пользователей на MySQL, декоратор, конвертеры и расширения для IDataReader
+- В Presentation добавлен UsersController с CRUD-методами, централизованная валидация моделей через ValidateModelState
+- Переработаны фильтры ошибок и результатов, добавлен глобальный обработчик необработанных исключений
+- В Shared реализованы базовые исключения, утилиты для логирования, маппинга и валидации
+- DI и Program.cs переписаны для использования CompositionRoot
+- Обновлены .gitignore, .csproj, структура решения
+- Удалены устаревшие сервисы и классы, внедрена строгая типизация, улучшено логирование и трассировка
+";
 
         public static readonly string BaseDirectory = AppContext.BaseDirectory;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Presentation.Extensions;
-using Presentation.Responses;
+using Presentation.Objects.Responses;
+using Presentation.Utilities.Extensions;
 using Shared.OpenTelemetry.Logging.Extensions;
 using Shared.OpenTelemetry.Tracing.Sources;
 
@@ -20,8 +20,7 @@ namespace Presentation.Api.Filters
 
         public void OnResultExecuting(ResultExecutingContext context)
         {
-            using var activity =
-                ActivitySourceDictionary.Filters.Response.StartActivity("Сборка ответа клиенту");
+            using var activity = ActivitySourceDictionary.Filters.Response.StartActivity("Сборка ответа клиенту");
 
             switch (context.Result)
             {
