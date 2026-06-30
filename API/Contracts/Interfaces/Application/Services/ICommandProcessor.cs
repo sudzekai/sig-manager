@@ -1,4 +1,4 @@
-﻿using Contracts.Objects.Dtos.Models.Requests;
+﻿using Contracts.Objects.Dtos;
 
 namespace Contracts.Interfaces.Application.Services
 {

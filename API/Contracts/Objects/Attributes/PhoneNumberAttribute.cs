@@ -19,6 +19,5 @@ namespace Contracts.Objects.Attributes
 
             return ValidationResult.Success;
         }
-
     }
 }

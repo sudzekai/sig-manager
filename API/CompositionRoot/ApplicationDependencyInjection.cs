@@ -11,12 +11,14 @@ namespace CompositionRoot
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<ICommandProcessor, CommandProcessor>();
             services.AddSingleton<IBanIpService, BanIpService>();
 
-            services.AddSingleton<UsersService>();
+            services.AddScoped<ICommandProcessor, CommandProcessor>();
+            services.AddScoped<IHashService, HashService>();
 
-            services.AddSingleton<IUsersService>(sp =>
+            services.AddScoped<UsersService>();
+
+            services.AddScoped<IUsersService>(sp =>
             {
                 var inner = sp.GetRequiredService<UsersService>();
                 var logger = sp.GetRequiredService<ILogger<UsersService>>();

@@ -5,21 +5,13 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.1.0";
+        public const string CurrentVersion = "v0.1.1";
 
-        public const string ChangeLog = @"Изменения несовместимые с предыдущей версией решения
-Рефакторинг архитектуры: слои, DI, пользователи, валидация
-
-- Введены слои Contracts, Domain, CompositionRoot для разделения интерфейсов, бизнес-логики и регистрации зависимостей
-- Сервисы Application переписаны под новые интерфейсы, добавлен UsersService с декоратором для логирования и трассировки
-- Реализован репозиторий пользователей на MySQL, декоратор, конвертеры и расширения для IDataReader
-- В Presentation добавлен UsersController с CRUD-методами, централизованная валидация моделей через ValidateModelState
-- Переработаны фильтры ошибок и результатов, добавлен глобальный обработчик необработанных исключений
-- В Shared реализованы базовые исключения, утилиты для логирования, маппинга и валидации
-- DI и Program.cs переписаны для использования CompositionRoot
-- Обновлены .gitignore, .csproj, структура решения
-- Удалены устаревшие сервисы и классы, внедрена строгая типизация, улучшено логирование и трассировка
-";
+        public const string ChangeLog = @"Добавлена фильтрация и сортировка пользователей, Argon2
+Реализована поддержка фильтрации, поиска и сортировки пользователей через GetUsersListRequest во всех слоях. 
+Добавлен сервис хеширования паролей на Argon2id (IHashService, HashService). 
+Изменены интерфейсы и DI-композиция, внедрён OneOfAttribute для валидации сортировки. 
+Улучшено логирование SQL и уровень логирования по умолчанию. Обновлены версии и DTO.";
 
         public static readonly string BaseDirectory = AppContext.BaseDirectory;
 

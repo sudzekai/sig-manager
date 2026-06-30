@@ -1,4 +1,5 @@
 ﻿using Contracts.Interfaces.Application.Services;
+using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Microsoft.Extensions.Logging;
 using Shared.OpenTelemetry.Logging.Extensions;
@@ -40,11 +41,11 @@ namespace Application.Services.Users
             _logger.CustomLogDebug($"Пользователь с id: {id} удалён");
         }
 
-        public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync()
+        public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {
             using var activity = _activitySource.StartActivity(nameof(GetAllAsync));
 
-            var result = await _inner.GetAllAsync();
+            var result = await _inner.GetAllAsync(request);
 
             _logger.CustomLogDebug($"Получен список пользователей", new() { ["count"] = result.Count });
 

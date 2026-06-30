@@ -1,10 +1,13 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
+using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
 using Infrastructure.Internal.Conveters;
+using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.User;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
+using System.Text;
 
 namespace Infrastructure.Repositories.Users
 {
@@ -38,6 +41,8 @@ namespace Infrastructure.Repositories.Users
                 new("roleId", user.RoleId)
             ];
 
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
+
             var idObj = await _db.ExecuteScalarAsync(query, parameters);
 
             var id = Convert.ToInt32(idObj);
@@ -54,17 +59,92 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("id", id)];
 
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
+
             await _db.ExecuteNonQueryAsync(query, parameters);
         }
 
-        public async Task<IReadOnlyList<User>> GetAllAsync()
+        public async Task<IReadOnlyList<User>> GetAllAsync(GetUsersListRequest request)
         {
-            var query = $@"
+            StringBuilder query = new($@"
                 SELECT {string.Join(", ", UserSelects.Simple)} 
-                FROM {UserSchema.TableName};
-            ";
+                FROM {UserSchema.TableName}
+                WHERE 1=1
+            ");
 
-            using var reader = await _db.ExecuteReaderAsync(query);
+            List<MySqlParameter> parameters = [];
+
+            if (request.RoleId.HasValue)
+            {
+                query.Append($"\nAND {UserSchema.RoleId} = @roleId");
+                parameters.Add(new("roleId", request.RoleId.Value));
+            }
+
+            if (request.CreatedAtStart != default)
+            {
+                query.Append($"\nAND {UserSchema.CreatedAt} > @createdAtStart");
+                parameters.Add(new("createdAtStart", request.CreatedAtStart));
+            }
+
+            if (request.CreatedAtEnd != default)
+            {
+                query.Append($"\nAND {UserSchema.CreatedAt} < @createdAtEnd");
+                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
+            }
+
+            if (request.UpdatedAtStart != default)
+            {
+                query.Append($"\nAND {UserSchema.UpdatedAt} > @updatedAtStart");
+                parameters.Add(new("updatedAtStart", request.UpdatedAtStart));
+            }
+
+            if (request.UpdatedAtEnd != default)
+            {
+                query.Append($"\nAND {UserSchema.UpdatedAt} < @updatedAtEnd");
+                parameters.Add(new("updatedAtEnd", request.UpdatedAtEnd));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                query.Append(@$"
+                    AND ({UserSchema.Username} LIKE @searchFull 
+                    OR {UserSchema.FullName} LIKE @searchFull 
+                    OR {UserSchema.Email} LIKE @searchStart 
+                    OR {UserSchema.PhoneNumber} LIKE @searchEnd)
+                ");
+
+                parameters.Add(new("searchFull", $"%{request.SearchTerm}%"));
+                parameters.Add(new("searchStart", $"{request.SearchTerm}%"));
+                parameters.Add(new("searchEnd", $"%{request.SearchTerm}"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            {
+                var orderBy = request.OrderBy.ToLower() switch
+                {
+                    "username" => UserSchema.Username,
+                    "fullname" => UserSchema.FullName,
+                    "role" => UserSchema.RoleId,
+                    "createdate" => UserSchema.CreatedAt,
+                    "updatedate" => UserSchema.UpdatedAt,
+                    _ => UserSchema.Id
+                };
+
+                var orderDirection = request.OrderDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
+                    ? "ASC"
+                    : "DESC";
+
+                query.Append($"\nORDER BY {orderBy} {orderDirection}");
+            }
+
+            query.Append($"\nLIMIT @limit OFFSET @offset;");
+
+            parameters.Add(new("limit", request.Limit));
+            parameters.Add(new("offset", request.Offset));
+
+            _logger.CustomLogDebugSqlExecution(query.ToString(), [.. parameters]);
+
+            using var reader = await _db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
 
             var result = UserConverter.ListFromReader(reader);
 
@@ -80,6 +160,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("email", email)];
+
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -98,6 +180,8 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("id", id)];
 
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
+
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -114,6 +198,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
+
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -132,6 +218,8 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("username", username)];
 
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
+
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -148,6 +236,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("id", id)];
+
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -184,6 +274,8 @@ namespace Infrastructure.Repositories.Users
                 new("updatedAt", user.UpdatedAt),
                 new("roleId", user.RoleId)
             ];
+
+            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             await _db.ExecuteNonQueryAsync(query, parameters);
         }

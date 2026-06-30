@@ -1,4 +1,5 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
+using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
 using Shared.OpenTelemetry.Tracing.Sources;
 using System.Diagnostics;
@@ -15,10 +16,10 @@ namespace Infrastructure.Repositories.Users
             _inner = inner;
         }
 
-        public async Task<IReadOnlyList<User>> GetAllAsync()
+        public async Task<IReadOnlyList<User>> GetAllAsync(GetUsersListRequest request)
         {
             using var activity = _activitySource.StartActivity(nameof(GetAllAsync));
-            return await _inner.GetAllAsync();
+            return await _inner.GetAllAsync(request);
         }
 
         public async Task<User?> GetByIdAsync(int id)

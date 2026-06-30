@@ -1,5 +1,5 @@
 ﻿using Contracts.Interfaces.Application.Services;
-using Contracts.Objects.Dtos.Models.Requests;
+using Contracts.Objects.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Attributes;
 using Shared.OpenTelemetry.Tracing.Sources;

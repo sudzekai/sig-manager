@@ -1,8 +1,8 @@
 ﻿using Contracts.Interfaces.Application.Services;
 using Contracts.Interfaces.Infrastructure.Repositories;
+using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Domain.Models;
-using Microsoft.Extensions.Logging;
 using Shared.Types.Exceptions;
 
 namespace Application.Services.Users
@@ -10,12 +10,12 @@ namespace Application.Services.Users
     public class UsersService : IUsersService
     {
         private readonly IUserRepository _repository;
-        private readonly ILogger<UsersService> _logger;
+        private readonly IHashService _hashService;
 
-        public UsersService(IUserRepository repository, ILogger<UsersService> logger)
+        public UsersService(IUserRepository repository, IHashService hashService)
         {
             _repository = repository;
-            _logger = logger;
+            _hashService = hashService;
         }
 
         public async Task<UserInfoDto> CreateAsync(UserCreateDto createDto)
@@ -29,7 +29,9 @@ namespace Application.Services.Users
             if (await IsPhoneNumberExistsAsync(createDto.PhoneNumber))
                 throw new BadRequestException("Пользователь с таким номером телефона уже существует");
 
-            User user = new(createDto.Username, createDto.FullName, createDto.Email, createDto.PhoneNumber, createDto.Password, 1);
+            string passwordHash = _hashService.HashString(createDto.Password);
+
+            User user = new(createDto.Username, createDto.FullName, createDto.Email, createDto.PhoneNumber, passwordHash, 1);
 
             var id = await _repository.CreateAsync(user);
 
@@ -46,9 +48,9 @@ namespace Application.Services.Users
             await _repository.DeleteByIdAsync(id);
         }
 
-        public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync()
+        public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {
-            var result = await _repository.GetAllAsync();
+            var result = await _repository.GetAllAsync(request);
 
             return [.. result.Select(x => new UserSimpleDto(x.Id, x.Username, x.FullName))];
         }
@@ -95,7 +97,9 @@ namespace Application.Services.Users
             var user = await _repository.GetFullByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден");
 
-            user.ChangePasswordHash(updateDto.Password);
+            string passwordHash = _hashService.HashString(updateDto.Password);
+
+            user.ChangePasswordHash(passwordHash);
 
             await _repository.UpdateAsync(user);
         }

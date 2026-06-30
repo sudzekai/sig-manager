@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Contracts.Objects.Dtos.Models.Requests
+namespace Contracts.Objects.Dtos
 {
     public class CommandDto
     {

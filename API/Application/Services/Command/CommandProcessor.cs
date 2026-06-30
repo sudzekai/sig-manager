@@ -1,6 +1,6 @@
 ﻿using Application.Services.Command.Handlers;
 using Contracts.Interfaces.Application.Services;
-using Contracts.Objects.Dtos.Models.Requests;
+using Contracts.Objects.Dtos;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared.OpenTelemetry.Logging.Extensions;

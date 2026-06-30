@@ -1,10 +1,11 @@
-﻿using Contracts.Objects.Dtos.User;
+﻿using Contracts.Objects.Dtos.Requests;
+using Contracts.Objects.Dtos.User;
 
 namespace Contracts.Interfaces.Application.Services
 {
     public interface IUsersService
     {
-        Task<IReadOnlyList<UserSimpleDto>> GetAllAsync();
+        Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request);
         Task<UserInfoDto> GetById(int id);
         Task<UserInfoDto> GetByUsernameAsync(string username);
 

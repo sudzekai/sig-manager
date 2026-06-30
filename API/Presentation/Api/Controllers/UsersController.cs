@@ -1,4 +1,5 @@
 ﻿using Contracts.Interfaces.Application.Services;
+using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Attributes;
@@ -25,11 +26,11 @@ namespace Presentation.Api.Controllers
 
         [HttpGet]
         [ValidateModelState]
-        public async Task<IReadOnlyList<UserSimpleDto>> GetAll()
+        public async Task<IReadOnlyList<UserSimpleDto>> GetAll([FromQuery] GetUsersListRequest request)
         {
             using var activity = _activitySource.StartActivity(nameof(GetAll));
 
-            return await _service.GetAllAsync();
+            return await _service.GetAllAsync(request);
         }
 
         [HttpGet("{Id}")]

@@ -20,9 +20,9 @@ namespace CompositionRoot
 
         public static IServiceCollection AddScopedRepositories(this IServiceCollection services)
         {
-            services.AddSingleton<UserRepository>();
+            services.AddScoped<UserRepository>();
 
-            services.AddSingleton<IUserRepository>(sp =>
+            services.AddScoped<IUserRepository>(sp =>
             {
                 var inner = sp.GetRequiredService<UserRepository>();
 
