@@ -5,7 +5,7 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.1.1";
+        public const string CurrentVersion = "v0.1.2";
 
         public const string ChangeLog = @"(WIP) Добавлена инфраструктура для работы с автомобилями (Car)
 Введены модели, DTO и репозиторий для сущности Car, реализованы схемы и селекты для таблицы cars, добавлен декоратор с трассировкой. 
