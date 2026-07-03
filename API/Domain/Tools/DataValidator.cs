@@ -40,6 +40,18 @@ namespace Domain.Tools
                 throw new DataValidationException($"{fieldName} должен быть меньше {max+1}");
         }
 
+        public static void Min(decimal value, decimal min, string fieldName)
+        {
+            if (value < min)
+                throw new DataValidationException($"{fieldName} должен быть больше {min-1}");
+        }
+
+        public static void Max(decimal value, decimal max, string fieldName)
+        {
+            if (value > max)
+                throw new DataValidationException($"{fieldName} должен быть меньше {max+1}");
+        }
+
         public static void OneOf(string value, List<string> enums, string fieldName)
         {
             if (!enums.Any(x => x.Equals(value, StringComparison.OrdinalIgnoreCase)))
