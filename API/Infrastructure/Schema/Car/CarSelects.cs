@@ -1,6 +1,4 @@
-﻿using Infrastructure.Schema.User;
-
-namespace Infrastructure.Schema.Car
+﻿namespace Infrastructure.Schema.Car
 {
     internal class CarSelects
     {

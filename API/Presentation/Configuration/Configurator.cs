@@ -59,8 +59,6 @@ namespace Presentation.Configuration
                             o.Endpoint = new Uri(grpcOtlp);
                         });
 
-                    t.AddConsoleExporter();
-
                     t.SetSampler(new AlwaysOnSampler());
                 })
                 .WithLogging(l =>

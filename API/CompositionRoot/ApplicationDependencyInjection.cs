@@ -23,7 +23,7 @@ namespace CompositionRoot
                 var inner = sp.GetRequiredService<UsersService>();
                 var logger = sp.GetRequiredService<ILogger<UsersService>>();
 
-                return new UsersServiceDecorator(inner, logger);
+                return new UsersServiceDecorator(inner);
             });
 
             return services;

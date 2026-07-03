@@ -5,7 +5,10 @@ using Domain.Models;
 using Infrastructure.Internal.Conveters;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;
+using Shared.Extensions;
+using System.Diagnostics;
 using System.Text;
+using Shared.Types.Enums;
 
 namespace Infrastructure.Repositories.Users
 {
@@ -32,6 +35,8 @@ namespace Infrastructure.Repositories.Users
                 new("roleId", user.RoleId)
             ];
 
+            Activity.Current?.SetSqlTag(DbOperation.INSERT, parameters.Length);
+
             var idObj = await _db.ExecuteScalarAsync(query, parameters);
 
             var id = Convert.ToInt32(idObj);
@@ -47,6 +52,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("id", id)];
+
+            Activity.Current?.SetSqlTag(DbOperation.DELETE, parameters.Length);
 
             await _db.ExecuteNonQueryAsync(query, parameters);
         }
@@ -129,6 +136,8 @@ namespace Infrastructure.Repositories.Users
             parameters.Add(new("limit", request.Limit));
             parameters.Add(new("offset", request.Offset));
 
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Count);
+
             using var reader = await _db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
 
             var result = UserConverter.ListFromReader(reader);
@@ -145,6 +154,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("email", email)];
+
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -163,6 +174,8 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("id", id)];
 
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -179,6 +192,8 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
+
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -197,6 +212,8 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("username", username)];
 
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+            
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -214,6 +231,8 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("id", id)];
 
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+            
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -250,6 +269,8 @@ namespace Infrastructure.Repositories.Users
                 new("roleId", user.RoleId)
             ];
 
+            Activity.Current?.SetSqlTag(DbOperation.UPDATE, parameters.Length);
+            
             await _db.ExecuteNonQueryAsync(query, parameters);
         }
     }

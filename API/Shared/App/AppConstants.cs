@@ -5,24 +5,18 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.1.3";
+        public const string CurrentVersion = "v0.1.4";
 
 
-        public const string ChangeLog = 
+        public const string ChangeLog =
             """
-            Рефакторинг логирования и трассировки, переход на OTEL
+            Расширена трассировка с помощью Activity и OTel
 
-            - Удалены самописные классы и расширения для логирования/трассировки
-            - Внедрён Telemetry с единым ActivitySource для всех слоёв
-            - Добавлен кастомный консольный лог-форматтер с цветами
-            - Везде используется стандартный ILogger и OTEL ActivitySource
-            - Поддержка экспорта логов и трейсов в OTLP через .env
-            - Изменена иерархия исключений, добавлен ConflictException
-            - Удалено логирование SQL-запросов в репозиториях
-            - Обновлены шаблоны .env, DI и конфигурация
-            - Исправлены имена параметров маршрута в контроллерах
-            - Удалены устаревшие утилиты для валидации и маппинга
-            - Унифицирована структура ошибок в ответах API
+            Добавлена расширенная трассировка сервисов и репозиториев через Activity и OpenTelemetry: 
+            - Внедрены новые методы StartServiceActivity/StartRepositoryActivity
+            - Добавлены теги операций и результата, реализован enum DbOperation и ActivityExtensions. 
+            - Улучшено логирование ошибок и результатов в фильтрах и middleware. 
+            - Проведён рефакторинг для поддержки новых возможностей трассировки.
             """;
 
         public static TextWriter StandartWriter { get; set; } = Console.Out;

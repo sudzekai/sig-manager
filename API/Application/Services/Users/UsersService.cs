@@ -4,6 +4,7 @@ using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Domain.Models;
 using Shared.Types.Exceptions;
+using System.Diagnostics;
 
 namespace Application.Services.Users
 {
@@ -29,7 +30,7 @@ namespace Application.Services.Users
 
             var id = await _repository.CreateAsync(user);
 
-            var created = await _repository.GetInfoByIdAsync(id);
+            var created = await _repository.GetInfoByIdAsync(id) ?? throw new InternalServerException("Внутренняя ошибка сервера", "internal error: created user was null");
 
             return new(created.Id, created.Username, created.FullName, created.Email, created.PhoneNumber);
         }
@@ -62,26 +63,44 @@ namespace Application.Services.Users
             var user = await _repository.GetInfoByUsernameAsync(username) ??
                 throw new NotFoundException("Пользователь с таким именем пользователя не найден", $"username: {username} doesn't exist");
 
+
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
         }
 
         public async Task UpdateInfoByIdAsync(int id, UserInfoUpdateDto updateDto)
         {
+            Activity.Current?.SetTag("db.entity.id", id);
+
             var user = await _repository.GetFullByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             if (updateDto.Username != null)
+            {
+                if (await IsUsernameExistsAsync(updateDto.Username, id))
+                    throw new ConflictException("Пользователь с таким именем уже существует", $"username: {updateDto.Username} exists");
+
                 user.ChangeUsername(updateDto.Username);
+            }
 
             if (updateDto.FullName != null)
                 user.ChangeFullName(updateDto.FullName);
 
             if (updateDto.Email != null)
+            {
+                if (await IsEmailExistsAsync(updateDto.Email, id))
+                    throw new ConflictException("Пользователь с такой электронной почтой уже существует", $"email: {updateDto.Email} exists");
+
                 user.ChangeEmail(updateDto.Email);
+            }
 
             if (updateDto.PhoneNumber != null)
+            {
+                if (await IsPhoneNumberExistsAsync(updateDto.PhoneNumber))
+                    throw new ConflictException("Пользователь с таким номером телефона уже существует", $"phoneNumber: {updateDto.PhoneNumber} exists");
+
                 user.ChangePhoneNumber(updateDto.PhoneNumber);
 
+            }
 
             await _repository.UpdateAsync(user);
         }

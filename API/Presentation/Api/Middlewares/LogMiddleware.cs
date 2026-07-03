@@ -23,6 +23,22 @@ namespace Presentation.Api.Middlewares
             stopwatch.Stop();
 
             logger.LogInformation("Ответ на запрос: {StatusCode} lat: {Duration}ms", context.Response.StatusCode, stopwatch.Elapsed.TotalMilliseconds);
+
+            activity?.SetTag("response.code", context.Response.StatusCode);
+
+            var hasError = context.Items.TryGetValue("error.occurred", out var err);
+
+            var errorType = context.Items.TryGetValue("error.type", out var type)
+                ? type?.ToString()
+                : null;
+
+            if (errorType != null)
+            {
+                if (errorType == "internal")
+                    activity?.SetFailed();
+
+                activity?.SetTag("error.type", type);
+            }
         }
     }
 }

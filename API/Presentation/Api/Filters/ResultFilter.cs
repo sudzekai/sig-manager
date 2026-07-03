@@ -7,15 +7,13 @@ using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Filters
 {
-    public class ResultFilter(ILogger<ResultFilter> logger) : IResultFilter
+    public class ResultFilter : IResultFilter
     {
-        private readonly ILogger<ResultFilter> _logger = logger;
-
         public void OnResultExecuted(ResultExecutedContext context) { }
 
         public void OnResultExecuting(ResultExecutingContext context)
         {
-            using var activity = Telemetry.Filter.StartRichActivity();
+            using var activity = Telemetry.Filter.StartRichActivity("Result filter");
 
             switch (context.Result)
             {
