@@ -16,7 +16,7 @@
 
         public static ResponseEnvelope FromData(object? data) => new(data);
 
-        public static ResponseEnvelope FromError(Shared.Types.Exceptions.ApplicationException ex) => new(new Error(ex.Code, ex.Message));
+        public static ResponseEnvelope FromError(Shared.Types.Exceptions.ApplicationException ex) => new(new Error(ex.Code, ex.BusinessMessage));
 
         public static ResponseEnvelope InternalServerError  => new(new Error(500, "Внутренняя ошибка сервера"));
 

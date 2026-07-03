@@ -3,24 +3,15 @@ using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
 using Infrastructure.Internal.Conveters;
-using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.User;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Text;
 
 namespace Infrastructure.Repositories.Users
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(IDbContext db) : IUserRepository
     {
-        private readonly IDbContext _db;
-        private readonly ILogger<UserRepository> _logger;
-
-        public UserRepository(IDbContext db, ILogger<UserRepository> logger)
-        {
-            _db = db;
-            _logger = logger;
-        }
+        private readonly IDbContext _db = db;
 
         public async Task<int> CreateAsync(User user)
         {
@@ -41,8 +32,6 @@ namespace Infrastructure.Repositories.Users
                 new("roleId", user.RoleId)
             ];
 
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
-
             var idObj = await _db.ExecuteScalarAsync(query, parameters);
 
             var id = Convert.ToInt32(idObj);
@@ -58,8 +47,6 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("id", id)];
-
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             await _db.ExecuteNonQueryAsync(query, parameters);
         }
@@ -142,8 +129,6 @@ namespace Infrastructure.Repositories.Users
             parameters.Add(new("limit", request.Limit));
             parameters.Add(new("offset", request.Offset));
 
-            _logger.CustomLogDebugSqlExecution(query.ToString(), [.. parameters]);
-
             using var reader = await _db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
 
             var result = UserConverter.ListFromReader(reader);
@@ -160,8 +145,6 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("email", email)];
-
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -180,8 +163,6 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("id", id)];
 
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
-
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -198,8 +179,6 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
-
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -218,8 +197,6 @@ namespace Infrastructure.Repositories.Users
 
             MySqlParameter[] parameters = [new("username", username)];
 
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
-
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
@@ -236,8 +213,6 @@ namespace Infrastructure.Repositories.Users
             ";
 
             MySqlParameter[] parameters = [new("id", id)];
-
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             using var reader = await _db.ExecuteReaderAsync(query, parameters);
 
@@ -274,8 +249,6 @@ namespace Infrastructure.Repositories.Users
                 new("updatedAt", user.UpdatedAt),
                 new("roleId", user.RoleId)
             ];
-
-            _logger.CustomLogDebugSqlExecution(query, [.. parameters]);
 
             await _db.ExecuteNonQueryAsync(query, parameters);
         }

@@ -6,14 +6,14 @@ namespace Presentation.DI
 {
     internal static class DependencyInjection
     {
-        public static IServiceCollection AddTransietMiddleware(this IServiceCollection services)
+        public static IServiceCollection AddMiddleware(this IServiceCollection services)
         {
             services.AddTransient<LogMiddleware>();
 
             return services;
         }
 
-        public static IServiceCollection AddScopedFilters(this IServiceCollection services)
+        public static IServiceCollection AddFilters(this IServiceCollection services)
         {
             services.AddScoped<IExceptionFilter, ExceptionsFilter>();
             services.AddScoped<IResultFilter, ResultFilter>();

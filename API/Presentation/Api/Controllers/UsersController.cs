@@ -6,47 +6,40 @@ using Presentation.Attributes;
 using Presentation.Objects.Requests;
 using Presentation.Objects.Responses;
 using Presentation.Utilities.Extensions;
-using Shared.OpenTelemetry.Tracing.Sources;
-using System.Diagnostics;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Controllers
 {
     [ApiController]
     [Route("/users")]
-    public class UsersController
+    public class UsersController(IUsersService service)
     {
-        private readonly IUsersService _service;
-        private readonly ActivitySource _activitySource = ActivitySourceDictionary.Controllers.Users;
-
-        public UsersController(IUsersService service, ActivitySource activitySource)
-        {
-            _service = service;
-            _activitySource = activitySource;
-        }
+        private readonly IUsersService _service = service;
 
         [HttpGet]
         [ValidateModelState]
         public async Task<IReadOnlyList<UserSimpleDto>> GetAll([FromQuery] GetUsersListRequest request)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetAll));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             return await _service.GetAllAsync(request);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ValidateModelState]
-        public async Task<UserInfoDto> GetById([FromRoute] IdRoute route)
+        public async Task<UserInfoDto> GetById([FromRoute(Name = "id")] IdRoute route)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetById));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             return await _service.GetById(route.Id);
         }
 
-        [HttpGet("username/{Value}")]
+        [HttpGet("username/{value}")]
         [ValidateModelState]
-        public async Task<UserInfoDto> GetByUsername([FromRoute] StringRoute route)
+        public async Task<UserInfoDto> GetByUsername([FromRoute(Name = "value")] StringRoute route)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetByUsername));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             return await _service.GetByUsernameAsync(route.Value);
         }
@@ -55,45 +48,45 @@ namespace Presentation.Api.Controllers
         [ValidateModelState]
         public async Task<IActionResult> Post([FromBody] UserCreateDto body)
         {
-            using var activity = _activitySource.StartActivity(nameof(Post));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             var result = await _service.CreateAsync(body);
 
             return ResponseEnvelope.FromData(result).ToCreatedObjectResult();
         }
 
-        [HttpPut("{Id}/info")]
+        [HttpPut("{id}/info")]
         [ValidateModelState]
-        public async Task PutInfoById([FromRoute] IdRoute route, [FromBody] UserInfoUpdateDto body)
+        public async Task PutInfoById([FromRoute(Name = "id")] IdRoute route, [FromBody] UserInfoUpdateDto body)
         {
-            using var activity = _activitySource.StartActivity(nameof(PutInfoById));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             await _service.UpdateInfoByIdAsync(route.Id, body);
         }
 
-        [HttpPut("{Id}/password")]
+        [HttpPut("{id}/password")]
         [ValidateModelState]
-        public async Task PutPasswordById([FromRoute] IdRoute route, [FromBody] UserPasswordUpdateDto body)
+        public async Task PutPasswordById([FromRoute(Name = "id")] IdRoute route, [FromBody] UserPasswordUpdateDto body)
         {
-            using var activity = _activitySource.StartActivity(nameof(PutPasswordById));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             await _service.UpdatePasswordByIdAsync(route.Id, body);
         }
 
-        [HttpPut("{Id}/role")]
+        [HttpPut("{id}/role")]
         [ValidateModelState]
-        public async Task PutRoleById([FromRoute] IdRoute route, [FromBody] UserRoleUpdateDto body)
+        public async Task PutRoleById([FromRoute(Name = "id")] IdRoute route, [FromBody] UserRoleUpdateDto body)
         {
-            using var activity = _activitySource.StartActivity(nameof(PutRoleById));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             await _service.UpdateRoleByIdAsync(route.Id, body);
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         [ValidateModelState]
-        public async Task DeleteById([FromRoute] IdRoute route)
+        public async Task DeleteById([FromRoute(Name = "id")] IdRoute route)
         {
-            using var activity = _activitySource.StartActivity(nameof(DeleteById));
+            using var activity = Telemetry.Controller.StartRichActivity();
 
             await _service.DeleteByIdAsync(route.Id);
         }

@@ -2,25 +2,20 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Presentation.Objects.Responses;
 using Presentation.Utilities.Extensions;
-using Shared.OpenTelemetry.Logging.Extensions;
-using Shared.OpenTelemetry.Tracing.Sources;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Filters
 {
-    public class ResultFilter : IResultFilter
+    public class ResultFilter(ILogger<ResultFilter> logger) : IResultFilter
     {
-        private readonly ILogger<ResultFilter> _logger;
-
-        public ResultFilter(ILogger<ResultFilter> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<ResultFilter> _logger = logger;
 
         public void OnResultExecuted(ResultExecutedContext context) { }
 
         public void OnResultExecuting(ResultExecutingContext context)
         {
-            using var activity = ActivitySourceDictionary.Filters.Response.StartActivity("Сборка ответа клиенту");
+            using var activity = Telemetry.Filter.StartRichActivity();
 
             switch (context.Result)
             {
@@ -41,14 +36,6 @@ namespace Presentation.Api.Filters
                     context.Result = new NoContentResult();
                     break;
             }
-
-            _logger.CustomLogInfo(
-                "Успешный ответ на запрос",
-                new()
-                {
-                    ["response.code"] = context.HttpContext.Response.StatusCode
-                }
-            );
         }
     }
 }

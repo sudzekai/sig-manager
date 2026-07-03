@@ -14,7 +14,7 @@ namespace Presentation.Attributes
                         .SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage));
 
-                throw new BadRequestException(errors);
+                throw new BadRequestException(errors, "incorrect input");
             }
         }
     }

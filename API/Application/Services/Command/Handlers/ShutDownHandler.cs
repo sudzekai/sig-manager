@@ -2,14 +2,9 @@
 
 namespace Application.Services.Command.Handlers
 {
-    internal class ShutDownHandler : ICommandHandler
+    internal class ShutDownHandler(IHostApplicationLifetime hostApplicationLifetime) : ICommandHandler
     {
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
-
-        public ShutDownHandler(IHostApplicationLifetime hostApplicationLifetime)
-        {
-            _hostApplicationLifetime = hostApplicationLifetime;
-        }
+        private readonly IHostApplicationLifetime _hostApplicationLifetime = hostApplicationLifetime;
 
         public string CommandName { get; } = "exit";
 

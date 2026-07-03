@@ -19,6 +19,8 @@ namespace Presentation
             await Configurator.ConfigureEnvironmentAsync();
             GlobalExceptionHandler.Register();
 
+            AppConstants.StandartWriter = Console.Out;
+
             var builder = WebApplication.CreateBuilder(args);
 
             // global
@@ -35,8 +37,8 @@ namespace Presentation
             builder.Services.AddApplicationServices();
 
             // presentation
-            builder.Services.AddScopedFilters();
-            builder.Services.AddTransietMiddleware();
+            builder.Services.AddFilters();
+            builder.Services.AddMiddleware();
 
             builder.Services.AddControllers(o =>
             {
@@ -52,8 +54,7 @@ namespace Presentation
 
             var app = builder.Build();
 
-            var pathBase = builder.Configuration["API_PATH_BASE"]
-                ?? throw new ArgumentNullException("API_PATH_BASE");
+            var pathBase = builder.Configuration.TryGetString("API_PATH_BASE");
 
             app.UseAppLifetimeLogging();
 
@@ -128,7 +129,7 @@ namespace Presentation
 
             logger.LogInformation("Среда: {environment}", builder.Environment.EnvironmentName);
 
-            logger.LogInformation("Сервер прослушивает: \n{pad}- {host}", new string(' ', 27), string.Join($"\n{new string(' ', 27)}- ", app.Urls));
+            logger.LogInformation("Сервер прослушивает: {host}", string.Join(", ", app.Urls));
 
             logger.LogInformation("Базовый путь API: {pathBase}", app.Configuration["API_PATH_BASE"]);
         }

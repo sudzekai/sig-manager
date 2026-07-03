@@ -1,12 +1,11 @@
 ﻿using DotNetEnv;
-using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Presentation.Objects.Types.Exceptions;
+using Presentation.Utilities.Extensions;
+using Presentation.Utilities.Logging;
 using Shared.App;
-using Shared.OpenTelemetry.Logging.Exporters;
-using Shared.OpenTelemetry.Tracing.Sources;
+using Shared.OpenTelemetry;
 
 namespace Presentation.Configuration
 {
@@ -21,15 +20,25 @@ namespace Presentation.Configuration
 
         public static void ConfigureAPI(this WebApplicationBuilder builder)
         {
-            var urls = builder.Configuration["API_ALLOWED_HOSTS"]
-                ?? throw new MissingEnvironmentalVariableException("API_ALLOWED_HOSTS");
-
+            var urls = builder.Configuration.TryGetString("API_ALLOWED_HOSTS");
             builder.WebHost.UseUrls(urls);
         }
 
         public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
         {
             builder.Logging.ClearProviders();
+
+            builder.Logging.AddConsole(o =>
+            {
+                o.FormatterName = "custom";
+            });
+
+            builder.Services.AddLogging(logging =>
+            {
+                logging.AddConsoleFormatter<LogFormatter, LogFormatterOptions>();
+            });
+
+            var grpcOtlp = builder.Configuration.TryGetNullableString("OLTP_ENDPOINT");
 
             builder.Services.AddOpenTelemetry()
                 .ConfigureResource(r =>
@@ -38,29 +47,29 @@ namespace Presentation.Configuration
                 })
                 .WithTracing(t =>
                 {
-                    t.AddSource(ActivitySourceDictionary.Sources.UserList);
-                    t.AddSource(ActivitySourceDictionary.Sources.ShiftList);
-                    t.AddSource(ActivitySourceDictionary.Sources.MiddlewareList);
-                    t.AddSource(ActivitySourceDictionary.Sources.FiltersList);
+                    t.AddSource(Telemetry.Controller.Name);
+                    t.AddSource(Telemetry.Service.Name);
+                    t.AddSource(Telemetry.Repository.Name);
+                    t.AddSource(Telemetry.Middleware.Name);
+                    t.AddSource(Telemetry.Filter.Name);
 
-                    //t.AddProcessor(
-                    //    new SimpleActivityExportProcessor(
-                    //        new TracingFileExporter("trace.log"))
-                    //    );
+                    if (!string.IsNullOrWhiteSpace(grpcOtlp))
+                        t.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(grpcOtlp);
+                        });
+
+                    t.AddConsoleExporter();
 
                     t.SetSampler(new AlwaysOnSampler());
                 })
                 .WithLogging(l =>
                 {
-                    //l.AddProcessor(
-                    //    new SimpleLogRecordExportProcessor(
-                    //        new LoggingFileExporter("applog.log"))
-                    //    );
-
-                    l.AddProcessor(
-                        new SimpleLogRecordExportProcessor(
-                            new LoggingConsoleExporter(Console.Out))
-                        );
+                    if (!string.IsNullOrWhiteSpace(grpcOtlp))
+                        l.AddOtlpExporter(o =>
+                        {
+                            o.Endpoint = new Uri(grpcOtlp);
+                        });
                 });
 
             builder.Services.Configure<OpenTelemetryLoggerOptions>(o =>
@@ -80,15 +89,32 @@ namespace Presentation.Configuration
 
             if (!File.Exists(AppConstants.DotEnvFullPath))
                 await File.WriteAllTextAsync(AppConstants.DotEnvFullPath,
-@"API_PATH_BASE=/api
+                    """
+                    # OLTP_ENDPOINT используется для трансферинга otel логов и трейсеров в OLTP систему. Если не указано, то логи не будут отправляться в OLTP систему.
+                    OLTP_ENDPOINT=
 
-API_ALLOWED_HOSTS=http://*:8080
+                    # API_BASE_PATH используется для указания базового пути API. Обязательное поле.
+                    API_BASE_PATH=/api
 
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=db
-DB_USER=root
-DB_PASSWORD=root");
+                    # API_ALLOWED_HOSTS используется для указания разрешенных хостов для API. Обязательное поле.
+                    API_ALLOWED_HOSTS=http://*:8080
+
+                    # DB_HOST используется для указания хоста базы данных. Обязательное поле.
+                    DB_HOST=localhost
+
+                    # DB_HOST используется для указания хоста базы данных. Обязательное поле.
+                    DB_PORT=3306
+
+                    # DB_NAME используется для указания имени базы данных. Обязательное поле.
+                    DB_NAME=db
+
+                    # DB_USER используется для указания имени пользователя базы данных. Обязательное поле.
+                    DB_USER=root
+
+                    # DB_USER используется для указания пароля пользователя базы данных. Обязательное поле.
+                    DB_PASSWORD=root
+                    """
+                );
 
             if (!File.Exists(AppConstants.BanIpListFullPath))
                 await File.WriteAllTextAsync(AppConstants.BanIpListFullPath, "[]");

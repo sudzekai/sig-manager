@@ -1,4 +1,6 @@
 ﻿using Shared.App;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 using Shared.Types.Exceptions;
 using System.Net;
 
@@ -10,8 +12,10 @@ namespace Application.Services.Command.Handlers
 
         public async Task<string> HandleAsync(string[] args)
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             if (args.Length == 0)
-                throw new BadRequestException("использование: banip (add|remove|reload|show) (<ipv4>)");
+                throw new BadRequestException("использование: banip (add|remove|reload|show) (<ipv4>)", "banip command invalid input: args == 0");
 
             var cmd = args[0];
 
@@ -27,18 +31,18 @@ namespace Application.Services.Command.Handlers
             if (cmd == "add" || cmd == "remove")
             {
                 if (args.Length < 2)
-                    throw new BadRequestException("использование: (banip add|remove) <ipv4>");
+                    throw new BadRequestException("использование: (banip add|remove) <ipv4>", "banip command invalid input: args < 2");
 
                 var ip = args[1];
 
                 if (!IPAddress.TryParse(ip, out var addr) ||
                     addr.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
-                    throw new BadRequestException("неверный формат ipv4");
+                    throw new BadRequestException("неверный формат ipv4", "banip command invalid input: ipv4 validation error");
 
                 if (cmd == "add")
                 {
                     if (AppCache.BanIp.List.Contains(ip))
-                        throw new BadRequestException("ip уже в списке");
+                        throw new BadRequestException("ip уже в списке", "banip command invalid input: ipv4 exists");
 
                     await AppCache.BanIp.AddIpAsync(ip);
                     return "banip список обновлён";
@@ -47,14 +51,14 @@ namespace Application.Services.Command.Handlers
                 if (cmd == "remove")
                 {
                     if (!AppCache.BanIp.List.Contains(ip))
-                        throw new BadRequestException("ip не найден в списке");
+                        throw new BadRequestException("ip не найден в списке", "banip command invalid input: ipv4 doesn't exist");
 
                     await AppCache.BanIp.RemoveIpAsync(ip);
                     return "banip список обновлён";
                 }
             }
 
-            throw new BadRequestException("некорректный ввод");
+            throw new BadRequestException("некорректный ввод", "banip command invalid input");
         }
     }
 }

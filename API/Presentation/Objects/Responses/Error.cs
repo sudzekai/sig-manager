@@ -1,14 +1,8 @@
 ﻿namespace Presentation.Objects.Responses
 {
-    public class Error
+    public class Error(int code, string message)
     {
-        public Error(int code, string message)
-        {
-            Code = code;
-            Message = message;
-        }
-
-        public int Code { get; set; }
-        public string Message { get; set; }
+        public int Code { get; init; } = code;
+        public string Message { get; init; } = message;
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Contracts.Interfaces.Application.Services;
 using Konscious.Security.Cryptography;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,6 +11,8 @@ namespace Application.Services
     {
         public string HashString(string value)
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             byte[] salt = RandomNumberGenerator.GetBytes(16);
 
             var argon2 = new Argon2id(Encoding.UTF8.GetBytes(value))
@@ -26,6 +30,8 @@ namespace Application.Services
 
         public bool Compare(string value, string hashString)
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             string[] parts = hashString.Split(':');
 
             if (parts.Length != 2)

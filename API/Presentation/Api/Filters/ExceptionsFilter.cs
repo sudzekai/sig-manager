@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Presentation.Objects.Responses;
 using Presentation.Utilities.Extensions;
-using Shared.OpenTelemetry.Logging.Extensions;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Filters
 {
-    public class ExceptionsFilter : IExceptionFilter
+    public class ExceptionsFilter(ILogger<ExceptionsFilter> logger) : IExceptionFilter
     {
-        private readonly ILogger<ExceptionsFilter> _logger;
-
-        public ExceptionsFilter(ILogger<ExceptionsFilter> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<ExceptionsFilter> _logger = logger;
 
         public void OnException(ExceptionContext context)
         {
+            using var activity = Telemetry.Filter.StartRichActivity();
+
             var ex = context.Exception;
 
             if (ex is null)
@@ -24,29 +22,13 @@ namespace Presentation.Api.Filters
 
             if (ex is Shared.Types.Exceptions.ApplicationException exception)
             {
+                _logger.LogError("{Type}: {Message}", ex.GetType().ToString().Split(".").Last(), exception.Message);
                 context.Result = ResponseEnvelope.FromError(exception).ToErroredObjectResult();
-                _logger.CustomLogError(
-                    "Ошибочний ответ на запрос",
-                    new()
-                    {
-                        ["response.code"] = exception.Code,
-                        ["response.message"] = exception.Message
-                    }
-                );
                 return;
             }
 
             context.Result = ResponseEnvelope.InternalServerError.ToErroredObjectResult();
-            _logger.CustomLogError(
-                "Ошибочний ответ на запрос",
-                new()
-                {
-                    ["response.code"] = 500,
-                    ["response.message"] = ResponseEnvelope.InternalServerError.Error?.Message,
-                    ["exception.caller"] = ex.Source?.ToString(),
-                    ["exception.message"] = ex.ToString()
-                }
-            );
+            _logger.LogError("{Type}: {Message}\n{Full}", ex.GetType().ToString().Split(".").Last(), ex.Message, ex.ToString());
         }
     }
 }

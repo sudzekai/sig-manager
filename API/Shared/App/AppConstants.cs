@@ -5,13 +5,27 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.1.2";
+        public const string CurrentVersion = "v0.1.3";
 
-        public const string ChangeLog = @"(WIP) Добавлена инфраструктура для работы с автомобилями (Car)
-Введены модели, DTO и репозиторий для сущности Car, реализованы схемы и селекты для таблицы cars, добавлен декоратор с трассировкой. 
-Добавлен запрос GetCarsListRequest с фильтрацией и сортировкой. 
-В DataValidator добавлен метод OneOf. 
-Внесены изменения в работу с пользователями (методы GetInfoBy...), поля схемы пользователей объявлены как const";
+
+        public const string ChangeLog = 
+            """
+            Рефакторинг логирования и трассировки, переход на OTEL
+
+            - Удалены самописные классы и расширения для логирования/трассировки
+            - Внедрён Telemetry с единым ActivitySource для всех слоёв
+            - Добавлен кастомный консольный лог-форматтер с цветами
+            - Везде используется стандартный ILogger и OTEL ActivitySource
+            - Поддержка экспорта логов и трейсов в OTLP через .env
+            - Изменена иерархия исключений, добавлен ConflictException
+            - Удалено логирование SQL-запросов в репозиториях
+            - Обновлены шаблоны .env, DI и конфигурация
+            - Исправлены имена параметров маршрута в контроллерах
+            - Удалены устаревшие утилиты для валидации и маппинга
+            - Унифицирована структура ошибок в ответах API
+            """;
+
+        public static TextWriter StandartWriter { get; set; } = Console.Out;
 
         public static readonly string BaseDirectory = AppContext.BaseDirectory;
 

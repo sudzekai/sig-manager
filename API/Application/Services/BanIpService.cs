@@ -1,5 +1,7 @@
 ﻿using Contracts.Interfaces.Application.Services;
 using Shared.App;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 using System.Net;
 using System.Text.Json;
 
@@ -7,13 +9,15 @@ namespace Application.Services
 {
     public class BanIpService : IBanIpService
     {
-        private readonly HashSet<string> _ipList = new();
+        private readonly HashSet<string> _ipList = [];
         private readonly SemaphoreSlim _fileLock = new(1, 1);
 
         public IReadOnlyCollection<string> IpList => _ipList;
 
         public async Task LoadAsync()
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             var path = AppConstants.BanIpListFullPath;
 
             if (!File.Exists(path))
@@ -37,6 +41,8 @@ namespace Application.Services
 
         public async Task AddAsync(string ip)
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             ValidateIp(ip);
 
             lock (_ipList)
@@ -50,6 +56,8 @@ namespace Application.Services
 
         public async Task RemoveAsync(string ip)
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             ValidateIp(ip);
 
             lock (_ipList)
@@ -63,6 +71,7 @@ namespace Application.Services
 
         public bool Contains(string ip)
         {
+
             lock (_ipList)
             {
                 return _ipList.Contains(ip);
@@ -71,6 +80,8 @@ namespace Application.Services
 
         private async Task SaveAsync()
         {
+            using var activity = Telemetry.Service.StartRichActivity();
+
             var path = AppConstants.BanIpListFullPath;
 
             await _fileLock.WaitAsync();

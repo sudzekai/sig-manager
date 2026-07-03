@@ -2,26 +2,22 @@
 using Contracts.Objects.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Attributes;
-using Shared.OpenTelemetry.Tracing.Sources;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Controllers
 {
     [ApiController]
     [Route("/commands")]
-    public class CommandsController
+    public class CommandsController(ICommandProcessor commandProcessor)
     {
-        private readonly ICommandProcessor _commandProcessor;
-
-        public CommandsController(ICommandProcessor commandProcessor)
-        {
-            _commandProcessor = commandProcessor;
-        }
+        private readonly ICommandProcessor _commandProcessor = commandProcessor;
 
         [HttpPost]
         [ValidateModelState]
         public async Task<string> Process([FromBody] CommandDto body)
         {
-            using var activity = ActivitySourceDictionary.Controllers.CommandProcessor.StartActivity("Обработка запроса на выполнение команды");
+            using var activity = Telemetry.Repository.StartRichActivity();
 
             return await _commandProcessor.ProcessAsync(body);
         }

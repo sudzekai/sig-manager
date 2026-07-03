@@ -1,70 +1,69 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
-using Infrastructure.Schema.Car;
-using Infrastructure.Schema.User;
-using Org.BouncyCastle.Asn1.Ocsp;
-using Shared.OpenTelemetry.Tracing.Sources;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Infrastructure.Repositories.Cars
 {
-    public class CarRepositoryDecorator : ICarRepository
+    public class CarRepositoryDecorator(ICarRepository inner) : ICarRepository
     {
-        private readonly ICarRepository _inner;
-        private readonly ActivitySource _activitySource = ActivitySourceDictionary.Repositories.Cars;
-
-        public CarRepositoryDecorator(ICarRepository inner)
-        {
-            _inner = inner;
-        }
+        private readonly ICarRepository _inner = inner;
 
         public async Task<int> CreateAsync(Car car)
         {
-            using var activity = _activitySource.StartActivity(nameof(CreateAsync));
+            using var activity = Telemetry.Repository.StartRichActivity();
+
             return await _inner.CreateAsync(car);
         }
 
         public async Task DeleteByIdAsync(int id)
         {
-            using var activity = _activitySource.StartActivity(nameof(DeleteByIdAsync));
+            using var activity = Telemetry.Repository.StartRichActivity();
+
             await _inner.DeleteByIdAsync(id);
         }
 
         public async Task<IReadOnlyList<User>> GetAllAsync(GetCarsListRequest request)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetAllAsync));
+            using var activity = Telemetry.Repository.StartRichActivity();
+
             return await _inner.GetAllAsync(request);
         }
 
         public async Task<User?> GetFullById(int id)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetFullById));
+            using var activity = Telemetry.Repository.StartRichActivity();  
+
             return await _inner.GetFullById(id);
         }
 
         public async Task<User?> GetInfoById(int id)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetInfoById));
+            using var activity = Telemetry.Service.StartRichActivity();
+
             return await _inner.GetInfoById(id);
         }
 
         public async Task<User?> GetInfoByNameAsync(string name)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetInfoByNameAsync));
+            using var activity = Telemetry.Service.StartRichActivity();
+
             return await _inner.GetInfoByNameAsync(name);
         }
 
         public async Task<User?> GetInfoByNumberAsync(int number)
         {
-            using var activity = _activitySource.StartActivity(nameof(GetInfoByNumberAsync));
+            using var activity = Telemetry.Service.StartRichActivity();
+
             return await _inner.GetInfoByNumberAsync(number);
         }
 
         public async Task UpdateAsync(Car car)
         {
-            using var activity = _activitySource.StartActivity(nameof(UpdateAsync));
+            using var activity = Telemetry.Service.StartRichActivity();
+
             await _inner.UpdateAsync(car);
         }
     }

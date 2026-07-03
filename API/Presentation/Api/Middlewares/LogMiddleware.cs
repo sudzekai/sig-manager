@@ -1,36 +1,28 @@
-﻿using Shared.OpenTelemetry.Logging.Extensions;
-using Shared.OpenTelemetry.Tracing.Sources;
+﻿using Shared.Extensions;
+using Shared.OpenTelemetry;
+using System.Diagnostics;
 
 namespace Presentation.Api.Middlewares
 {
-    public class LogMiddleware : IMiddleware
+    public class LogMiddleware(ILogger<LogMiddleware> logger) : IMiddleware
     {
-        private readonly ILogger<LogMiddleware> _logger;
-
-        public LogMiddleware(ILogger<LogMiddleware> logger)
-        {
-            _logger = logger;
-        }
-
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            using var activity = ActivitySourceDictionary.Middlewares.Log.StartActivity("Логирование запроса");
-
+            using var activity = Telemetry.Middleware.StartRichActivity("Logging");
+            var stopwatch = Stopwatch.StartNew();
+            
             var ip = context.Connection.RemoteIpAddress;
 
             if (ip is not null && ip.IsIPv4MappedToIPv6)
                 ip = ip.MapToIPv4();
 
-            _logger.CustomLogInfo("Получен запрос",
-                new()
-                {
-                    ["request.ip"] = ip?.ToString(),
-                    ["request.method"] = context.Request.Method,
-                    ["request.path"] = context.Request.Path
-                }
-            );
+            logger.LogInformation("Получен запрос: {Method} -> {Path} от: {Ip}", context.Request.Method, context.Request.Path.Value, ip);
 
             await next.Invoke(context);
+
+            stopwatch.Stop();
+
+            logger.LogInformation("Ответ на запрос: {StatusCode} lat: {Duration}ms", context.Response.StatusCode, stopwatch.Elapsed.TotalMilliseconds);
         }
     }
 }

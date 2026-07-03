@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Contracts.Objects.Dtos.User
 {
-    public class UserCreateDto
+    public class UserCreateDto 
     {
         [Required(ErrorMessage = "Имя пользователя обязательно")]
         public string Username { get; set; } = string.Empty;

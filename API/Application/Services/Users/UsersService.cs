@@ -7,27 +7,21 @@ using Shared.Types.Exceptions;
 
 namespace Application.Services.Users
 {
-    public class UsersService : IUsersService
+    public class UsersService(IUserRepository repository, IHashService hashService) : IUsersService
     {
-        private readonly IUserRepository _repository;
-        private readonly IHashService _hashService;
-
-        public UsersService(IUserRepository repository, IHashService hashService)
-        {
-            _repository = repository;
-            _hashService = hashService;
-        }
+        private readonly IUserRepository _repository = repository;
+        private readonly IHashService _hashService = hashService;
 
         public async Task<UserInfoDto> CreateAsync(UserCreateDto createDto)
         {
             if (await IsUsernameExistsAsync(createDto.Username))
-                throw new BadRequestException("Пользователь с таким именем уже существует");
+                throw new ConflictException("Пользователь с таким именем уже существует", $"username: {createDto.Username} exists");
 
             if (await IsEmailExistsAsync(createDto.Email))
-                throw new BadRequestException("Пользователь с такой электронной почтой уже существует");
+                throw new ConflictException("Пользователь с такой электронной почтой уже существует", $"email: {createDto.Email} exists");
 
             if (await IsPhoneNumberExistsAsync(createDto.PhoneNumber))
-                throw new BadRequestException("Пользователь с таким номером телефона уже существует");
+                throw new ConflictException("Пользователь с таким номером телефона уже существует", $"phoneNumber: {createDto.PhoneNumber} exists");
 
             string passwordHash = _hashService.HashString(createDto.Password);
 
@@ -43,7 +37,7 @@ namespace Application.Services.Users
         public async Task DeleteByIdAsync(int id)
         {
             if (!(await IsUserExistsAsync(id)))
-                throw new NotFoundException("Пользователь с таким идентификатором не найден");
+                throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             await _repository.DeleteByIdAsync(id);
         }
@@ -58,7 +52,7 @@ namespace Application.Services.Users
         public async Task<UserInfoDto> GetById(int id)
         {
             var user = await _repository.GetInfoByIdAsync(id) ??
-                throw new NotFoundException("Пользователь с таким идентификатором не найден");
+                throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
         }
@@ -66,7 +60,7 @@ namespace Application.Services.Users
         public async Task<UserInfoDto> GetByUsernameAsync(string username)
         {
             var user = await _repository.GetInfoByUsernameAsync(username) ??
-                throw new NotFoundException("Пользователь с таким именем пользователя не найден");
+                throw new NotFoundException("Пользователь с таким именем пользователя не найден", $"username: {username} doesn't exist");
 
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
         }
@@ -74,7 +68,7 @@ namespace Application.Services.Users
         public async Task UpdateInfoByIdAsync(int id, UserInfoUpdateDto updateDto)
         {
             var user = await _repository.GetFullByIdAsync(id) ??
-                throw new NotFoundException("Пользователь с таким идентификатором не найден");
+                throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             if (updateDto.Username != null)
                 user.ChangeUsername(updateDto.Username);
@@ -95,7 +89,7 @@ namespace Application.Services.Users
         public async Task UpdatePasswordByIdAsync(int id, UserPasswordUpdateDto updateDto)
         {
             var user = await _repository.GetFullByIdAsync(id) ??
-                throw new NotFoundException("Пользователь с таким идентификатором не найден");
+                throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             string passwordHash = _hashService.HashString(updateDto.Password);
 
@@ -107,7 +101,7 @@ namespace Application.Services.Users
         public async Task UpdateRoleByIdAsync(int id, UserRoleUpdateDto updateDto)
         {
             var user = await _repository.GetFullByIdAsync(id) ??
-                throw new NotFoundException("Пользователь с таким идентификатором не найден");
+                throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             user.ChangeRoleId(updateDto.RoleId);
 
