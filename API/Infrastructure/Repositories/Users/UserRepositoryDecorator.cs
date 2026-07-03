@@ -83,7 +83,7 @@ namespace Infrastructure.Repositories.Users
             using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_info_by_phone_number");
             _logger.LogInformation("Получение информации о пользователе с phoneNumber {phoneNumber}", phoneNumber);
 
-            var result = await _inner.GetInfoByEmailAsync(phoneNumber);
+            var result = await _inner.GetInfoByPhoneNumberAsync(phoneNumber);
 
             return result;
         }

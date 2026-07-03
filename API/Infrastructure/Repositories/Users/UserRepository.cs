@@ -9,18 +9,17 @@ using Shared.Extensions;
 using System.Diagnostics;
 using System.Text;
 using Shared.Types.Enums;
+using Shared.App;
 
 namespace Infrastructure.Repositories.Users
 {
     public class UserRepository(IDbContext db) : IUserRepository
     {
-        private readonly IDbContext _db = db;
-
         public async Task<int> CreateAsync(User user)
         {
             var query = @$"
                 INSERT INTO {UserSchema.TableName} ({string.Join(", ", UserSelects.Insertation)}) 
-                VALUES (@username, @fullName, @phoneNumber, @email, @passwordHash, @createdAt, @updatedAt, @roleId);
+                VALUES (@username, @fullName, @phoneNumber, @phoneNumberLastFour, @email, @passwordHash, @createdAt, @updatedAt, @roleId);
                 SELECT LAST_INSERT_ID();
             ";
 
@@ -28,6 +27,7 @@ namespace Infrastructure.Repositories.Users
                 new("username", user.Username),
                 new("fullName", user.FullName),
                 new("phoneNumber", user.PhoneNumber),
+                new("phoneNumberLastFour", user.PhoneNumberLastFour),
                 new("email", user.Email),
                 new("passwordHash", user.PasswordHash),
                 new("createdAt", user.CreatedAt),
@@ -37,7 +37,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.INSERT, parameters.Length);
 
-            var idObj = await _db.ExecuteScalarAsync(query, parameters);
+            var idObj = await db.ExecuteScalarAsync(query, parameters);
 
             var id = Convert.ToInt32(idObj);
 
@@ -55,7 +55,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.DELETE, parameters.Length);
 
-            await _db.ExecuteNonQueryAsync(query, parameters);
+            await db.ExecuteNonQueryAsync(query, parameters);
         }
 
         public async Task<IReadOnlyList<User>> GetAllAsync(GetUsersListRequest request)
@@ -101,15 +101,13 @@ namespace Infrastructure.Repositories.Users
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 query.Append(@$"
-                    AND ({UserSchema.Username} LIKE @searchFull 
-                    OR {UserSchema.FullName} LIKE @searchFull 
-                    OR {UserSchema.Email} LIKE @searchStart 
-                    OR {UserSchema.PhoneNumber} LIKE @searchEnd)
+                    AND ({UserSchema.Username} LIKE @searchTerm 
+                    OR {UserSchema.FullName} LIKE @searchTerm 
+                    OR {UserSchema.Email} LIKE @searchTerm 
+                    OR {UserSchema.PhoneNumberLastFour} LIKE @searchTerm)
                 ");
 
-                parameters.Add(new("searchFull", $"%{request.SearchTerm}%"));
-                parameters.Add(new("searchStart", $"{request.SearchTerm}%"));
-                parameters.Add(new("searchEnd", $"%{request.SearchTerm}"));
+                parameters.Add(new("searchTerm", $"{request.SearchTerm}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
@@ -138,7 +136,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Count);
 
-            using var reader = await _db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
+            using var reader = await db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
 
             var result = UserConverter.ListFromReader(reader);
 
@@ -157,7 +155,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            using var reader = await _db.ExecuteReaderAsync(query, parameters);
+            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
 
@@ -176,7 +174,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            using var reader = await _db.ExecuteReaderAsync(query, parameters);
+            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
 
@@ -195,7 +193,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            using var reader = await _db.ExecuteReaderAsync(query, parameters);
+            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
 
@@ -214,7 +212,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
             
-            using var reader = await _db.ExecuteReaderAsync(query, parameters);
+            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
 
@@ -233,7 +231,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
             
-            using var reader = await _db.ExecuteReaderAsync(query, parameters);
+            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
             var result = UserConverter.FromReader(reader);
 
@@ -248,6 +246,7 @@ namespace Infrastructure.Repositories.Users
                     {UserSchema.Username} = @username,
                     {UserSchema.FullName} = @fullName,
                     {UserSchema.PhoneNumber} = @phoneNumber,
+                    {UserSchema.PhoneNumberLastFour} = @phoneNumberLastFour,
                     {UserSchema.Email} = @email,
                     {UserSchema.PasswordHash} = @passwordHash,
                     {UserSchema.VerificationCode} = @verificationCode,
@@ -262,6 +261,7 @@ namespace Infrastructure.Repositories.Users
                 new("username", user.Username),
                 new("fullName", user.FullName),
                 new("phoneNumber", user.PhoneNumber),
+                new("phoneNumberLastFour", user.PhoneNumber[^4..]),
                 new("email", user.Email),
                 new("passwordHash", user.PasswordHash),
                 new("verificationCode", user.VerificationCode),
@@ -271,7 +271,7 @@ namespace Infrastructure.Repositories.Users
 
             Activity.Current?.SetSqlTag(DbOperation.UPDATE, parameters.Length);
             
-            await _db.ExecuteNonQueryAsync(query, parameters);
+            await db.ExecuteNonQueryAsync(query, parameters);
         }
     }
 }

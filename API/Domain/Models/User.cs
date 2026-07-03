@@ -1,4 +1,5 @@
-﻿using Domain.Tools;
+﻿using Domain.Exceptions;
+using Domain.Tools;
 
 namespace Domain.Models
 {
@@ -21,6 +22,7 @@ namespace Domain.Models
             ChangePasswordHash(passwordHash);
             ChangeRoleId(roleId);
 
+            PhoneNumberLastFour = phoneNumber[^4..];
             CreatedAt = DateTime.Now;
             UpdatedAt = CreatedAt;
         }
@@ -31,6 +33,7 @@ namespace Domain.Models
             string fullName,
             string email,
             string phoneNumber,
+            string phoneNumberLastFour,
             string passwordHash,
             string? verificationCode,
             DateTime createdAt,
@@ -47,7 +50,8 @@ namespace Domain.Models
                 VerificationCode = verificationCode,
                 CreatedAt = createdAt,
                 UpdatedAt = updatedAt,
-                RoleId = roleId
+                RoleId = roleId,
+                PhoneNumberLastFour = phoneNumberLastFour
             };
 
         public int Id { get; private set; }
@@ -121,6 +125,7 @@ namespace Domain.Models
         #region PhoneNumber
 
         public string PhoneNumber { get; private set; }
+        public string PhoneNumberLastFour { get; private set; }
 
         private void ValidatePhoneNumber(string value)
         {
@@ -136,6 +141,7 @@ namespace Domain.Models
             ValidatePhoneNumber(value);
 
             PhoneNumber = value;
+            PhoneNumberLastFour = value[^4..];
             Touch();
         }
 

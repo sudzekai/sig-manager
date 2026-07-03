@@ -5,13 +5,13 @@ namespace Contracts.Interfaces.Infrastructure.Repositories
 {
     public interface ICarRepository
     {
-        Task<IReadOnlyList<User>> GetAllAsync(GetCarsListRequest request);
+        Task<IReadOnlyList<Car>> GetAllAsync(GetCarsListRequest request);
 
-        Task<User?> GetFullById(int id);
+        Task<Car?> GetFullByIdAsync(int id);
 
-        Task<User?> GetInfoById(int id);
-        Task<User?> GetInfoByNumberAsync(int number);
-        Task<User?> GetInfoByNameAsync(string name);
+        Task<Car?> GetInfoByIdAsync(int id);
+        Task<Car?> GetInfoByNumberAsync(int number);
+        Task<Car?> GetInfoByNameAsync(string name);
 
         Task<int> CreateAsync(Car car);
         Task DeleteByIdAsync(int id);

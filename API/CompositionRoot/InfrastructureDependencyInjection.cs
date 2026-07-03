@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Infrastructure.Databse.Context;
+using Infrastructure.Repositories.Cars;
 using Infrastructure.Repositories.Users;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ namespace CompositionRoot
 {
     public static class InfrastructureDependencyInjection
     {
-        public static async Task<IServiceCollection> AddSingletonDatabaseAsync(this IServiceCollection services, string connectionString)
+        public static async Task<IServiceCollection> AddDatabase(this IServiceCollection services, string connectionString)
         {
             var database = new SiGManagerDB(connectionString);
             await database.TestConnectionAsync();
@@ -20,7 +21,7 @@ namespace CompositionRoot
             return services;
         }
 
-        public static IServiceCollection AddScopedRepositories(this IServiceCollection services)
+        public static IServiceCollection AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<UserRepository>();
 
@@ -30,6 +31,16 @@ namespace CompositionRoot
                 var logger = sp.GetRequiredService<ILogger<UserRepository>>();
 
                 return new UserRepositoryDecorator(inner, logger);
+            });
+
+            services.AddScoped<CarRepository>();
+
+            services.AddScoped<ICarRepository>(sp =>
+            {
+                var inner = sp.GetRequiredService<CarRepository>();
+                var logger = sp.GetRequiredService<ILogger<CarRepository>>();
+
+                return new CarRepositoryDecorator(inner, logger);
             });
 
             return services;

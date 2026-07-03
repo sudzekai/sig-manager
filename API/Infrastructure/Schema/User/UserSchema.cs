@@ -9,6 +9,7 @@
         public const string Email = "email";
         public const string FullName = "full_name";
         public const string PhoneNumber = "phone_number";
+        public const string PhoneNumberLastFour = "phone_number_last_four";
         public const string PasswordHash = "password_hash";
         public const string VerificationCode = "verification_code";
         public const string CreatedAt = "created_at";

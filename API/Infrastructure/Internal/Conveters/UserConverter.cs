@@ -18,6 +18,7 @@ namespace Infrastructure.Internal.Conveters
                 reader.TryGetString(UserSchema.FullName),
                 reader.TryGetString(UserSchema.Email),
                 reader.TryGetString(UserSchema.PhoneNumber),
+                reader.TryGetString(UserSchema.PhoneNumberLastFour),
                 reader.TryGetString(UserSchema.PasswordHash),
                 reader.TryGetString(UserSchema.VerificationCode),
                 reader.TryGetDateTime(UserSchema.CreatedAt),
@@ -35,6 +36,7 @@ namespace Infrastructure.Internal.Conveters
             reader.TryGetOrdinal(UserSchema.FullName, out int fullNameOrdinal);
             reader.TryGetOrdinal(UserSchema.Email, out int emailOrdinal);
             reader.TryGetOrdinal(UserSchema.PhoneNumber, out int phoneNumberOrdinal);
+            reader.TryGetOrdinal(UserSchema.PhoneNumberLastFour, out int phoneNumberLastFourOrdinal);
             reader.TryGetOrdinal(UserSchema.PasswordHash, out int passwordHashOrdinal);
             reader.TryGetOrdinal(UserSchema.VerificationCode, out int verificationCodeOrdinal);
             reader.TryGetOrdinal(UserSchema.CreatedAt, out int createdAtOrdinal);
@@ -51,6 +53,7 @@ namespace Infrastructure.Internal.Conveters
                     reader.TryGetString(fullNameOrdinal),
                     reader.TryGetString(emailOrdinal),
                     reader.TryGetString(phoneNumberOrdinal),
+                    reader.TryGetString(phoneNumberLastFourOrdinal),
                     reader.TryGetString(passwordHashOrdinal),
                     reader.TryGetString(verificationCodeOrdinal),
                     reader.TryGetDateTime(createdAtOrdinal),

@@ -30,8 +30,8 @@ namespace Presentation
             builder.ConfigureOpenTelemetry();
 
             // infrastructure
-            await builder.Services.AddSingletonDatabaseAsync(GetConnectionString(builder.Configuration));
-            builder.Services.AddScopedRepositories();
+            await builder.Services.AddDatabase(GetConnectionString(builder.Configuration));
+            builder.Services.AddRepositories();
 
             // application
             builder.Services.AddApplicationServices();

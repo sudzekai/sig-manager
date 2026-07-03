@@ -4,15 +4,11 @@ using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Domain.Models;
 using Shared.Types.Exceptions;
-using System.Diagnostics;
 
 namespace Application.Services.Users
 {
     public class UsersService(IUserRepository repository, IHashService hashService) : IUsersService
     {
-        private readonly IUserRepository _repository = repository;
-        private readonly IHashService _hashService = hashService;
-
         public async Task<UserInfoDto> CreateAsync(UserCreateDto createDto)
         {
             if (await IsUsernameExistsAsync(createDto.Username))
@@ -24,13 +20,13 @@ namespace Application.Services.Users
             if (await IsPhoneNumberExistsAsync(createDto.PhoneNumber))
                 throw new ConflictException("Пользователь с таким номером телефона уже существует", $"phoneNumber: {createDto.PhoneNumber} exists");
 
-            string passwordHash = _hashService.HashString(createDto.Password);
+            string passwordHash = hashService.HashString(createDto.Password);
 
             User user = new(createDto.Username, createDto.FullName, createDto.Email, createDto.PhoneNumber, passwordHash, 1);
 
-            var id = await _repository.CreateAsync(user);
+            var id = await repository.CreateAsync(user);
 
-            var created = await _repository.GetInfoByIdAsync(id) ?? throw new InternalServerException("Внутренняя ошибка сервера", "internal error: created user was null");
+            var created = await repository.GetInfoByIdAsync(id) ?? throw new InternalServerException("Внутренняя ошибка сервера", "internal error: created user was null");
 
             return new(created.Id, created.Username, created.FullName, created.Email, created.PhoneNumber);
         }
@@ -40,19 +36,19 @@ namespace Application.Services.Users
             if (!(await IsUserExistsAsync(id)))
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
-            await _repository.DeleteByIdAsync(id);
+            await repository.DeleteByIdAsync(id);
         }
 
         public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {
-            var result = await _repository.GetAllAsync(request);
+            var result = await repository.GetAllAsync(request);
 
             return [.. result.Select(x => new UserSimpleDto(x.Id, x.Username, x.FullName))];
         }
 
         public async Task<UserInfoDto> GetById(int id)
         {
-            var user = await _repository.GetInfoByIdAsync(id) ??
+            var user = await repository.GetInfoByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             return new(user.Id, user.Username, user.FullName, user.Email, user.PhoneNumber);
@@ -60,7 +56,7 @@ namespace Application.Services.Users
 
         public async Task<UserInfoDto> GetByUsernameAsync(string username)
         {
-            var user = await _repository.GetInfoByUsernameAsync(username) ??
+            var user = await repository.GetInfoByUsernameAsync(username) ??
                 throw new NotFoundException("Пользователь с таким именем пользователя не найден", $"username: {username} doesn't exist");
 
 
@@ -69,9 +65,7 @@ namespace Application.Services.Users
 
         public async Task UpdateInfoByIdAsync(int id, UserInfoUpdateDto updateDto)
         {
-            Activity.Current?.SetTag("db.entity.id", id);
-
-            var user = await _repository.GetFullByIdAsync(id) ??
+            var user = await repository.GetFullByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             if (updateDto.Username != null)
@@ -102,34 +96,34 @@ namespace Application.Services.Users
 
             }
 
-            await _repository.UpdateAsync(user);
+            await repository.UpdateAsync(user);
         }
 
         public async Task UpdatePasswordByIdAsync(int id, UserPasswordUpdateDto updateDto)
         {
-            var user = await _repository.GetFullByIdAsync(id) ??
+            var user = await repository.GetFullByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
-            string passwordHash = _hashService.HashString(updateDto.Password);
+            string passwordHash = hashService.HashString(updateDto.Password);
 
             user.ChangePasswordHash(passwordHash);
 
-            await _repository.UpdateAsync(user);
+            await repository.UpdateAsync(user);
         }
 
         public async Task UpdateRoleByIdAsync(int id, UserRoleUpdateDto updateDto)
         {
-            var user = await _repository.GetFullByIdAsync(id) ??
+            var user = await repository.GetFullByIdAsync(id) ??
                 throw new NotFoundException("Пользователь с таким идентификатором не найден", $"id: {id} doesn't exist");
 
             user.ChangeRoleId(updateDto.RoleId);
 
-            await _repository.UpdateAsync(user);
+            await repository.UpdateAsync(user);
         }
 
         private async Task<bool> IsUserExistsAsync(int id)
         {
-            var existing = await _repository.GetInfoByIdAsync(id);
+            var existing = await repository.GetInfoByIdAsync(id);
 
             if (existing == null) return false;
 
@@ -138,7 +132,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsUsernameExistsAsync(string username, int? excludedId = null)
         {
-            var existing = await _repository.GetInfoByUsernameAsync(username);
+            var existing = await repository.GetInfoByUsernameAsync(username);
 
             if (existing == null) return false;
 
@@ -149,7 +143,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsEmailExistsAsync(string email, int? excludedId = null)
         {
-            var existing = await _repository.GetInfoByEmailAsync(email);
+            var existing = await repository.GetInfoByEmailAsync(email);
 
             if (existing == null) return false;
 
@@ -160,7 +154,7 @@ namespace Application.Services.Users
 
         private async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int? excludedId = null)
         {
-            var existing = await _repository.GetInfoByPhoneNumberAsync(phoneNumber);
+            var existing = await repository.GetInfoByPhoneNumberAsync(phoneNumber);
 
             if (existing == null) return false;
 
