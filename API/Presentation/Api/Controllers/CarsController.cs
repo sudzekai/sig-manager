@@ -30,7 +30,7 @@ namespace Presentation.Api.Controllers
         {
             using var activity = Telemetry.Controller.StartRichActivity();
 
-            return await service.GetInfoByIdAsync(route.Id);
+            return await service.GetByIdAsync(route.Id);
         }
 
         [HttpPost]

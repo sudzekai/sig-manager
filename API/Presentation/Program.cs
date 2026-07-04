@@ -107,7 +107,7 @@ namespace Presentation
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
             var http = new HttpClient();
-
+            
             http.DefaultRequestHeaders.UserAgent.ParseAdd("sig-manager");
 
             var json = await http.GetStringAsync("https://api.github.com/repos/sudzekai/sig-manager/tags");

@@ -39,13 +39,13 @@ namespace Application.Services.Cars
             return result;
         }
 
-        public async Task<CarInfoDto> GetInfoByIdAsync(int id)
+        public async Task<CarInfoDto> GetByIdAsync(int id)
         {
             using var activity = Telemetry.Service.StartServiceActivity("car", "get_by_id");
 
             activity?.SetTag("id", id);
 
-            return await inner.GetInfoByIdAsync(id);
+            return await inner.GetByIdAsync(id);
         }
 
         public async Task UpdateInfoByIdAsync(int id, CarInfoUpdateDto updateDto)

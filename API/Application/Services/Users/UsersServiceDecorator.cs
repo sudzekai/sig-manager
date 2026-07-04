@@ -3,7 +3,6 @@ using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Shared.Extensions;
 using Shared.OpenTelemetry;
-using System.Diagnostics;
 
 namespace Application.Services.Users
 {
@@ -24,7 +23,7 @@ namespace Application.Services.Users
         {
             using var activity = Telemetry.Service.StartServiceActivity("user", "delete");
             activity?.SetTag("id", id);
-            
+
             await inner.DeleteByIdAsync(id);
         }
 
@@ -35,7 +34,7 @@ namespace Application.Services.Users
             var result = await inner.GetAllAsync(request);
 
             activity?.SetTag("count", result.Count);
-            
+
             return result;
         }
 
@@ -45,16 +44,6 @@ namespace Application.Services.Users
             activity?.SetTag("id", id);
 
             var result = await inner.GetById(id);
-
-            return result;
-        }
-
-        public async Task<UserInfoDto> GetByUsernameAsync(string username)
-        {
-            using var activity = Telemetry.Service.StartServiceActivity("user", "get_by_username");
-            activity?.SetTag("username", username);
-
-            var result = await inner.GetByUsernameAsync(username);
 
             return result;
         }
@@ -71,7 +60,7 @@ namespace Application.Services.Users
         {
             using var activity = Telemetry.Service.StartServiceActivity("user", "update_password_by_id");
             activity?.SetTag("id", id);
-            
+
             await inner.UpdatePasswordByIdAsync(id, updateDto);
         }
 

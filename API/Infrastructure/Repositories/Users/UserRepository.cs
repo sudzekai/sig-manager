@@ -1,21 +1,18 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
-using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
-using Infrastructure.Internal.Conveters;
+using Infrastructure.Internal.Extensions;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
-using System.Diagnostics;
-using System.Text;
 using Shared.Types.Enums;
-using Shared.App;
+using System.Diagnostics;
 
 namespace Infrastructure.Repositories.Users
 {
     public class UserRepository(IDbContext db) : IUserRepository
     {
-        public async Task<int> CreateAsync(User user)
+        public async Task<int> AddAsync(User user)
         {
             var query = @$"
                 INSERT INTO {UserSchema.TableName} ({string.Join(", ", UserSelects.Insertation)}) 
@@ -44,7 +41,7 @@ namespace Infrastructure.Repositories.Users
             return id;
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var query = $@"
                 DELETE FROM {UserSchema.TableName}
@@ -58,168 +55,7 @@ namespace Infrastructure.Repositories.Users
             await db.ExecuteNonQueryAsync(query, parameters);
         }
 
-        public async Task<IReadOnlyList<User>> GetAllAsync(GetUsersListRequest request)
-        {
-            StringBuilder query = new($@"
-                SELECT {string.Join(", ", UserSelects.Simple)} 
-                FROM {UserSchema.TableName}
-                WHERE 1=1
-            ");
-
-            List<MySqlParameter> parameters = [];
-
-            if (request.RoleId.HasValue)
-            {
-                query.Append($"\nAND {UserSchema.RoleId} = @roleId");
-                parameters.Add(new("roleId", request.RoleId.Value));
-            }
-
-            if (request.CreatedAtStart != default)
-            {
-                query.Append($"\nAND {UserSchema.CreatedAt} > @createdAtStart");
-                parameters.Add(new("createdAtStart", request.CreatedAtStart));
-            }
-
-            if (request.CreatedAtEnd != default)
-            {
-                query.Append($"\nAND {UserSchema.CreatedAt} < @createdAtEnd");
-                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
-            }
-
-            if (request.UpdatedAtStart != default)
-            {
-                query.Append($"\nAND {UserSchema.UpdatedAt} > @updatedAtStart");
-                parameters.Add(new("updatedAtStart", request.UpdatedAtStart));
-            }
-
-            if (request.UpdatedAtEnd != default)
-            {
-                query.Append($"\nAND {UserSchema.UpdatedAt} < @updatedAtEnd");
-                parameters.Add(new("updatedAtEnd", request.UpdatedAtEnd));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-            {
-                query.Append(@$"
-                    AND ({UserSchema.Username} LIKE @searchTerm 
-                    OR {UserSchema.FullName} LIKE @searchTerm 
-                    OR {UserSchema.Email} LIKE @searchTerm 
-                    OR {UserSchema.PhoneNumberLastFour} LIKE @searchTerm)
-                ");
-
-                parameters.Add(new("searchTerm", $"{request.SearchTerm}%"));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-            {
-                var orderBy = request.OrderBy.ToLower() switch
-                {
-                    "username" => UserSchema.Username,
-                    "fullname" => UserSchema.FullName,
-                    "role" => UserSchema.RoleId,
-                    "createdate" => UserSchema.CreatedAt,
-                    "updatedate" => UserSchema.UpdatedAt,
-                    _ => UserSchema.Id
-                };
-
-                var orderDirection = request.OrderDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                    ? "ASC"
-                    : "DESC";
-
-                query.Append($"\nORDER BY {orderBy} {orderDirection}");
-            }
-
-            query.Append($"\nLIMIT @limit OFFSET @offset;");
-
-            parameters.Add(new("limit", request.Limit));
-            parameters.Add(new("offset", request.Offset));
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Count);
-
-            using var reader = await db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
-
-            var result = UserConverter.ListFromReader(reader);
-
-            return result;
-        }
-
-        public async Task<User?> GetInfoByEmailAsync(string email)
-        {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Info)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Email} = @email;
-            ";
-
-            MySqlParameter[] parameters = [new("email", email)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = UserConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<User?> GetInfoByIdAsync(int id)
-        {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Info)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Id} = @id;
-            ";
-
-            MySqlParameter[] parameters = [new("id", id)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = UserConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<User?> GetInfoByPhoneNumberAsync(string phoneNumber)
-        {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Info)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.PhoneNumber} = @phoneNumber;
-            ";
-
-            MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = UserConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<User?> GetInfoByUsernameAsync(string username)
-        {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Info)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Username} = @username;
-            ";
-
-            MySqlParameter[] parameters = [new("username", username)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-            
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = UserConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<User?> GetFullByIdAsync(int id)
+        public async Task<User?> GetAsync(int id)
         {
             var query = $@"
                 SELECT {string.Join(", ", UserSelects.Full)} 
@@ -230,10 +66,28 @@ namespace Infrastructure.Repositories.Users
             MySqlParameter[] parameters = [new("id", id)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-            
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
 
-            var result = UserConverter.FromReader(reader);
+            User? result = null;
+
+            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            {
+                while (await reader.ReadAsync())
+                {
+                    result = User.Restore(
+                        reader.GetInt32(UserSchema.Id),
+                        reader.GetString(UserSchema.Username),
+                        reader.GetString(UserSchema.FullName),
+                        reader.GetString(UserSchema.Email),
+                        reader.GetString(UserSchema.PhoneNumber),
+                        reader.GetString(UserSchema.PhoneNumberLastFour),
+                        reader.GetString(UserSchema.PasswordHash),
+                        reader.GetNullableString(UserSchema.VerificationCode),
+                        reader.GetDateTime(UserSchema.CreatedAt),
+                        reader.GetDateTime(UserSchema.UpdatedAt),
+                        reader.GetInt32(UserSchema.RoleId)
+                    );
+                }
+            }
 
             return result;
         }
@@ -270,7 +124,7 @@ namespace Infrastructure.Repositories.Users
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.UPDATE, parameters.Length);
-            
+
             await db.ExecuteNonQueryAsync(query, parameters);
         }
     }

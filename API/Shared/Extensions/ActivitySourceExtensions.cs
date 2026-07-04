@@ -52,5 +52,21 @@ namespace Shared.Extensions
 
             return activity;
         }
+
+        public static Activity? StartQueryActivity(
+            this ActivitySource activitySource, 
+            string entity,
+            string operation,
+            [CallerMemberName] string name = "", 
+            [CallerFilePath] string path = "", 
+            ActivityKind kind = ActivityKind.Internal)
+        {
+            var activity = activitySource.StartRichActivity(name, path, kind);
+
+            activity?.SetTag("entity", entity);
+            activity?.SetTag("operation", operation);
+
+            return activity;
+        }
     }
 }

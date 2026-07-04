@@ -1,20 +1,17 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
-using Contracts.Objects.Dtos.Requests;
 using Domain.Models;
-using Infrastructure.Internal.Conveters;
 using Infrastructure.Schema.Car;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
 using Shared.Types.Enums;
 using System.Diagnostics;
-using System.Text;
 
 namespace Infrastructure.Repositories.Cars
 {
     public class CarRepository(IDbContext db) : ICarRepository
     {
-        public async Task<int> CreateAsync(Car car)
+        public async Task<int> AddAsync(Car car)
         {
             var query = @$"
                 INSERT INTO {CarSchema.TableName} ({string.Join(", ", CarSelects.Insertation)}) 
@@ -40,7 +37,7 @@ namespace Infrastructure.Repositories.Cars
             return id;
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var query = @$"
                 DELETE FROM {CarSchema.TableName} 
@@ -54,91 +51,7 @@ namespace Infrastructure.Repositories.Cars
             await db.ExecuteNonQueryAsync(query, parameters);
         }
 
-        public async Task<IReadOnlyList<Car>> GetAllAsync(GetCarsListRequest request)
-        {
-            StringBuilder query = new($@"
-                SELECT {string.Join(", ", CarSelects.Simple)} 
-                FROM {CarSchema.TableName}
-                WHERE 1=1
-            ");
-
-            List<MySqlParameter> parameters = [];
-
-            if (!string.IsNullOrWhiteSpace(request.Status))
-            {
-                query.Append($"\nAND {CarSchema.Status} = @status");
-                parameters.Add(new("status", request.Status.ToLower()));
-            }
-
-            if (request.CreatedAtStart != default)
-            {
-                query.Append($"\nAND {CarSchema.CreatedAt} > @createdAtStart");
-                parameters.Add(new("createdAtStart", request.CreatedAtStart));
-            }
-
-            if (request.CreatedAtEnd != default)
-            {
-                query.Append($"\nAND {CarSchema.CreatedAt} < @createdAtEnd");
-                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
-            }
-
-            if (request.UpdatedAtStart != default)
-            {
-                query.Append($"\nAND {CarSchema.UpdatedAt} > @updatedAtStart");
-                parameters.Add(new("updatedAtStart", request.UpdatedAtStart));
-            }
-
-            if (request.UpdatedAtEnd != default)
-            {
-                query.Append($"\nAND {CarSchema.UpdatedAt} < @updatedAtEnd");
-                parameters.Add(new("updatedAtEnd", request.UpdatedAtEnd));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-            {
-                query.Append(@$"
-                    AND ({CarSchema.Name} LIKE @searchTerm 
-                    OR {CarSchema.Number} LIKE @searchTerm 
-                    OR {CarSchema.Plate} LIKE @searchTerm)
-                ");
-
-                parameters.Add(new("searchTerm", $"{request.SearchTerm}%"));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-            {
-                var orderBy = request.OrderBy.ToLower() switch
-                {
-                    "name" => CarSchema.Name,
-                    "status" => CarSchema.Status,
-                    "number" => CarSchema.Number,
-                    "createdate" => CarSchema.CreatedAt,
-                    "updatedate" => CarSchema.UpdatedAt,
-                    _ => CarSchema.Id
-                };
-
-                var orderDirection = request.OrderDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                    ? "ASC"
-                    : "DESC";
-
-                query.Append($"\nORDER BY {orderBy} {orderDirection}");
-            }
-
-            query.Append($"\nLIMIT @limit OFFSET @offset;");
-
-            parameters.Add(new("limit", request.Limit));
-            parameters.Add(new("offset", request.Offset));
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Count);
-
-            using var reader = await db.ExecuteReaderAsync(query.ToString(), [.. parameters]);
-
-            var result = CarConverter.ListFromReader(reader);
-
-            return result;
-        }
-
-        public async Task<Car?> GetFullByIdAsync(int id)
+        public async Task<Car?> GetAsync(int id)
         {
             var query = @$"
                 SELECT {string.Join(", ", CarSelects.Full)} FROM {CarSchema.TableName} 
@@ -149,63 +62,23 @@ namespace Infrastructure.Repositories.Cars
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
+            Car? result = null;
 
-            var result = CarConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<Car?> GetInfoByIdAsync(int id)
-        {
-            var query = @$"
-                SELECT {string.Join(", ", CarSelects.Info)} FROM {CarSchema.TableName} 
-                WHERE {CarSchema.Id} = @id;
-            ";
-
-            MySqlParameter[] parameters = [new("id", id)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = CarConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<Car?> GetInfoByNameAsync(string name)
-        {
-            var query = @$"
-                SELECT {string.Join(", ", CarSelects.Info)} FROM {CarSchema.TableName} 
-                WHERE {CarSchema.Name} = @name;
-            ";
-
-            MySqlParameter[] parameters = [new("name", name)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-            
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = CarConverter.FromReader(reader);
-
-            return result;
-        }
-
-        public async Task<Car?> GetInfoByNumberAsync(int number)
-        {
-            var query = @$"
-                SELECT {string.Join(", ", CarSelects.Info)} FROM {CarSchema.TableName} 
-                WHERE {CarSchema.Number} = @number;
-            ";
-
-            MySqlParameter[] parameters = [new("number", number)];
-
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-            
-            using var reader = await db.ExecuteReaderAsync(query, parameters);
-
-            var result = CarConverter.FromReader(reader);
+            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            {
+                while (await reader.ReadAsync())
+                {
+                    result = Car.Restore(
+                        reader.GetInt32(CarSchema.Id),
+                        reader.GetString(CarSchema.Name),
+                        reader.GetInt32(CarSchema.Number),
+                        reader.GetString(CarSchema.Plate),
+                        reader.GetString(CarSchema.Status),
+                        reader.GetDateTime(CarSchema.CreatedAt),
+                        reader.GetDateTime(CarSchema.UpdatedAt)
+                    );
+                }
+            }
 
             return result;
         }

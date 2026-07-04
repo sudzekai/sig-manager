@@ -7,7 +7,7 @@ namespace Contracts.Interfaces.Application.Services
     {
         Task<CarInfoDto> CreateAsync(CarCreateDto createDto);
         Task DeleteByIdAsync(int id);
-        Task<CarInfoDto> GetInfoByIdAsync(int id);
+        Task<CarInfoDto> GetByIdAsync(int id);
         Task<IReadOnlyList<CarSimpleDto>> GetAllAsync(GetCarsListRequest request);
         Task UpdateInfoByIdAsync(int id, CarInfoUpdateDto updateDto);
         Task UpdateStatusByIdAsync(int id, CarStatusUpdateDto updateDto);

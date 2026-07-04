@@ -7,14 +7,10 @@ namespace Contracts.Interfaces.Application.Services
     {
         Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request);
         Task<UserInfoDto> GetById(int id);
-        Task<UserInfoDto> GetByUsernameAsync(string username);
-
         Task<UserInfoDto> CreateAsync(UserCreateDto createDto);
-
         Task UpdateInfoByIdAsync(int id, UserInfoUpdateDto updateDto);
         Task UpdatePasswordByIdAsync(int id, UserPasswordUpdateDto updateDto);
         Task UpdateRoleByIdAsync(int id, UserRoleUpdateDto updateDto);
-
         Task DeleteByIdAsync(int id);
     }
 }

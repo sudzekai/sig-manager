@@ -4,64 +4,22 @@ namespace Infrastructure.Internal.Extensions
 {
     internal static class DataReaderExtensions
     {
-        public static bool TryGetOrdinal(this IDataReader reader, string columnName, out int ordinal)
-        {
-            try
-            {
-                ordinal = reader.GetOrdinal(columnName);
-                return true;
-            }
-            catch
-            {
-                ordinal = -1;
-                return false;
-            }
-        }
+        public static int? GetNullableInt32(this IDataReader reader, string columnName)
+            => reader.GetNullableInt32(reader.GetOrdinal(columnName));
 
-        public static int TryGetInt32(this IDataReader reader, string columnName)
-        {
-            if (!TryGetOrdinal(reader, columnName, out int ordinal))
-                return default;
+        public static int? GetNullableInt32(this IDataReader reader, int ordinal)
+            => reader.IsDBNull(ordinal) ? null : reader.GetInt32(ordinal);
 
-            return reader.TryGetInt32(ordinal);
-        }
+        public static string? GetNullableString(this IDataReader reader, string columnName)
+            => reader.GetNullableString(reader.GetOrdinal(columnName));
 
-        public static int TryGetInt32(this IDataReader reader, int ordinal)
-        {
-            if (ordinal < 0)
-                return default;
-            return reader.IsDBNull(ordinal) ? default : reader.GetInt32(ordinal);
-        }
+        public static string? GetNullableString(this IDataReader reader, int ordinal)
+            => reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
 
-        public static string? TryGetString(this IDataReader reader, string columnName)
-        {
-            if (!TryGetOrdinal(reader, columnName, out int ordinal))
-                return null;
+        public static DateTime? GetNullableDateTime(this IDataReader reader, string columnName)
+            => reader.GetNullableDateTime(reader.GetOrdinal(columnName));
 
-            return reader.TryGetString(ordinal);
-        }
-
-        public static string? TryGetString(this IDataReader reader, int ordinal)
-        {
-            if (ordinal < 0)
-                return null;
-            return reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal);
-        }
-
-        public static DateTime TryGetDateTime(this IDataReader reader, string columnName)
-        {
-            if (!TryGetOrdinal(reader, columnName, out int ordinal))
-                return default;
-
-            return reader.TryGetDateTime(ordinal);
-        }
-
-        public static DateTime TryGetDateTime(this IDataReader reader, int ordinal)
-        {
-            if (ordinal < 0)
-                return default;
-
-            return reader.IsDBNull(ordinal) ? default : reader.GetDateTime(ordinal);
-        }
+        public static DateTime? GetNullableDateTime(this IDataReader reader, int ordinal)
+            => reader.IsDBNull(ordinal) ? null : reader.GetDateTime(ordinal);
     }
 }
