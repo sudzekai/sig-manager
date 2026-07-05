@@ -56,17 +56,17 @@ create table user_shifts (
     shift_id int not null,
     position_id int not null,
 
-    primary key (popcorn_shift_id, product_id),
+    primary key (user_id, shift_id),
 
     foreign key (user_id)
         references users(id)
-        on delete cascade,
+        on delete cascade
         on update cascade,
     
     foreign key (shift_id)
         references shifts(id)
         on delete cascade
-        on update cascade
+        on update cascade,
     
     foreign key (position_id)
         references positions(id)

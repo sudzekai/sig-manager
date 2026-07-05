@@ -14,5 +14,5 @@ create table cars (
     `status` ENUM("working", "broken") not null default "working",
     plate varchar(150) not null default "-",
 
-    constraint unique_idx_products_name unique (`name`),
-)
+    constraint unique_idx_cars_name unique (`name`)
+);

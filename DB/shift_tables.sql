@@ -19,7 +19,7 @@ create table info_shifts (
 
     cash decimal(18,2),
     cashless decimal(18,2),
-    receipt_photo_file_name varchar(100),
+    receipt_photo_file_name varchar(255),
 
     foreign key (shift_id)
         references shifts(id)
