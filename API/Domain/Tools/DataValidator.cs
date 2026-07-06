@@ -7,7 +7,7 @@ namespace Domain.Tools
     {
         public static void NullOrWhiteSpace([NotNull] string? value, string fieldName)
         {
-            if (string.IsNullOrWhiteSpace(fieldName))
+            if (string.IsNullOrWhiteSpace(value))
                 throw new DataValidationException($"{fieldName} не может быть пустым");
         }
 

@@ -14,7 +14,7 @@ namespace Domain.Models.Cars
         public int Id
         {
             get => _id;
-            private set
+            set
             {
                 if (_id == value)
                     return;
@@ -68,7 +68,7 @@ namespace Domain.Models.Cars
             get => _status;
 
             [MemberNotNull(nameof(_status))]
-            private set
+            set
             {
                 if (_status == value)
                     return;

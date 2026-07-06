@@ -112,7 +112,7 @@ namespace Infrastructure.Queries.CarShift
                 }
             }
 
-            return result;
+            throw new NotImplementedException();
         }
     }
 }

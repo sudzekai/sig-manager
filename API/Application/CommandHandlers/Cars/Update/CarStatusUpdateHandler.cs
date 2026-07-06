@@ -13,7 +13,7 @@ namespace Application.CommandHandlers.Cars.Update
             var existing = await repository.GetAsync(command.Id)
                             ?? throw NotFoundException.CarWithId(command.Id);
 
-            existing.ChangeStatus(command.Dto.Status);
+            existing.Status  = command.Dto.Status;
 
             await repository.UpdateAsync(existing);
 

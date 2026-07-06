@@ -19,7 +19,7 @@ namespace Application.CommandHandlers.Cars.Update
                 if (await IsNameExistsAsync(command.Dto.Name, command.Id))
                     throw ConflictException.CarName;
 
-                existing.ChangeName(command.Dto.Name);
+                existing.Name = command.Dto.Name;
             }
 
             if (command.Dto.Id != default)
@@ -27,11 +27,11 @@ namespace Application.CommandHandlers.Cars.Update
                 if (await IsIdExistsAsync(command.Dto.Id, command.Id))
                     throw ConflictException.CarId;
 
-                existing.ChangeId(command.Dto.Id);
+                existing.Id = command.Dto.Id;
             }
 
             if (!string.IsNullOrWhiteSpace(command.Dto.Plate))
-                existing.ChangePlate(command.Dto.Plate);
+                existing.Plate = command.Dto.Plate;
 
             await repository.UpdateAsync(existing);
 
