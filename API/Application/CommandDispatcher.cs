@@ -6,7 +6,7 @@ namespace Application
 {
     public class CommandDispatcher(IServiceProvider serviceProvider) : ICommandDispatcher
     {
-        public async Task<TResult> DispatchAsync<TResult>(ICommand<TResult> command)
+        public async Task<TResult> ExecuteAsync<TResult>(ICommand<TResult> command)
         {
             var handlerType = typeof(ICommandHandler<,>)
                 .MakeGenericType(command.GetType(), typeof(TResult));

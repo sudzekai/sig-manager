@@ -5,20 +5,15 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.2.2";
-
+        public const string CurrentVersion = "v0.2.3";
 
         public const string ChangeLog =
             """
-            Рефакторинг: внедрение CQRS и Command Dispatcher
+            Внедрение CQRS: разделение Command/Query, диспетчеры
 
-            Переведён проект на CQRS с использованием паттерна Command Handler/Dispatcher. 
-            Контроллеры теперь используют ICommandDispatcher для обработки команд. 
-            Добавлены отдельные обработчики команд для пользователей, машин и Bash-команд. 
-            Модель Car и связанные DTO изменены: поле Number заменено на Id. 
-            Реализованы новые команды и методы поиска по уникальным полям в репозиториях. 
-            Удалены устаревшие сервисы и интерфейсы, обновлена DI-композиция и исключения. 
-            Улучшена расширяемость и тестируемость архитектуры.
+            Реализован паттерн CQRS: команды и запросы вынесены в отдельные обработчики и диспетчеры. 
+            Добавлены интерфейсы и реализации для QueryDispatcher и связанных типов. Контроллеры теперь используют оба диспетчера. 
+            Обновлены DI-расширения и пространства имён. Удалены устаревшие команды, добавлены объекты Query.
             """;
 
         public static TextWriter StandartWriter { get; set; } = Console.Out;

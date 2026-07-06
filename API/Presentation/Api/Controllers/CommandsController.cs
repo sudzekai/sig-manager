@@ -14,7 +14,7 @@ namespace Presentation.Api.Controllers
         [ValidateModelState]
         public async Task<string> Process([FromBody] CommandDto body)
         {
-            return await dispatcher.DispatchAsync(new BashExecuteCommand(body));
+            return await dispatcher.ExecuteAsync(new BashExecuteCommand(body));
         }
     }
 }

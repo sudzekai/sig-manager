@@ -1,25 +1,26 @@
 ﻿using Application;
-using Application.Handlers.Bash;
-using Application.Handlers.Cars.Get;
-using Application.Handlers.Cars.Update;
-using Application.Handlers.Cars.Write;
-using Application.Handlers.Users.Get;
-using Application.Handlers.Users.Update;
-using Application.Handlers.Users.Write;
+using Application.CommandHandlers.Bash;
+using Application.CommandHandlers.Cars.Update;
+using Application.CommandHandlers.Cars.Write;
+using Application.CommandHandlers.Users.Update;
+using Application.CommandHandlers.Users.Write;
+using Application.QueryHandlers.Cars;
+using Application.QueryHandlers.Users;
 using Application.Services;
 using Contracts.Interfaces.Application.Commands;
 using Contracts.Interfaces.Application.Dispatchers;
+using Contracts.Interfaces.Application.Queries;
 using Contracts.Interfaces.Application.Services;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Bash;
-using Contracts.Objects.Commands.Cars.Get;
 using Contracts.Objects.Commands.Cars.Update;
 using Contracts.Objects.Commands.Cars.Write;
-using Contracts.Objects.Commands.Users.Get;
 using Contracts.Objects.Commands.Users.Update;
 using Contracts.Objects.Commands.Users.Write;
 using Contracts.Objects.Dtos.Car;
 using Contracts.Objects.Dtos.User;
+using Contracts.Objects.Queries.Cars;
+using Contracts.Objects.Queries.Users;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CompositionRoot
@@ -31,7 +32,6 @@ namespace CompositionRoot
             services.AddSingleton<IBanIpService, BanIpService>();
             services.AddScoped<IHashService, HashService>();
 
-            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
             services.AddCommandHandlers();
 
@@ -40,6 +40,9 @@ namespace CompositionRoot
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+
             services.AddBashHandlers()
                     .AddUserHandlers()
                     .AddCarHandlers();
@@ -53,9 +56,9 @@ namespace CompositionRoot
 
         private static IServiceCollection AddUserHandlers(this IServiceCollection services)
         =>  // get
-            services.AddScoped<ICommandHandler<UserGetAllCommand, IReadOnlyList<UserSimpleDto>>, 
+            services.AddScoped<IQueryHandler<UserGetAllQuery, IReadOnlyList<UserSimpleDto>>, 
                                UserGetAllHandler>()
-                    .AddScoped<ICommandHandler<UserGetCommand, UserInfoDto>, 
+                    .AddScoped<IQueryHandler<UserGetQuery, UserInfoDto>, 
                                UserGetHandler>()
             // update
                     .AddScoped<ICommandHandler<UserInfoUpdateCommand, Unit>,
@@ -72,9 +75,9 @@ namespace CompositionRoot
 
         private static IServiceCollection AddCarHandlers(this IServiceCollection services)
         =>  // get
-            services.AddScoped<ICommandHandler<CarGetAllCommand, IReadOnlyList<CarSimpleDto>>, 
+            services.AddScoped<IQueryHandler<CarGetAllQuery, IReadOnlyList<CarSimpleDto>>, 
                                CarGetAllHandler>()
-                    .AddScoped<ICommandHandler<CarGetCommand, CarInfoDto>, 
+                    .AddScoped<IQueryHandler<CarGetQuery, CarInfoDto>, 
                                CarGetHandler>()
             // update
                     .AddScoped<ICommandHandler<CarInfoUpdateCommand, Unit>,

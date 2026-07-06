@@ -4,6 +4,6 @@ namespace Contracts.Interfaces.Application.Dispatchers
 {
     public interface ICommandDispatcher
     {
-        Task<TResult> DispatchAsync<TResult>(ICommand<TResult> command);
+        Task<TResult> ExecuteAsync<TResult>(ICommand<TResult> command);
     }
 }

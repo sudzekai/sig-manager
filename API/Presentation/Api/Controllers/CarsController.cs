@@ -1,9 +1,9 @@
 ﻿using Contracts.Interfaces.Application.Dispatchers;
-using Contracts.Objects.Commands.Cars.Get;
 using Contracts.Objects.Commands.Cars.Update;
 using Contracts.Objects.Commands.Cars.Write;
 using Contracts.Objects.Dtos.Car;
 using Contracts.Objects.Dtos.Requests;
+using Contracts.Objects.Queries.Cars;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Attributes;
 using Presentation.Objects.Requests;
@@ -14,27 +14,27 @@ namespace Presentation.Api.Controllers
 {
     [ApiController]
     [Route("/cars")]
-    public class CarsController(ICommandDispatcher dispatcher)
+    public class CarsController(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
     {
         [HttpGet]
         [ValidateModelState]
         public async Task<IReadOnlyList<CarSimpleDto>> GetAll([FromQuery] GetCarsListRequest query)
         {
-            return await dispatcher.DispatchAsync(new CarGetAllCommand(query));
+            return await queryDispatcher.QueryAsync(new CarGetAllQuery(query));
         }
 
         [HttpGet("{id}")]
         [ValidateModelState]
         public async Task<CarInfoDto> GetById([FromRoute] IdRoute route)
         {
-            return await dispatcher.DispatchAsync(new CarGetCommand(route.Id));
+            return await queryDispatcher.QueryAsync(new CarGetQuery(route.Id));
         }
 
         [HttpPost]
         [ValidateModelState]
         public async Task<IActionResult> Post([FromBody] CarCreateDto body)
         {
-            var result = await dispatcher.DispatchAsync(new CarCreateCommand(body));
+            var result = await commandDispatcher.ExecuteAsync(new CarCreateCommand(body));
 
             return ResponseEnvelope.FromData(result).ToCreatedObjectResult();
         }
@@ -43,21 +43,21 @@ namespace Presentation.Api.Controllers
         [ValidateModelState]
         public async Task UpdateInfoById([FromRoute] IdRoute route, [FromBody] CarInfoUpdateDto body)
         {
-            await dispatcher.DispatchAsync(new CarInfoUpdateCommand(route.Id, body));
+            await commandDispatcher.ExecuteAsync(new CarInfoUpdateCommand(route.Id, body));
         }
 
         [HttpPut("{id}/status")]
         [ValidateModelState]
         public async Task UpdateStatusById([FromRoute] IdRoute route, [FromBody] CarStatusUpdateDto body)
         {
-            await dispatcher.DispatchAsync(new CarStatusUpdateCommand(route.Id, body));
+            await commandDispatcher.ExecuteAsync(new CarStatusUpdateCommand(route.Id, body));
         }
 
         [HttpDelete]
         [ValidateModelState]
         public async Task DeleteById([FromRoute] IdRoute route)
         {
-            await dispatcher.DispatchAsync(new CarDeleteCommand(route.Id));
+            await commandDispatcher.ExecuteAsync(new CarDeleteCommand(route.Id));
         }
     }
 }
