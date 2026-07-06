@@ -4,7 +4,7 @@ using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Commands.Users.Write;
 using Contracts.Objects.Dtos.User;
-using Domain.Models;
+using Domain.Models.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Write

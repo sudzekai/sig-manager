@@ -16,7 +16,7 @@ namespace Application.CommandHandlers.Users.Update
 
             string passwordHash = hashService.HashString(command.Dto.Password);
 
-            user.ChangePasswordHash(passwordHash);
+            user.PasswordHash = passwordHash;
 
             await repository.UpdateAsync(user);
 

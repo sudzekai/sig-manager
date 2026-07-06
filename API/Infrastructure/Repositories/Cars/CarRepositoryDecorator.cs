@@ -1,5 +1,5 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
-using Domain.Models;
+using Domain.Models.Cars;
 using Microsoft.Extensions.Logging;
 using Shared.Extensions;
 using Shared.OpenTelemetry;

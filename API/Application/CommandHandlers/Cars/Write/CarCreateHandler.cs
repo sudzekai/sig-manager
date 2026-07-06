@@ -3,7 +3,7 @@ using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Commands.Cars.Write;
 using Contracts.Objects.Dtos.Car;
-using Domain.Models;
+using Domain.Models.Cars;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Cars.Write

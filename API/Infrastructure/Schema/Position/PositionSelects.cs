@@ -1,6 +1,4 @@
-﻿using Infrastructure.Schema.Right;
-
-namespace Infrastructure.Schema.Position
+﻿namespace Infrastructure.Schema.Position
 {
     internal static class PositionSelects
     {

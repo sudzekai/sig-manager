@@ -6,21 +6,10 @@
             CarSchema.Id,
             CarSchema.Name,
             CarSchema.Plate,
-            CarSchema.Status,
-            CarSchema.CreatedAt,
-            CarSchema.UpdatedAt
+            CarSchema.Status
         ];
 
         public static readonly IReadOnlyList<string> Full = [
-            CarSchema.Id,
-            CarSchema.Name,
-            CarSchema.Plate,
-            CarSchema.Status,
-            CarSchema.CreatedAt,
-            CarSchema.UpdatedAt
-        ];
-
-        public static readonly IReadOnlyList<string> Info = [
             CarSchema.Id,
             CarSchema.Name,
             CarSchema.Plate,

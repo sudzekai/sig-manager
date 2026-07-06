@@ -1,12 +1,19 @@
 ﻿using Domain.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Tools
 {
     internal class DataValidator
     {
-        public static void NullOrWhiteSpace(string value, string fieldName)
+        public static void NullOrWhiteSpace([NotNull] string? value, string fieldName)
         {
             if (string.IsNullOrWhiteSpace(fieldName))
+                throw new DataValidationException($"{fieldName} не может быть пустым");
+        }
+
+        public static void Null([NotNull] object? value, string fieldName)
+        {
+            if (value is null)
                 throw new DataValidationException($"{fieldName} не может быть пустым");
         }
 

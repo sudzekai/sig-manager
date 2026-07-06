@@ -1,6 +1,6 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
-using Domain.Models;
+using Domain.Models.Users;
 using Infrastructure.Internal.Extensions;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;

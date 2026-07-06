@@ -8,7 +8,5 @@
         public const string Name = "name";
         public const string Plate = "plate";
         public const string Status = "status";
-        public const string CreatedAt = "created_at";
-        public const string UpdatedAt = "updated_at";
     }
 }

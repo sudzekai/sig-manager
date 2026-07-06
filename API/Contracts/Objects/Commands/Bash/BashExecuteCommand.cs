@@ -3,5 +3,5 @@ using Contracts.Objects.Dtos;
 
 namespace Contracts.Objects.Commands.Bash
 {
-    public record BashExecuteCommand(CommandDto Dto) : ICommand<string>;
+    public record BashExecuteCommand(BashCommandDto Dto) : ICommand<string>;
 }

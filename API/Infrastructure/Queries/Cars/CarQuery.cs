@@ -29,30 +29,6 @@ namespace Infrastructure.Queries.Cars
                 parameters.Add(new("status", request.Status.ToLower()));
             }
 
-            if (request.CreatedAtStart != default)
-            {
-                query.Append($"\nAND {CarSchema.CreatedAt} > @createdAtStart");
-                parameters.Add(new("createdAtStart", request.CreatedAtStart));
-            }
-
-            if (request.CreatedAtEnd != default)
-            {
-                query.Append($"\nAND {CarSchema.CreatedAt} < @createdAtEnd");
-                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
-            }
-
-            if (request.UpdatedAtStart != default)
-            {
-                query.Append($"\nAND {CarSchema.UpdatedAt} > @updatedAtStart");
-                parameters.Add(new("updatedAtStart", request.UpdatedAtStart));
-            }
-
-            if (request.UpdatedAtEnd != default)
-            {
-                query.Append($"\nAND {CarSchema.UpdatedAt} < @updatedAtEnd");
-                parameters.Add(new("updatedAtEnd", request.UpdatedAtEnd));
-            }
-
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 query.Append(@$"
@@ -70,8 +46,6 @@ namespace Infrastructure.Queries.Cars
                 {
                     "name" => CarSchema.Name,
                     "status" => CarSchema.Status,
-                    "createdate" => CarSchema.CreatedAt,
-                    "updatedate" => CarSchema.UpdatedAt,
                     _ => CarSchema.Id
                 };
 
@@ -113,7 +87,7 @@ namespace Infrastructure.Queries.Cars
         public async Task<CarInfoDto?> GetByIdAsync(int id)
         {
             var query = @$"
-                SELECT {string.Join(", ", CarSelects.Info)} FROM {CarSchema.TableName} 
+                SELECT {string.Join(", ", CarSelects.Full)} FROM {CarSchema.TableName} 
                 WHERE {CarSchema.Id} = @id;
             ";
 

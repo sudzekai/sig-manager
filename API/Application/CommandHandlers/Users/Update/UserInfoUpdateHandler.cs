@@ -18,18 +18,18 @@ namespace Application.CommandHandlers.Users.Update
                 if (await IsUsernameExistsAsync(command.Dto.Username, command.Id))
                     throw ConflictException.UserUsername;
 
-                user.ChangeUsername(command.Dto.Username);
+                user.Username = command.Dto.Username;
             }
 
             if (command.Dto.FullName != null)
-                user.ChangeFullName(command.Dto.FullName);
+                user.FullName = command.Dto.FullName;
 
             if (command.Dto.Email != null)
             {
                 if (await IsEmailExistsAsync(command.Dto.Email, command.Id))
                     throw ConflictException.UserEmail;
 
-                user.ChangeEmail(command.Dto.Email);
+                user.Email = command.Dto.Email;
             }
 
             if (command.Dto.PhoneNumber != null)
@@ -37,7 +37,7 @@ namespace Application.CommandHandlers.Users.Update
                 if (await IsPhoneNumberExistsAsync(command.Dto.PhoneNumber, command.Id))
                     throw ConflictException.UserPhoneNumber;
 
-                user.ChangePhoneNumber(command.Dto.PhoneNumber);
+                user.PhoneNumber = command.Dto.PhoneNumber;
 
             }
 

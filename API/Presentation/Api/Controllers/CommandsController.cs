@@ -12,7 +12,7 @@ namespace Presentation.Api.Controllers
     {
         [HttpPost]
         [ValidateModelState]
-        public async Task<string> Process([FromBody] CommandDto body)
+        public async Task<string> Process([FromBody] BashCommandDto body)
         {
             return await dispatcher.ExecuteAsync(new BashExecuteCommand(body));
         }

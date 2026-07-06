@@ -1,4 +1,4 @@
-﻿using Domain.Models;
+﻿using Domain.Models.Users;
 
 namespace Contracts.Interfaces.Infrastructure.Repositories
 {

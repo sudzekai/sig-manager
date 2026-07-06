@@ -1,6 +1,6 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
-using Domain.Models;
+using Domain.Models.Cars;
 using Infrastructure.Schema.Car;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
@@ -15,7 +15,7 @@ namespace Infrastructure.Repositories.Cars
         {
             var query = @$"
                 INSERT INTO {CarSchema.TableName} ({string.Join(", ", CarSelects.Insertation)}) 
-                VALUES (@id, @name, @plate, @status, @createdAt, @updatedAt);
+                VALUES (@id, @name, @plate, @status);
                 SELECT LAST_INSERT_ID();
             ";
 
@@ -23,9 +23,7 @@ namespace Infrastructure.Repositories.Cars
                 new("id", car.Id),
                 new("name", car.Name),
                 new("plate", car.Plate),
-                new("status", car.Status),
-                new("createdAt", car.CreatedAt),
-                new("updatedAt", car.UpdatedAt)
+                new("status", car.Status)
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.INSERT, parameters.Length);
@@ -72,9 +70,7 @@ namespace Infrastructure.Repositories.Cars
                         reader.GetInt32(CarSchema.Id),
                         reader.GetString(CarSchema.Name),
                         reader.GetString(CarSchema.Plate),
-                        reader.GetString(CarSchema.Status),
-                        reader.GetDateTime(CarSchema.CreatedAt),
-                        reader.GetDateTime(CarSchema.UpdatedAt)
+                        reader.GetString(CarSchema.Status)
                     );
                 }
             }
@@ -110,8 +106,7 @@ namespace Infrastructure.Repositories.Cars
                     {CarSchema.Id} = @id,
                     {CarSchema.Name} = @name,
                     {CarSchema.Plate} = @plate,
-                    {CarSchema.Status} = @status,
-                    {CarSchema.UpdatedAt} = @updatedAt
+                    {CarSchema.Status} = @status
                 WHERE
                     {CarSchema.Id} = @id
             ";
@@ -121,8 +116,6 @@ namespace Infrastructure.Repositories.Cars
                 new("name", car.Name),
                 new("plate", car.Plate),
                 new("status", car.Status),
-                new("createdAt", car.CreatedAt),
-                new("updatedAt", car.UpdatedAt),
                 new("id", car.Id)
             ];
 

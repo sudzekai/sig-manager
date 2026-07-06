@@ -13,7 +13,7 @@ namespace Application.CommandHandlers.Users.Update
             var user = await repository.GetAsync(command.Id)
                 ?? throw NotFoundException.UserWithId(command.Id);
 
-            user.ChangeRoleId(command.Dto.RoleId);
+            user.RoleId = command.Dto.RoleId;
 
             await repository.UpdateAsync(user);
 
