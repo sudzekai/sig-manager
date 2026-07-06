@@ -30,9 +30,18 @@ namespace Infrastructure.Repositories.Cars
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("car", "get");
 
-            logger.LogInformation("Восстановление записи о машины с id {id}", id);
+            logger.LogInformation("Восстановление записи о машине с id {id}", id);
 
             return await inner.GetAsync(id);
+        }
+
+        public async Task<int?> GetIdByNameAsync(string name)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("car", "get_id_by_name");
+            
+            logger.LogInformation("Поиск записи о машине с name {name}", name);
+
+            return await inner.GetIdByNameAsync(name);
         }
 
         public async Task UpdateAsync(Car car)

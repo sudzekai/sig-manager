@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Infrastructure.Queries.Roles
 {
-    internal class RoleQuery(IDbContext db) : IRoleQuery
+    public class RoleQuery(IDbContext db) : IRoleQuery
     {
         public async Task<IReadOnlyList<RoleSimpleDto>> GetAllAsync()
         {

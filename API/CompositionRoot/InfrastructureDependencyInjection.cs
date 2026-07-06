@@ -1,7 +1,9 @@
-﻿using Application.Services.Users;
-using Contracts.Interfaces.Infrastructure.Context;
+﻿using Contracts.Interfaces.Infrastructure.Context;
+using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Infrastructure.Databse.Context;
+using Infrastructure.Queries.Cars;
+using Infrastructure.Queries.Users;
 using Infrastructure.Repositories.Cars;
 using Infrastructure.Repositories.Users;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +35,16 @@ namespace CompositionRoot
                 return new UserRepositoryDecorator(inner, logger);
             });
 
+            services.AddScoped<UserQuery>();
+
+            services.AddScoped<IUserQuery>(sp =>
+            {
+                var inner = sp.GetRequiredService<UserQuery>();
+                var logger = sp.GetRequiredService<ILogger<UserQuery>>();
+
+                return new UserQueryDecorator(inner, logger);
+            });
+
             services.AddScoped<CarRepository>();
 
             services.AddScoped<ICarRepository>(sp =>
@@ -41,6 +53,16 @@ namespace CompositionRoot
                 var logger = sp.GetRequiredService<ILogger<CarRepository>>();
 
                 return new CarRepositoryDecorator(inner, logger);
+            });
+
+            services.AddScoped<CarQuery>();
+
+            services.AddScoped<ICarQuery>(sp =>
+            {
+                var inner = sp.GetRequiredService<CarQuery>();
+                var logger = sp.GetRequiredService<ILogger<CarQuery>>();
+
+                return new CarQueryDecorator(inner, logger);
             });
 
             return services;

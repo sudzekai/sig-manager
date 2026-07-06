@@ -4,8 +4,8 @@ namespace Contracts.Objects.Dtos.Requests
 {
     public class GetCarsListRequest : GetListRequest
     {
-        [OneOf("Status,CreateDate,UpdateDate,Id,Number,Name", Required = false,
-            ErrorMessage = "OrderBy должен быть одним из: Status, CreateDate, UpdateDate, Id, Number, Name")]
+        [OneOf("Status,CreateDate,UpdateDate,Id,Name", Required = false,
+            ErrorMessage = "OrderBy должен быть одним из: Status, CreateDate, UpdateDate, Id, Name")]
         public override string OrderBy { get; set; } = string.Empty;
 
         [OneOf("Working,Broken", Required = false,

@@ -1,4 +1,7 @@
-﻿using Contracts.Interfaces.Application.Services;
+﻿using Contracts.Interfaces.Application.Dispatchers;
+using Contracts.Objects.Commands.Cars.Get;
+using Contracts.Objects.Commands.Cars.Update;
+using Contracts.Objects.Commands.Cars.Write;
 using Contracts.Objects.Dtos.Car;
 using Contracts.Objects.Dtos.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -6,40 +9,32 @@ using Presentation.Attributes;
 using Presentation.Objects.Requests;
 using Presentation.Objects.Responses;
 using Presentation.Utilities.Extensions;
-using Shared.Extensions;
-using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Controllers
 {
     [ApiController]
     [Route("/cars")]
-    public class CarsController(ICarsService service)
+    public class CarsController(ICommandDispatcher dispatcher)
     {
         [HttpGet]
         [ValidateModelState]
         public async Task<IReadOnlyList<CarSimpleDto>> GetAll([FromQuery] GetCarsListRequest query)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            return await service.GetAllAsync(query);
+            return await dispatcher.DispatchAsync(new CarGetAllCommand(query));
         }
 
         [HttpGet("{id}")]
         [ValidateModelState]
         public async Task<CarInfoDto> GetById([FromRoute] IdRoute route)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            return await service.GetByIdAsync(route.Id);
+            return await dispatcher.DispatchAsync(new CarGetCommand(route.Id));
         }
 
         [HttpPost]
         [ValidateModelState]
         public async Task<IActionResult> Post([FromBody] CarCreateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            var result = await service.CreateAsync(body);
+            var result = await dispatcher.DispatchAsync(new CarCreateCommand(body));
 
             return ResponseEnvelope.FromData(result).ToCreatedObjectResult();
         }
@@ -48,27 +43,21 @@ namespace Presentation.Api.Controllers
         [ValidateModelState]
         public async Task UpdateInfoById([FromRoute] IdRoute route, [FromBody] CarInfoUpdateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.UpdateInfoByIdAsync(route.Id, body);
+            await dispatcher.DispatchAsync(new CarInfoUpdateCommand(route.Id, body));
         }
 
         [HttpPut("{id}/status")]
         [ValidateModelState]
         public async Task UpdateStatusById([FromRoute] IdRoute route, [FromBody] CarStatusUpdateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.UpdateStatusByIdAsync(route.Id, body);
+            await dispatcher.DispatchAsync(new CarStatusUpdateCommand(route.Id, body));
         }
 
         [HttpDelete]
         [ValidateModelState]
         public async Task DeleteById([FromRoute] IdRoute route)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.DeleteByIdAsync(route.Id);
+            await dispatcher.DispatchAsync(new CarDeleteCommand(route.Id));
         }
     }
 }

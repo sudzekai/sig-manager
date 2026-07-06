@@ -43,5 +43,32 @@ namespace Infrastructure.Repositories.Users
 
             return await inner.GetAsync(id);
         }
+
+        public async Task<int?> GetIdByUsernameAsync(string username)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_username");
+
+            logger.LogInformation("Поиск записи о пользователе с username {username}", username);
+
+            return await inner.GetIdByUsernameAsync(username);
+        }
+
+        public async Task<int?> GetIdByEmailAsync(string email)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_email");
+
+            logger.LogInformation("Поиск записи о пользователе с email {email}", email);
+
+            return await inner.GetIdByEmailAsync(email);
+        }
+
+        public async Task<int?> GetIdByPhoneNumberAsync(string phoneNumber)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_phoneNumber");
+
+            logger.LogInformation("Поиск записи о пользователе с phoneNumber {phoneNumber}", phoneNumber);
+
+            return await inner.GetIdByPhoneNumberAsync(phoneNumber);
+        }
     }
 }

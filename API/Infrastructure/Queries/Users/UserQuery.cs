@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Infrastructure.Queries.Users
 {
-    internal class UserQuery(IDbContext db) : IUserQuery
+    public class UserQuery(IDbContext db) : IUserQuery
     {
         public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {

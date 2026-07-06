@@ -15,13 +15,13 @@ namespace Infrastructure.Repositories.Cars
         {
             var query = @$"
                 INSERT INTO {CarSchema.TableName} ({string.Join(", ", CarSelects.Insertation)}) 
-                VALUES (@name, @number, @plate, @status, @createdAt, @updatedAt);
+                VALUES (@id, @name, @plate, @status, @createdAt, @updatedAt);
                 SELECT LAST_INSERT_ID();
             ";
 
             MySqlParameter[] parameters = [
+                new("id", car.Id),
                 new("name", car.Name),
-                new("number", car.Number),
                 new("plate", car.Plate),
                 new("status", car.Status),
                 new("createdAt", car.CreatedAt),
@@ -71,7 +71,6 @@ namespace Infrastructure.Repositories.Cars
                     result = Car.Restore(
                         reader.GetInt32(CarSchema.Id),
                         reader.GetString(CarSchema.Name),
-                        reader.GetInt32(CarSchema.Number),
                         reader.GetString(CarSchema.Plate),
                         reader.GetString(CarSchema.Status),
                         reader.GetDateTime(CarSchema.CreatedAt),
@@ -83,13 +82,33 @@ namespace Infrastructure.Repositories.Cars
             return result;
         }
 
+        public async Task<int?> GetIdByNameAsync(string name)
+        {
+            var query = $"""
+                SELECT {CarSchema.Id} 
+                FROM {CarSchema.TableName}
+                WHERE {CarSchema.Name} = @name;
+                """;
+
+            MySqlParameter[] parameters = [new("name", name)];
+            
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+
+            var idObj = await db.ExecuteScalarAsync(query, parameters);
+
+            if (idObj is null) 
+                return null;
+
+            return Convert.ToInt32(idObj);
+        }
+
         public async Task UpdateAsync(Car car)
         {
             var query = $@"
                 UPDATE {CarSchema.TableName}
                 SET 
+                    {CarSchema.Id} = @id,
                     {CarSchema.Name} = @name,
-                    {CarSchema.Number} = @number,
                     {CarSchema.Plate} = @plate,
                     {CarSchema.Status} = @status,
                     {CarSchema.UpdatedAt} = @updatedAt
@@ -98,8 +117,8 @@ namespace Infrastructure.Repositories.Cars
             ";
 
             MySqlParameter[] parameters = [
+                new("id", car.Id),
                 new("name", car.Name),
-                new("number", car.Number),
                 new("plate", car.Plate),
                 new("status", car.Status),
                 new("createdAt", car.CreatedAt),

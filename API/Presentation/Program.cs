@@ -34,7 +34,7 @@ namespace Presentation
             builder.Services.AddRepositories();
 
             // application
-            builder.Services.AddApplicationServices();
+            builder.Services.AddApplicationLayer();
 
             // presentation
             builder.Services.AddFilters();

@@ -1,4 +1,7 @@
-﻿using Contracts.Interfaces.Application.Services;
+﻿using Contracts.Interfaces.Application.Dispatchers;
+using Contracts.Objects.Commands.Users.Get;
+using Contracts.Objects.Commands.Users.Update;
+using Contracts.Objects.Commands.Users.Write;
 using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Microsoft.AspNetCore.Mvc;
@@ -6,49 +9,32 @@ using Presentation.Attributes;
 using Presentation.Objects.Requests;
 using Presentation.Objects.Responses;
 using Presentation.Utilities.Extensions;
-using Shared.Extensions;
-using Shared.OpenTelemetry;
 
 namespace Presentation.Api.Controllers
 {
     [ApiController]
     [Route("/users")]
-    public class UsersController(IUsersService service)
+    public class UsersController(ICommandDispatcher dispatcher)
     {
         [HttpGet]
         [ValidateModelState]
-        public async Task<IReadOnlyList<UserSimpleDto>> GetAll([FromQuery] GetUsersListRequest request)
+        public async Task<IReadOnlyList<UserSimpleDto>> GetAll([FromQuery] GetUsersListRequest query)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            return await service.GetAllAsync(request);
+            return await dispatcher.DispatchAsync(new UserGetAllCommand(query));
         }
 
         [HttpGet("{id}")]
         [ValidateModelState]
         public async Task<UserInfoDto> GetById([FromRoute] IdRoute route)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            return await service.GetById(route.Id);
-        }
-
-        [HttpGet("username/{value}")]
-        [ValidateModelState]
-        public async Task<UserInfoDto> GetByUsername([FromRoute] StringRoute route)
-        {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            return await service.GetByUsernameAsync(route.Value);
+            return await dispatcher.DispatchAsync(new UserGetCommand(route.Id));
         }
 
         [HttpPost]
         [ValidateModelState]
         public async Task<IActionResult> Post([FromBody] UserCreateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            var result = await service.CreateAsync(body);
+            var result = await dispatcher.DispatchAsync(new UserCreateCommand(body));
 
             return ResponseEnvelope.FromData(result).ToCreatedObjectResult();
         }
@@ -57,36 +43,28 @@ namespace Presentation.Api.Controllers
         [ValidateModelState]
         public async Task PutInfoById([FromRoute] IdRoute route, [FromBody] UserInfoUpdateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.UpdateInfoByIdAsync(route.Id, body);
+            await dispatcher.DispatchAsync(new UserInfoUpdateCommand(route.Id, body));
         }
 
         [HttpPut("{id}/password")]
         [ValidateModelState]
         public async Task PutPasswordById([FromRoute] IdRoute route, [FromBody] UserPasswordUpdateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.UpdatePasswordByIdAsync(route.Id, body);
+            await dispatcher.DispatchAsync(new UserPasswordUpdateCommand(route.Id, body));
         }
 
         [HttpPut("{id}/role")]
         [ValidateModelState]
         public async Task PutRoleById([FromRoute] IdRoute route, [FromBody] UserRoleUpdateDto body)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.UpdateRoleByIdAsync(route.Id, body);
+            await dispatcher.DispatchAsync(new UserRoleUpdateCommand(route.Id, body));
         }
 
         [HttpDelete("{id}")]
         [ValidateModelState]
         public async Task DeleteById([FromRoute] IdRoute route)
         {
-            using var activity = Telemetry.Controller.StartRichActivity();
-
-            await service.DeleteByIdAsync(route.Id);
+            await dispatcher.DispatchAsync(new UserDeleteCommand(route.Id));
         }
     }
 }

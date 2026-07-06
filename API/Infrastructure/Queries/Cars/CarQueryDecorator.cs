@@ -7,7 +7,7 @@ using Shared.OpenTelemetry;
 
 namespace Infrastructure.Queries.Cars
 {
-    internal class CarQueryDecorator(ICarQuery inner, ILogger<ICarQuery> logger) : ICarQuery
+    public class CarQueryDecorator(ICarQuery inner, ILogger<ICarQuery> logger) : ICarQuery
     {
         public async Task<IReadOnlyList<CarSimpleDto>> GetAllAsync(GetCarsListRequest request)
         {

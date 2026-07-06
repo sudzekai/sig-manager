@@ -1,4 +1,4 @@
 ﻿namespace Contracts.Interfaces.Application.Commands
 {
-    public interface ICommandHandler<TResult>;
+    public interface ICommand<TResult>;
 }

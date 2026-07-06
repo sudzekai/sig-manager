@@ -9,6 +9,6 @@
         public static ConflictException UserEmail => new("Пользователь с такой электронной почтой уже существует", "Пользователь с переданным email уже существует");
 
         public static ConflictException CarName => new("Машина с таким названием уже существует", "Машина с переданным name уже существует");
-        public static ConflictException CarNumber => new("Машина с таким номером уже существует", "Машина с переданным number уже существует");
+        public static ConflictException CarId => new("Машина с таким идентификатором уже существует", "Машина с переданным id уже существует");
     }
 }

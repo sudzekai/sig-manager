@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Infrastructure.Queries.Cars
 {
-    internal class CarQuery(IDbContext db) : ICarQuery
+    public class CarQuery(IDbContext db) : ICarQuery
     {
         public async Task<IReadOnlyList<CarSimpleDto>> GetAllAsync(GetCarsListRequest request)
         {
@@ -57,7 +57,7 @@ namespace Infrastructure.Queries.Cars
             {
                 query.Append(@$"
                     AND ({CarSchema.Name} LIKE @searchTerm 
-                    OR {CarSchema.Number} LIKE @searchTerm 
+                    OR {CarSchema.Id} LIKE @searchTerm 
                     OR {CarSchema.Plate} LIKE @searchTerm)
                 ");
 
@@ -70,7 +70,6 @@ namespace Infrastructure.Queries.Cars
                 {
                     "name" => CarSchema.Name,
                     "status" => CarSchema.Status,
-                    "number" => CarSchema.Number,
                     "createdate" => CarSchema.CreatedAt,
                     "updatedate" => CarSchema.UpdatedAt,
                     _ => CarSchema.Id
@@ -96,15 +95,13 @@ namespace Infrastructure.Queries.Cars
             {
                 var idOrdinal = reader.GetOrdinal(CarSchema.Id);
                 var nameOrdinal = reader.GetOrdinal(CarSchema.Name);
-                var numberOrdinal = reader.GetOrdinal(CarSchema.Number);
 
                 while (await reader.ReadAsync())
                 {
                     result.Add(
                         new(
                             reader.GetInt32(idOrdinal),
-                            reader.GetString(nameOrdinal),
-                            reader.GetInt32(numberOrdinal)
+                            reader.GetString(nameOrdinal)
                         )
                     );
                 }
@@ -133,7 +130,6 @@ namespace Infrastructure.Queries.Cars
                     result = new(
                         reader.GetInt32(CarSchema.Id),
                         reader.GetString(CarSchema.Name),
-                        reader.GetInt32(CarSchema.Number),
                         reader.GetString(CarSchema.Plate),
                         reader.GetString(CarSchema.Status)
                     );

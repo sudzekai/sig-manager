@@ -6,7 +6,7 @@ using Shared.OpenTelemetry;
 
 namespace Infrastructure.Queries.Roles
 {
-    internal class RoleQueryDecorator(IRoleQuery inner, ILogger<IRoleQuery> logger) : IRoleQuery
+    public class RoleQueryDecorator(IRoleQuery inner, ILogger<IRoleQuery> logger) : IRoleQuery
     {
         public async Task<IReadOnlyList<RoleSimpleDto>> GetAllAsync()
         {

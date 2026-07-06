@@ -7,7 +7,7 @@ using Shared.OpenTelemetry;
 
 namespace Infrastructure.Queries.Users
 {
-    internal class UserQueryDecorator(IUserQuery inner, ILogger<IUserQuery> logger) : IUserQuery
+    public class UserQueryDecorator(IUserQuery inner, ILogger<IUserQuery> logger) : IUserQuery
     {
         public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {

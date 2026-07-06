@@ -7,21 +7,20 @@ namespace Domain.Models
     {
         // ctors
 
-        private Car(int id, string name, int number, string plate, string status, DateTime createdAt, DateTime updatedAt)
+        private Car(int id, string name, string plate, string status, DateTime createdAt, DateTime updatedAt)
         {
             Id = id;
             Name = name;
-            Number = number;
             Plate = plate;
             Status = status;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt;
         }
 
-        private Car(string name, int number, string plate)
+        private Car(int id, string name, string plate)
         {
+            SetId(id);
             SetName(name);
-            SetNumber(number);
             SetPlate(plate);
             SetStatus("working");
 
@@ -31,17 +30,16 @@ namespace Domain.Models
 
         // statics
 
-        internal static Car Restore(int id, string name, int number, string plate, string status, DateTime createdAt, DateTime updatedAt)
-            => new(id, name, number, plate, status, createdAt, updatedAt);
+        internal static Car Restore(int id, string name, string plate, string status, DateTime createdAt, DateTime updatedAt)
+            => new(id, name, plate, status, createdAt, updatedAt);
 
-        public static Car Create(string name, int number, string plate)
-            => new(name, number, plate);
+        public static Car Create(int id, string name, string plate)
+            => new(id, name, plate);
 
         // props
 
         public int Id { get; private set; } = default;
         public string Name { get; private set; }
-        public int Number { get; private set; }
         public string Plate { get; private set; }
         public string Status { get; private set; }
         public DateTime CreatedAt { get; private set; }
@@ -57,12 +55,12 @@ namespace Domain.Models
             Name = value;
         }
 
-        [MemberNotNull(nameof(Number))]
-        private void SetNumber(int value)
+        [MemberNotNull(nameof(Id))]
+        private void SetId(int value)
         {
-            ValidateNumber(value);
+            ValidateId(value);
 
-            Number = value;
+            Id = value;
         }
 
         [MemberNotNull(nameof(Plate))]
@@ -97,12 +95,12 @@ namespace Domain.Models
             Touch();
         }
 
-        public void ChangeNumber(int value)
+        public void ChangeId(int value)
         {
-            if (Number == value)
+            if (Id == value)
                 return;
 
-            SetNumber(value);
+            SetId(value);
 
             Touch();
         }
@@ -135,9 +133,9 @@ namespace Domain.Models
             DataValidator.MaxLength(name, 50, nameof(name));
         }
 
-        private void ValidateNumber(int number)
+        private void ValidateId(int id)
         {
-            DataValidator.Min(number, 1, nameof(number));
+            DataValidator.Min(id, 1, nameof(id));
         }
 
         private void ValidatePlate(string plate)

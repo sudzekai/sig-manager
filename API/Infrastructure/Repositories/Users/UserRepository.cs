@@ -92,6 +92,66 @@ namespace Infrastructure.Repositories.Users
             return result;
         }
 
+        public async Task<int?> GetIdByEmailAsync(string email)
+        {
+            var query = $@"
+                SELECT {UserSchema.Id}
+                FROM {UserSchema.TableName}
+                WHERE {UserSchema.Email} = @email;
+            ";
+
+            MySqlParameter[] parameters = [new("email", email)];
+
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+
+            var idObj = await db.ExecuteScalarAsync(query, parameters);
+
+            if (idObj is null)
+                return null;
+
+            return Convert.ToInt32(idObj);
+        }
+
+        public async Task<int?> GetIdByPhoneNumberAsync(string phoneNumber)
+        {
+            var query = $@"
+                SELECT {UserSchema.Id}
+                FROM {UserSchema.TableName}
+                WHERE {UserSchema.PhoneNumber} = @phoneNumber;
+            ";
+
+            MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
+
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+
+            var idObj = await db.ExecuteScalarAsync(query, parameters);
+
+            if (idObj is null)
+                return null;
+
+            return Convert.ToInt32(idObj);
+        }
+
+        public async Task<int?> GetIdByUsernameAsync(string username)
+        {
+            var query = $@"
+                SELECT {UserSchema.Id}
+                FROM {UserSchema.TableName}
+                WHERE {UserSchema.Username} = @username;
+            ";
+
+            MySqlParameter[] parameters = [new("username", username)];
+
+            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
+
+            var idObj = await db.ExecuteScalarAsync(query, parameters);
+
+            if (idObj is null)
+                return null;
+
+            return Convert.ToInt32(idObj);
+        }
+
         public async Task UpdateAsync(User user)
         {
             var query = $@"

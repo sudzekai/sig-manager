@@ -10,6 +10,5 @@ namespace Contracts.Interfaces.Infrastructure.Repositories
         Task UpdateAsync(Car car);
 
         Task<int?> GetIdByNameAsync(string name);
-        Task<int?> GetIdByNumberAsync(int number);
     }
 }
