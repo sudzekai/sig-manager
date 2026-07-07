@@ -6,11 +6,10 @@ namespace Domain.Models.CarShifts
 {
     public partial class CarShift
     {
-        private CarShift(int shiftId, Shift shift, TicketShift ticketShift)
+        private CarShift(int firstTicket, decimal ticketPrice)
         {
-            _shiftId = shiftId;
-            _shift = shift;
-            _ticketShift = ticketShift;
+            _shift = Shift.Create("cars");
+            _ticketShift = TicketShift.Create(firstTicket, ticketPrice);
 
             _initialized = true;
         }
@@ -28,8 +27,8 @@ namespace Domain.Models.CarShifts
         public static CarShift Restore(int shiftId, Shift shift, InfoShift? infoShift, TicketShift ticketShift)
             => new(shiftId, shift, infoShift, ticketShift);
 
-        public static CarShift Create(int shiftId, Shift shift, TicketShift ticketShift)
-            => new(shiftId, shift, ticketShift);
+        public static CarShift Create(int firstTicket, decimal ticketPrice)
+            => new(firstTicket, ticketPrice);
 
         private readonly bool _initialized = false;
     }

@@ -17,8 +17,10 @@ namespace CompositionRoot
         {
             var database = new SiGManagerDB(connectionString);
             await database.TestConnectionAsync();
+            await database.DisposeAsync();
 
-            services.AddSingleton<IDbContext>(database);
+            services.AddScoped<IDbContext>(_ =>
+                new SiGManagerDB(connectionString));
 
             return services;
         }

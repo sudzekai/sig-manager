@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Objects.Dtos.Car;
 using Contracts.Objects.Dtos.Requests;
+using Infrastructure.Internal.Extensions;
 using Infrastructure.Schema.Car;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
@@ -65,20 +66,20 @@ namespace Infrastructure.Queries.Cars
 
             List<CarSimpleDto> result = [];
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query.ToString(), [.. parameters]))
-            {
-                var idOrdinal = reader.GetOrdinal(CarSchema.Id);
-                var nameOrdinal = reader.GetOrdinal(CarSchema.Name);
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
-                {
-                    result.Add(
-                        new(
-                            reader.GetInt32(idOrdinal),
-                            reader.GetString(nameOrdinal)
-                        )
-                    );
-                }
+            var idOrdinal = reader.GetOrdinal(CarSchema.Id);
+            var nameOrdinal = reader.GetOrdinal(CarSchema.Name);
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(
+                    new(
+                        reader.GetInt32(idOrdinal),
+                        reader.GetString(nameOrdinal)
+                    )
+                );
             }
 
             return result;
@@ -95,22 +96,20 @@ namespace Infrastructure.Queries.Cars
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            CarInfoDto? result = null;
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            if (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    result = new(
-                        reader.GetInt32(CarSchema.Id),
-                        reader.GetString(CarSchema.Name),
-                        reader.GetString(CarSchema.Plate),
-                        reader.GetString(CarSchema.Status)
-                    );
-                }
+                return new(
+                    reader.GetInt32(CarSchema.Id),
+                    reader.GetString(CarSchema.Name),
+                    reader.GetString(CarSchema.Plate),
+                    reader.GetString(CarSchema.Status)
+                );
             }
 
-            return result;
+            return null;
         }
     }
 }

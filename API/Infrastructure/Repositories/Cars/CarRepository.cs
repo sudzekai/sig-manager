@@ -1,6 +1,8 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models.Cars;
+using Infrastructure.Internal.Extensions;
+using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.Car;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
@@ -13,84 +15,69 @@ namespace Infrastructure.Repositories.Cars
     {
         public async Task<int> AddAsync(Car car)
         {
-            var query = @$"
-                INSERT INTO {CarSchema.TableName} ({string.Join(", ", CarSelects.Insertation)}) 
-                VALUES (@id, @name, @plate, @status);
-                SELECT LAST_INSERT_ID();
-            ";
+            var query = SqlQuery.Insert(CarSchema.TableName, CarSelects.Insertation);
 
             MySqlParameter[] parameters = [
-                new("id", car.Id),
-                new("name", car.Name),
-                new("plate", car.Plate),
-                new("status", car.Status)
+                CarSchema.Id.ToMysqlParameter(car.Id),
+                CarSchema.Name.ToMysqlParameter(car.Name),
+                CarSchema.Plate.ToMysqlParameter(car.Plate),
+                CarSchema.Status.ToMysqlParameter(car.Status)
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.INSERT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            var idObj = await command.ExecuteScalarAsync();
 
-            var id = Convert.ToInt32(idObj);
-
-            return id;
+            return Convert.ToInt32(idObj);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var query = @$"
-                DELETE FROM {CarSchema.TableName} 
-                WHERE {CarSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Delete(CarSchema.TableName, [CarSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [CarSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(DbOperation.DELETE, parameters.Length);
 
-            await db.ExecuteNonQueryAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<Car?> GetAsync(int id)
         {
-            var query = @$"
-                SELECT {string.Join(", ", CarSelects.Full)} FROM {CarSchema.TableName} 
-                WHERE {CarSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Select(CarSchema.TableName, CarSelects.Full, [CarSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [CarSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            Car? result = null;
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            if (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    result = Car.Restore(
-                        reader.GetInt32(CarSchema.Id),
-                        reader.GetString(CarSchema.Name),
-                        reader.GetString(CarSchema.Plate),
-                        reader.GetString(CarSchema.Status)
-                    );
-                }
+                return Car.Restore(
+                    reader.GetInt32(CarSchema.Id),
+                    reader.GetString(CarSchema.Name),
+                    reader.GetString(CarSchema.Plate),
+                    reader.GetString(CarSchema.Status)
+                );
             }
 
-            return result;
+            return null;
         }
 
         public async Task<int?> GetIdByNameAsync(string name)
         {
-            var query = $"""
-                SELECT {CarSchema.Id} 
-                FROM {CarSchema.TableName}
-                WHERE {CarSchema.Name} = @name;
-                """;
+            var query = SqlQuery.Select(CarSchema.TableName, [CarSchema.Id], [CarSchema.Name]);
 
-            MySqlParameter[] parameters = [new("name", name)];
+            MySqlParameter[] parameters = [CarSchema.Name.ToMysqlParameter(name)];
             
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
-
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            var idObj = await command.ExecuteScalarAsync();
 
             if (idObj is null) 
                 return null;
@@ -116,12 +103,12 @@ namespace Infrastructure.Repositories.Cars
                 new("name", car.Name),
                 new("plate", car.Plate),
                 new("status", car.Status),
-                new("id", car.Id)
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.UPDATE, parameters.Length);
-
-            await db.ExecuteNonQueryAsync(query, parameters);
+            
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await command.ExecuteNonQueryAsync();
         }
     }
 }

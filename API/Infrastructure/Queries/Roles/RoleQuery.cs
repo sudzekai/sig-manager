@@ -25,20 +25,20 @@ namespace Infrastructure.Queries.Roles
 
             List<RoleSimpleDto> result = [];
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query))
-            {
-                var idOrdinal = reader.GetOrdinal(RoleSchema.Id);
-                var nameOrdinal = reader.GetOrdinal(RoleSchema.Name);
+            await using var command = await db.CreateCommandAsync(query);
+            await using var reader = await command.ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
-                {
-                    result.Add(
-                        new(
-                            reader.GetInt32(idOrdinal),
-                            reader.GetString(nameOrdinal)
-                        )
-                    );
-                }
+            var idOrdinal = reader.GetOrdinal(RoleSchema.Id);
+            var nameOrdinal = reader.GetOrdinal(RoleSchema.Name);
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(
+                    new(
+                        reader.GetInt32(idOrdinal),
+                        reader.GetString(nameOrdinal)
+                    )
+                );
             }
 
             return result;
@@ -69,28 +69,28 @@ namespace Infrastructure.Queries.Roles
 
             List<RightDto> rights = [];
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            var rightIdOrdinal = reader.GetOrdinal("right_id");
+            var rightCodeOrdinal = reader.GetOrdinal("right_code");
+
+            while (await reader.ReadAsync())
             {
-                var rightIdOrdinal = reader.GetOrdinal("right_id");
-                var rightCodeOrdinal = reader.GetOrdinal("right_code");
-
-                while (await reader.ReadAsync())
+                if (roleId == default)
                 {
-                    if (roleId == default)
-                    {
-                        roleId = reader.GetInt32("role_id");
-                        roleName = reader.GetString("role_name");
-                    }
+                    roleId = reader.GetInt32("role_id");
+                    roleName = reader.GetString("role_name");
+                }
 
-                    if (reader.GetNullableInt32(rightIdOrdinal) is var rightId && rightId.HasValue)
-                    {
-                        rights.Add(
-                            new(
-                                rightId.Value,
-                                reader.GetString(rightCodeOrdinal)
-                            )
-                        );
-                    }
+                if (reader.GetNullableInt32(rightIdOrdinal) is var rightId && rightId.HasValue)
+                {
+                    rights.Add(
+                        new(
+                            rightId.Value,
+                            reader.GetString(rightCodeOrdinal)
+                        )
+                    );
                 }
             }
 

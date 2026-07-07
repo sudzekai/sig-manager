@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
+using Infrastructure.Internal.Extensions;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
@@ -93,22 +94,22 @@ namespace Infrastructure.Queries.Users
 
             List<UserSimpleDto> result = [];
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query.ToString(), [.. parameters]))
-            {
-                var idOrdinal = reader.GetOrdinal(UserSchema.Id);
-                var usernameOrdinal = reader.GetOrdinal(UserSchema.Username);
-                var fullNameOrdinal = reader.GetOrdinal(UserSchema.FullName);
+            await using var command = await db.CreateCommandAsync(query.ToString(), [..parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
 
-                while (await reader.ReadAsync())
-                {
-                    result.Add(
-                        new(
-                            reader.GetInt32(idOrdinal),
-                            reader.GetString(usernameOrdinal),
-                            reader.GetString(fullNameOrdinal)
-                        )
-                    );
-                }
+            var idOrdinal = reader.GetOrdinal(UserSchema.Id);
+            var usernameOrdinal = reader.GetOrdinal(UserSchema.Username);
+            var fullNameOrdinal = reader.GetOrdinal(UserSchema.FullName);
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(
+                    new(
+                        reader.GetInt32(idOrdinal),
+                        reader.GetString(usernameOrdinal),
+                        reader.GetString(fullNameOrdinal)
+                    )
+                );
             }
 
             return result;
@@ -128,18 +129,18 @@ namespace Infrastructure.Queries.Users
 
             UserInfoDto? result = null;
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
             {
-                while (await reader.ReadAsync())
-                {
-                    result = new(
-                        reader.GetInt32(UserSchema.Id),
-                        reader.GetString(UserSchema.Username),
-                        reader.GetString(UserSchema.FullName),
-                        reader.GetString(UserSchema.Email),
-                        reader.GetString(UserSchema.PhoneNumber)
-                    );
-                }
+                result = new(
+                    reader.GetInt32(UserSchema.Id),
+                    reader.GetString(UserSchema.Username),
+                    reader.GetString(UserSchema.FullName),
+                    reader.GetString(UserSchema.Email),
+                    reader.GetString(UserSchema.PhoneNumber)
+                );
             }
 
             return result;

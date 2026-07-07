@@ -10,7 +10,6 @@
         ];
 
         public static readonly IReadOnlyList<string> Full = [
-            CarSchema.Id,
             CarSchema.Name,
             CarSchema.Plate,
             CarSchema.Status

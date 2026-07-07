@@ -2,12 +2,13 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models;
 using Infrastructure.Internal.Extensions;
+using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.Right;
 using Infrastructure.Schema.Role;
 using Infrastructure.Schema.RoleRight;
 using MySql.Data.MySqlClient;
-using System.Diagnostics;
 using Shared.Extensions;
+using System.Diagnostics;
 
 namespace Infrastructure.Repositories.Roles
 {
@@ -15,37 +16,34 @@ namespace Infrastructure.Repositories.Roles
     {
         public async Task<int> AddAsync(Role role)
         {
-            var query = $"""
-                INSERT INTO {RoleSchema.TableName} ({RoleSelects.Insertation})
-                VALUES (@name);
-                SELECT LAST_INSERT_ID();
-                """;
+            var query = SqlQuery.Insert(RoleSchema.TableName, RoleSelects.Insertation);
 
-            MySqlParameter[] parameters = [new("name", role.Name)];
+            MySqlParameter[] parameters = [RoleSchema.Name.ToMysqlParameter(role.Name)];
 
             Activity.Current?.SetSqlTag(Shared.Types.Enums.DbOperation.INSERT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, [.. parameters]);
+            var idObj = await command.ExecuteScalarAsync();
 
             return Convert.ToInt32(idObj);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var query = $"""
-                DELETE FROM {RoleSchema.TableName}
-                WHERE {RoleSchema.Id} = @id;
-                """;
+            var query = SqlQuery.Delete(RoleSchema.Name, [RoleSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [RoleSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(Shared.Types.Enums.DbOperation.DELETE, parameters.Length);
 
-            await db.ExecuteNonQueryAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, [.. parameters]);
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<Role?> GetAsync(int id)
         {
+            throw new NotImplementedException();
+
             var query = $"""
                 SELECT
                     {RoleSchema.TableName}.{RoleSchema.Id} AS role_id,
@@ -67,38 +65,40 @@ namespace Infrastructure.Repositories.Roles
             Role? role = null;
 
             Activity.Current?.SetSqlTag(Shared.Types.Enums.DbOperation.SELECT, parameters.Length);
-            
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
+
+            await using var command = await db.CreateCommandAsync(query, [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            var roleIdOrdinal = reader.GetOrdinal("role_id");
+            var roleNameOrdinal = reader.GetOrdinal("role_name");
+            var rightIdOrdinal = reader.GetOrdinal("right_id");
+            var rightCodeOrdinal = reader.GetOrdinal("right_code");
+
+            if (await reader.ReadAsync())
             {
-                var roleIdOrdinal = reader.GetOrdinal("role_id");
-                var roleNameOrdinal = reader.GetOrdinal("role_name");
-                var rightIdOrdinal = reader.GetOrdinal("right_id");
-                var rightCodeOrdinal = reader.GetOrdinal("right_code");
+                role ??= Role.Restore(
+                    reader.GetInt32(roleIdOrdinal),
+                    reader.GetString(roleNameOrdinal)
+                );
 
-                while (await reader.ReadAsync())
+                if (reader.GetNullableInt32(rightIdOrdinal) is var rightId && rightId.HasValue)
                 {
-                    role ??= Role.Restore(
-                        reader.GetInt32(roleIdOrdinal),
-                        reader.GetString(roleNameOrdinal)
+                    role.AddRight(
+                        Right.Restore(
+                            rightId.Value,
+                            reader.GetString(rightCodeOrdinal)
+                        )
                     );
-
-                    if (reader.GetNullableInt32(rightIdOrdinal) is var rightId && rightId.HasValue)
-                    {
-                        role.AddRight(
-                            Right.Restore(
-                                rightId.Value,
-                                reader.GetString(rightCodeOrdinal)
-                            )
-                        );
-                    }
                 }
             }
 
             return role;
         }
 
-        public Task UpdateAsync(Role role)
+        public async Task UpdateAsync(Role role)
         {
+            throw new NotImplementedException();
+
             var query = $"""
                 SELECT {string.Join(", ", RightSelects.Full)}
                 FROM {RightSchema.TableName}
@@ -110,10 +110,9 @@ namespace Infrastructure.Repositories.Roles
                     {RoleRightSchema.RoleId} = @roleId
                 """;
 
-            
-            //Activity.Current?.SetSqlTag(Shared.Types.Enums.DbOperation.INSERT, parameters.Length);
 
-            throw new NotImplementedException();
+            await using var command = await db.CreateCommandAsync(query);
+            await command.ExecuteReaderAsync();
         }
     }
 }

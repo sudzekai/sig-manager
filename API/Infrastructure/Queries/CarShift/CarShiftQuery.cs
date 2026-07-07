@@ -94,22 +94,23 @@ namespace Infrastructure.Queries.CarShift
 
             List<UserSimpleDto> result = [];
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query.ToString(), [.. parameters]))
-            {
-                var idOrdinal = reader.GetOrdinal(UserSchema.Id);
-                var usernameOrdinal = reader.GetOrdinal(UserSchema.Username);
-                var fullNameOrdinal = reader.GetOrdinal(UserSchema.FullName);
+            await using var command = await db.CreateCommandAsync(query.ToString(), [..parameters]);
 
-                while (await reader.ReadAsync())
-                {
-                    result.Add(
-                        new(
-                            reader.GetInt32(idOrdinal),
-                            reader.GetString(usernameOrdinal),
-                            reader.GetString(fullNameOrdinal)
-                        )
-                    );
-                }
+            await using var reader = await command.ExecuteReaderAsync();
+
+            var idOrdinal = reader.GetOrdinal(UserSchema.Id);
+            var usernameOrdinal = reader.GetOrdinal(UserSchema.Username);
+            var fullNameOrdinal = reader.GetOrdinal(UserSchema.FullName);
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(
+                    new(
+                        reader.GetInt32(idOrdinal),
+                        reader.GetString(usernameOrdinal),
+                        reader.GetString(fullNameOrdinal)
+                    )
+                );
             }
 
             throw new NotImplementedException();

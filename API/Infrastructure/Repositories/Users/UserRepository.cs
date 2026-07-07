@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models.Users;
 using Infrastructure.Internal.Extensions;
+using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
@@ -14,97 +15,79 @@ namespace Infrastructure.Repositories.Users
     {
         public async Task<int> AddAsync(User user)
         {
-            var query = @$"
-                INSERT INTO {UserSchema.TableName} ({string.Join(", ", UserSelects.Insertation)}) 
-                VALUES (@username, @fullName, @phoneNumber, @phoneNumberLastFour, @email, @passwordHash, @createdAt, @updatedAt, @roleId);
-                SELECT LAST_INSERT_ID();
-            ";
+            var query = SqlQuery.Insert(UserSchema.TableName, UserSelects.Insertation) + "\nSELECT LAST_INSERT_ID();";
 
             MySqlParameter[] parameters = [
-                new("username", user.Username),
-                new("fullName", user.FullName),
-                new("phoneNumber", user.PhoneNumber),
-                new("phoneNumberLastFour", user.PhoneNumberLastFour),
-                new("email", user.Email),
-                new("passwordHash", user.PasswordHash),
-                new("createdAt", user.CreatedAt),
-                new("updatedAt", user.UpdatedAt),
-                new("roleId", user.RoleId)
+                UserSchema.Username.ToMysqlParameter(user.Username),
+                UserSchema.FullName.ToMysqlParameter(user.FullName),
+                UserSchema.PhoneNumber.ToMysqlParameter(user.PhoneNumber),
+                UserSchema.PhoneNumberLastFour.ToMysqlParameter(user.PhoneNumberLastFour),
+                UserSchema.Email.ToMysqlParameter(user.Email),
+                UserSchema.PasswordHash.ToMysqlParameter(user.PasswordHash),
+                UserSchema.CreatedAt.ToMysqlParameter(user.CreatedAt),
+                UserSchema.UpdatedAt.ToMysqlParameter(user.UpdatedAt),
+                UserSchema.RoleId.ToMysqlParameter(user.RoleId),
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.INSERT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            var idObj = await command.ExecuteScalarAsync();
 
-            var id = Convert.ToInt32(idObj);
-
-            return id;
+            return Convert.ToInt32(idObj);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var query = $@"
-                DELETE FROM {UserSchema.TableName}
-                WHERE {UserSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Delete(UserSchema.TableName, [UserSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [UserSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(DbOperation.DELETE, parameters.Length);
 
-            await db.ExecuteNonQueryAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<User?> GetAsync(int id)
         {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Full)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Select(UserSchema.TableName, UserSelects.Full, [UserSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [UserSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            User? result = null;
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            await using var reader = await command.ExecuteReaderAsync();
 
-            await using (var reader = (MySqlDataReader)await db.ExecuteReaderAsync(query, parameters))
-            {
-                while (await reader.ReadAsync())
-                {
-                    result = User.Restore(
-                        reader.GetInt32(UserSchema.Id),
-                        reader.GetString(UserSchema.Username),
-                        reader.GetString(UserSchema.FullName),
-                        reader.GetString(UserSchema.Email),
-                        reader.GetString(UserSchema.PhoneNumber),
-                        reader.GetString(UserSchema.PhoneNumberLastFour),
-                        reader.GetString(UserSchema.PasswordHash),
-                        reader.GetNullableString(UserSchema.VerificationCode),
-                        reader.GetDateTime(UserSchema.CreatedAt),
-                        reader.GetDateTime(UserSchema.UpdatedAt),
-                        reader.GetInt32(UserSchema.RoleId)
-                    );
-                }
-            }
+            if (await reader.ReadAsync())
+                return User.Restore(
+                    id,
+                    reader.GetString(UserSchema.Username),
+                    reader.GetString(UserSchema.FullName),
+                    reader.GetString(UserSchema.Email),
+                    reader.GetString(UserSchema.PhoneNumber),
+                    reader.GetString(UserSchema.PhoneNumberLastFour),
+                    reader.GetString(UserSchema.PasswordHash),
+                    reader.GetString(UserSchema.VerificationCode),
+                    reader.GetDateTime(UserSchema.CreatedAt),
+                    reader.GetDateTime(UserSchema.UpdatedAt),
+                    reader.GetInt32(UserSchema.RoleId)
+                );
 
-            return result;
+            return null;
         }
 
         public async Task<int?> GetIdByEmailAsync(string email)
         {
-            var query = $@"
-                SELECT {UserSchema.Id}
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Email} = @email;
-            ";
+            var query = SqlQuery.Select(UserSchema.TableName, [UserSchema.Id], [UserSchema.Email]);
 
-            MySqlParameter[] parameters = [new("email", email)];
+            MySqlParameter[] parameters = [UserSchema.Email.ToMysqlParameter(email)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            var idObj = await command.ExecuteScalarAsync();
 
             if (idObj is null)
                 return null;
@@ -114,17 +97,14 @@ namespace Infrastructure.Repositories.Users
 
         public async Task<int?> GetIdByPhoneNumberAsync(string phoneNumber)
         {
-            var query = $@"
-                SELECT {UserSchema.Id}
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.PhoneNumber} = @phoneNumber;
-            ";
+            var query = SqlQuery.Select(UserSchema.TableName, [UserSchema.Id], [UserSchema.PhoneNumber]);
 
-            MySqlParameter[] parameters = [new("phoneNumber", phoneNumber)];
+            MySqlParameter[] parameters = [UserSchema.PhoneNumber.ToMysqlParameter(phoneNumber)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            var idObj = await command.ExecuteScalarAsync();
 
             if (idObj is null)
                 return null;
@@ -134,17 +114,14 @@ namespace Infrastructure.Repositories.Users
 
         public async Task<int?> GetIdByUsernameAsync(string username)
         {
-            var query = $@"
-                SELECT {UserSchema.Id}
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Username} = @username;
-            ";
+            var query = SqlQuery.Select(UserSchema.TableName, [UserSchema.Id], [UserSchema.Username]);
 
-            MySqlParameter[] parameters = [new("username", username)];
+            MySqlParameter[] parameters = [UserSchema.Username.ToMysqlParameter(username)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
-            var idObj = await db.ExecuteScalarAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            var idObj = await command.ExecuteScalarAsync();
 
             if (idObj is null)
                 return null;
@@ -154,38 +131,27 @@ namespace Infrastructure.Repositories.Users
 
         public async Task UpdateAsync(User user)
         {
-            var query = $@"
-                UPDATE {UserSchema.TableName}
-                SET
-                    {UserSchema.Username} = @username,
-                    {UserSchema.FullName} = @fullName,
-                    {UserSchema.PhoneNumber} = @phoneNumber,
-                    {UserSchema.PhoneNumberLastFour} = @phoneNumberLastFour,
-                    {UserSchema.Email} = @email,
-                    {UserSchema.PasswordHash} = @passwordHash,
-                    {UserSchema.VerificationCode} = @verificationCode,
-                    {UserSchema.UpdatedAt} = @updatedAt,
-                    {UserSchema.RoleId} = @roleId
-                WHERE {UserSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Update(UserSchema.TableName, UserSelects.Full, [UserSchema.Id]);
 
             MySqlParameter[] parameters =
             [
-                new("id", user.Id),
-                new("username", user.Username),
-                new("fullName", user.FullName),
-                new("phoneNumber", user.PhoneNumber),
-                new("phoneNumberLastFour", user.PhoneNumber[^4..]),
-                new("email", user.Email),
-                new("passwordHash", user.PasswordHash),
-                new("verificationCode", user.VerificationCode),
-                new("updatedAt", user.UpdatedAt),
-                new("roleId", user.RoleId)
+                UserSchema.Id.ToMysqlParameter(user.Id),
+                UserSchema.Username.ToMysqlParameter(user.Username),
+                UserSchema.FullName.ToMysqlParameter(user.FullName),
+                UserSchema.PhoneNumber.ToMysqlParameter(user.PhoneNumber),
+                UserSchema.PhoneNumberLastFour.ToMysqlParameter(user.PhoneNumberLastFour),
+                UserSchema.Email.ToMysqlParameter(user.Email),
+                UserSchema.PasswordHash.ToMysqlParameter(user.PasswordHash),
+                UserSchema.VerificationCode.ToMysqlParameter(user.VerificationCode),
+                UserSchema.CreatedAt.ToMysqlParameter(user.CreatedAt),
+                UserSchema.UpdatedAt.ToMysqlParameter(user.UpdatedAt),
+                UserSchema.RoleId.ToMysqlParameter(user.RoleId),
             ];
 
             Activity.Current?.SetSqlTag(DbOperation.UPDATE, parameters.Length);
 
-            await db.ExecuteNonQueryAsync(query, parameters);
+            await using var command = await db.CreateCommandAsync(query, parameters);
+            await command.ExecuteNonQueryAsync();
         }
     }
 }

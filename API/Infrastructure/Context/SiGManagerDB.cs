@@ -6,10 +6,13 @@ using System.Text.RegularExpressions;
 
 namespace Infrastructure.Databse.Context
 {
-    public partial class SiGManagerDB : IDbContext
+    public sealed partial class SiGManagerDB : IDbContext, IAsyncDisposable
     {
         private readonly string _connectionString;
         private readonly Regex _connectionStringPattern = ConnectionStringPattern();
+
+        private MySqlConnection _connection;
+        private MySqlTransaction? _transaction;
 
         public SiGManagerDB(string connectionString)
         {
@@ -17,6 +20,8 @@ namespace Infrastructure.Databse.Context
                 throw new ArgumentException("Invalid connection string format.");
 
             _connectionString = connectionString;
+
+            _connection = new MySqlConnection(connectionString);
         }
 
         public async Task TestConnectionAsync()
@@ -25,61 +30,70 @@ namespace Infrastructure.Databse.Context
             await connection.OpenAsync();
         }
 
-        public async Task<IDbConnection> GetConnectionAsync()
+        public async Task<DbCommand> CreateCommandAsync(string query, DbParameter[]? parameters = null)
         {
-            var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
-            return connection;
-        }
-
-        public async Task<int> ExecuteNonQueryAsync(string query, DbParameter[]? parameters = null)
-        {
-            await using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            await using var command = new MySqlCommand(query, connection);
+            await EnsureConnectedAsync();
+            
+            MySqlCommand command = _transaction is null
+                        ? new(query, _connection)
+                        : new(query, _connection, _transaction);
 
             if (parameters is not null)
                 command.Parameters.AddRange(parameters);
 
-            return await command.ExecuteNonQueryAsync();
+            return command;
         }
 
-        public async Task<IDataReader> ExecuteReaderAsync(string sql, DbParameter[]? parameters = null)
+        public async Task BeginTransactionAsync()
         {
-            var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
+            await EnsureConnectedAsync();
 
-            var command = new MySqlCommand(sql, connection);
+            if (_transaction is not null)
+                throw new InvalidOperationException("Transaction already started.");
 
-            if (parameters is not null)
-                command.Parameters.AddRange(parameters);
-
-            return await command.ExecuteReaderAsync(CommandBehavior.CloseConnection);
-        }
-        
-        public async Task<object?> ExecuteScalarAsync(string sql, DbParameter[]? parameters = null)
-        {
-            await using var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            await using var command = new MySqlCommand(sql, connection);
-
-            if (parameters is not null)
-                command.Parameters.AddRange(parameters);
-
-            return await command.ExecuteScalarAsync();
+            _transaction = await _connection.BeginTransactionAsync();
         }
 
-        public async Task<IDbTransaction> BeginTransactionAsync()
+        public async Task CommitAsync()
         {
-            var connection = new MySqlConnection(_connectionString);
-            await connection.OpenAsync();
+            if (_transaction is null)
+                return;
 
-            return await connection.BeginTransactionAsync();
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+
+            _transaction = null;
+        }
+
+        public async Task RollBackAsync()
+        {
+            if (_transaction is null)
+                return;
+
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+
+            _transaction = null;
+        }
+
+        private async Task EnsureConnectedAsync()
+        {
+            if (_connection.State != ConnectionState.Open)
+                await _connection.OpenAsync();
         }
 
         [GeneratedRegex(@"^Server=[^;]+;Port=[^;]+;Database=[^;]+;Uid=[^;]+;Pwd=[^;]+;$")]
         private static partial Regex ConnectionStringPattern();
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_transaction is not null)
+            {
+                await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
+            }
+
+            await _connection.DisposeAsync();
+        }
     }
 }

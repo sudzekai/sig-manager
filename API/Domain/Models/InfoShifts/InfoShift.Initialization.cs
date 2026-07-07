@@ -12,9 +12,8 @@
             _initialized = true;
         }
 
-        private InfoShift(int shiftId, decimal cash, decimal cashLess, string receiptPhotoFileName)
+        private InfoShift(decimal cash, decimal cashLess, string receiptPhotoFileName)
         {
-            ShiftId = shiftId;
             Cash = cash;
             CashLess = cashLess;
             ReceiptPhotoFileName = receiptPhotoFileName;
@@ -25,8 +24,8 @@
         public static InfoShift Restore(int shiftId, decimal? cash, decimal? cashLess, string? receiptPhotoFileName)
             => new(shiftId, cash, cashLess, receiptPhotoFileName);
 
-        public static InfoShift Create(int shiftId, decimal cash, decimal cashLess, string receiptPhotoFileName)
-            => new(shiftId, cash, cashLess, receiptPhotoFileName);
+        public static InfoShift Create(decimal cash, decimal cashLess, string receiptPhotoFileName)
+            => new(cash, cashLess, receiptPhotoFileName);
 
         
         private readonly bool _initialized = false;

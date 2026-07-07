@@ -15,7 +15,6 @@
         ];
 
         public static readonly IReadOnlyList<string> Full = [
-            UserSchema.Id, 
             UserSchema.Username, 
             UserSchema.FullName, 
             UserSchema.PhoneNumber, 

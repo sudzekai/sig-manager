@@ -138,7 +138,7 @@ namespace Domain.Models.Users
         {
             get => _phoneNumberLastFour;
             [MemberNotNull(nameof(_phoneNumberLastFour))]
-            set
+            private set
             {
                 if (_phoneNumberLastFour == value)
                     return;
