@@ -3,7 +3,7 @@ using Domain.ValueObjects.Rights;
 
 namespace Contracts.Interfaces.Infrastructure.Repositories
 {
-    public interface IRightsRepository
+    public interface IRightRepository
     {
         Task<RightId> AddAsync(Right right);
         Task<bool> DeleteAsync(RightId id);
