@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace Shared.App
@@ -48,5 +49,11 @@ namespace Shared.App
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
+
+        public static NotImplementedException TODO(
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string filePath = "",
+            [CallerLineNumber] int lineNumber = 0)
+            => new($"TODO:\nfile: {filePath}\nmethod: {memberName}\nline number: {lineNumber}");
     }
 }

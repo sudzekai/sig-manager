@@ -2,10 +2,11 @@
 
 namespace Contracts.Objects.Dtos.CarShift
 {
-    public class CarShiftCreateDto
+    public class CarShiftOpenDto
     {
         public UserPositionDto[] UserPositions { get; set; } = [];
         public int FirstTicket { get; set; }
-        public string ParkId { get; set; } = string.Empty;
+        public decimal TicketPrice { get; set; }
+        public int ParkId { get; set; }
     }
 }

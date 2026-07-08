@@ -6,8 +6,9 @@ namespace Domain.Models.TicketShifts
 {
     public partial class TicketShift : DomainModelBase
     {
-        public TicketShift(ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
+        public TicketShift(ShiftId shiftId, ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
         {
+            ShiftId = shiftId;
             FirstTicket = firstTicket;
             TicketPrice = ticketPrice;
         }
@@ -20,8 +21,8 @@ namespace Domain.Models.TicketShifts
             TicketPrice = ticketPrice;
         }
 
-        public static TicketShift Create(ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
-            => new(firstTicket, ticketPrice);
+        public static TicketShift Create(ShiftId shiftId, ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
+            => new(shiftId, firstTicket, ticketPrice);
 
         public static TicketShift Restore(ShiftId shiftId, ShiftFirstTicket firstTicket, ShiftLastTicket? lastTicket, ShiftTicketPrice ticketPrice)
             => new(shiftId, firstTicket, lastTicket, ticketPrice);
