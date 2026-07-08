@@ -6,6 +6,6 @@ namespace Contracts.Objects.Dtos.Requests
     {
         [OneOf("Status,Id,Name", Required = false,
             ErrorMessage = "OrderBy должен быть одним из: Status, Id, Name")]
-        public override string OrderBy { get; set; }
+        public override string OrderBy { get; set; } = string.Empty;
     }
 }

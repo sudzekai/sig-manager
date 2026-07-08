@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Users.Write;
+using Domain.ValueObjects.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Write
@@ -10,10 +11,10 @@ namespace Application.CommandHandlers.Users.Write
     {
         public async Task<Unit> HandleAsync(UserDeleteCommand command)
         {
-            _ = await repository.GetAsync(command.Id)
-                ?? throw NotFoundException.UserWithId(command.Id);
+            var result = await repository.DeleteAsync(UserId.FromValue(command.Id));
 
-            await repository.DeleteAsync(command.Id);
+            if (!result)
+                throw NotFoundException.UserWithId(command.Id);
 
             return Unit.Value;
         }

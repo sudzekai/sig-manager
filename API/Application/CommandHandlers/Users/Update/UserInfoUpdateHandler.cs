@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Users.Update;
+using Domain.ValueObjects.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Update
@@ -10,7 +11,7 @@ namespace Application.CommandHandlers.Users.Update
     {
         public async Task<Unit> HandleAsync(UserInfoUpdateCommand command)
         {
-            var user = await repository.GetAsync(command.Id)
+            var user = await repository.GetAsync(UserId.FromValue(command.Id))
                 ?? throw NotFoundException.UserWithId(command.Id);
 
             if (command.Dto.Username != null)
@@ -18,18 +19,18 @@ namespace Application.CommandHandlers.Users.Update
                 if (await IsUsernameExistsAsync(command.Dto.Username, command.Id))
                     throw ConflictException.UserUsername;
 
-                user.Username = command.Dto.Username;
+                user.Username = Username.FromValue(command.Dto.Username);
             }
 
             if (command.Dto.FullName != null)
-                user.FullName = command.Dto.FullName;
+                user.FullName = UserFullName.FromValue(command.Dto.FullName);
 
             if (command.Dto.Email != null)
             {
                 if (await IsEmailExistsAsync(command.Dto.Email, command.Id))
                     throw ConflictException.UserEmail;
 
-                user.Email = command.Dto.Email;
+                user.Email = UserEmail.FromValue(command.Dto.Email);
             }
 
             if (command.Dto.PhoneNumber != null)
@@ -37,7 +38,7 @@ namespace Application.CommandHandlers.Users.Update
                 if (await IsPhoneNumberExistsAsync(command.Dto.PhoneNumber, command.Id))
                     throw ConflictException.UserPhoneNumber;
 
-                user.PhoneNumber = command.Dto.PhoneNumber;
+                user.PhoneNumber = UserPhoneNumber.FromValue(command.Dto.PhoneNumber);
 
             }
 
@@ -47,12 +48,12 @@ namespace Application.CommandHandlers.Users.Update
         }
 
         private async Task<bool> IsUsernameExistsAsync(string username, int excludedId)
-            => await repository.GetIdByUsernameAsync(username) is var id && id is not null && id != excludedId;
+            => await repository.GetIdByUsernameAsync(Username.FromValue(username)) is var id && id is not null && id.Value != excludedId;
 
         private async Task<bool> IsEmailExistsAsync(string email, int excludedId)
-            => await repository.GetIdByEmailAsync(email) is var id && id is not null && id != excludedId;
+            => await repository.GetIdByEmailAsync(UserEmail.FromValue(email)) is var id && id is not null && id.Value != excludedId;
 
         private async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int excludedId)
-           => await repository.GetIdByPhoneNumberAsync(phoneNumber) is var id && id is not null && id != excludedId;
+           => await repository.GetIdByPhoneNumberAsync(UserPhoneNumber.FromValue(phoneNumber)) is var id && id is not null && id.Value != excludedId;
     }
 }

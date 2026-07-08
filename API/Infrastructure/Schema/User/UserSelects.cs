@@ -11,7 +11,8 @@
             UserSchema.PasswordHash, 
             UserSchema.CreatedAt, 
             UserSchema.UpdatedAt, 
-            UserSchema.RoleId
+            UserSchema.RoleId,
+            UserSchema.VerificationCode
         ];
 
         public static readonly IReadOnlyList<string> Full = [
@@ -28,7 +29,6 @@
         ];
 
         public static readonly IReadOnlyList<string> Info = [
-            UserSchema.Id, 
             UserSchema.Username, 
             UserSchema.FullName, 
             UserSchema.PhoneNumber, 

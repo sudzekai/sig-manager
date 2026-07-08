@@ -2,8 +2,8 @@
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Presentation.Utilities.Extensions;
-using Presentation.Utilities.Logging;
+using Presentation.Internal.Utilities.Extensions;
+using Presentation.Internal.Utilities.Logging;
 using Shared.App;
 using Shared.OpenTelemetry;
 

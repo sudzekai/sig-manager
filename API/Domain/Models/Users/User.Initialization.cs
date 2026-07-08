@@ -1,42 +1,44 @@
-﻿namespace Domain.Models.Users
+﻿using Domain.Models.Base;
+using Domain.ValueObjects.Roles;
+using Domain.ValueObjects.Users;
+
+namespace Domain.Models.Users
 {
-    public partial class User
+    public partial class User : DomainModelBase
     {
         private User(
-            int id, 
-            string username, 
-            string fullName, 
-            string email, 
-            string phoneNumber, 
-            string phoneNumberLastFour, 
-            string passwordHash,
-            string verificationCode, 
+            UserId id, 
+            Username username, 
+            UserFullName fullName, 
+            UserEmail email, 
+            UserPhoneNumber phoneNumber, 
+            UserPasswordHash passwordHash,
+            UserVerificationCode verificationCode, 
             DateTime createdAt, 
             DateTime updatedAt, 
-            int roleId)
+            RoleId roleId)
         {
-            _id = id;
-            _username = username;
-            _fullName = fullName;
-            _email = email;
-            _phoneNumber = phoneNumber;
-            _phoneNumberLastFour = phoneNumberLastFour;
-            _passwordHash = passwordHash;
-            _verificationCode = verificationCode;
-            _createdAt = createdAt;
-            _updatedAt = updatedAt;
-            _roleId = roleId;
+            Id = id;
+            Username = username;
+            FullName = fullName;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            PasswordHash = passwordHash;
+            VerificationCode = verificationCode;
+            CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
+            RoleId = roleId;
 
             _initialized = true;
         }
 
         private User(
-            string username, 
-            string fullName, 
-            string email, 
-            string phoneNumber, 
-            string passwordHash, 
-            int roleId)
+            Username username, 
+            UserFullName fullName, 
+            UserEmail email, 
+            UserPhoneNumber phoneNumber, 
+            UserPasswordHash passwordHash, 
+            RoleId roleId)
         {
             Username = username;
             FullName = fullName;
@@ -44,7 +46,7 @@
             PhoneNumber = phoneNumber;
             PasswordHash = passwordHash;
             RoleId = roleId;
-            _verificationCode = "";
+            VerificationCode = UserVerificationCode.Empty;
 
             CreatedAt = DateTime.Now;
             UpdatedAt = CreatedAt;
@@ -53,23 +55,21 @@
         }
 
         internal static User Restore(
-            int id, 
-            string username, 
-            string fullName, 
-            string email, 
-            string phoneNumber, 
-            string phoneNumberLastFour, 
-            string passwordHash, 
-            string verificationCode, 
+            UserId id, 
+            Username username, 
+            UserFullName fullName, 
+            UserEmail email, 
+            UserPhoneNumber phoneNumber, 
+            UserPasswordHash passwordHash, 
+            UserVerificationCode verificationCode, 
             DateTime createdAt, 
             DateTime updatedAt, 
-            int roleId)
+            RoleId roleId)
             => new(id, 
                 username, 
                 fullName, 
                 email, 
                 phoneNumber, 
-                phoneNumberLastFour, 
                 passwordHash, 
                 verificationCode, 
                 createdAt, 
@@ -77,19 +77,17 @@
                 roleId);
 
         public static User Create(
-            string username, 
-            string fullName, 
-            string email,
-            string phoneNumber, 
-            string passwordHash, 
-            int roleId)
+            Username username, 
+            UserFullName fullName, 
+            UserEmail email,
+            UserPhoneNumber phoneNumber, 
+            UserPasswordHash passwordHash, 
+            RoleId roleId)
             => new(username, 
                 fullName, 
                 email, 
                 phoneNumber, 
                 passwordHash, 
                 roleId);
-
-        private readonly bool _initialized = false;
     }
 }

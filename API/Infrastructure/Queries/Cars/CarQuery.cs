@@ -9,6 +9,7 @@ using Shared.Extensions;
 using Shared.Types.Enums;
 using System.Diagnostics;
 using System.Text;
+using System.Data;
 
 namespace Infrastructure.Queries.Cars
 {

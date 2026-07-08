@@ -2,6 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Cars.Update;
+using Domain.ValueObjects.Cars;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Cars.Update
@@ -10,10 +11,10 @@ namespace Application.CommandHandlers.Cars.Update
     {
         public async Task<Unit> HandleAsync(CarStatusUpdateCommand command)
         {
-            var existing = await repository.GetAsync(command.Id)
+            var existing = await repository.GetAsync(CarId.FromValue(command.Id))
                             ?? throw NotFoundException.CarWithId(command.Id);
 
-            existing.Status  = command.Dto.Status;
+            existing.Status = CarStatus.FromValue(command.Dto.Status);
 
             await repository.UpdateAsync(existing);
 

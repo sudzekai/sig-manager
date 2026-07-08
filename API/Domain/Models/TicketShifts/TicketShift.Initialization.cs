@@ -1,27 +1,29 @@
-﻿namespace Domain.Models.TicketShifts
+﻿using Domain.Models.Base;
+using Domain.ValueObjects.Shifts;
+using Domain.ValueObjects.Shifts.Ticket;
+
+namespace Domain.Models.TicketShifts
 {
-    public partial class TicketShift
+    public partial class TicketShift : DomainModelBase
     {
-        public TicketShift(int firstTicket, decimal ticketPrice)
+        public TicketShift(ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
         {
             FirstTicket = firstTicket;
             TicketPrice = ticketPrice;
         }
 
-        public TicketShift(int shiftId, int firstTicket, int? lastTicket, decimal ticketPrice)
+        public TicketShift(ShiftId shiftId, ShiftFirstTicket firstTicket, ShiftLastTicket? lastTicket, ShiftTicketPrice ticketPrice)
         {
-            _shiftId = shiftId;
-            _firstTicket = firstTicket;
-            _lastTicket = lastTicket;
-            _ticketPrice = ticketPrice;
+            ShiftId = shiftId;
+            FirstTicket = firstTicket;
+            LastTicket = lastTicket;
+            TicketPrice = ticketPrice;
         }
 
-        public static TicketShift Create(int firstTicket, decimal ticketPrice)
+        public static TicketShift Create(ShiftFirstTicket firstTicket, ShiftTicketPrice ticketPrice)
             => new(firstTicket, ticketPrice);
 
-        public static TicketShift Restore(int shiftId, int firstTicket, int? lastTicket, decimal ticketPrice)
+        public static TicketShift Restore(ShiftId shiftId, ShiftFirstTicket firstTicket, ShiftLastTicket? lastTicket, ShiftTicketPrice ticketPrice)
             => new(shiftId, firstTicket, lastTicket, ticketPrice);
-
-        private bool _initialized = false;
     }
 }

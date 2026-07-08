@@ -3,12 +3,14 @@ using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Objects.Dtos.Requests;
 using Contracts.Objects.Dtos.User;
 using Infrastructure.Internal.Extensions;
+using Infrastructure.Internal.Helpers;
 using Infrastructure.Schema.User;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
 using Shared.Types.Enums;
 using System.Diagnostics;
 using System.Text;
+using System.Data;
 
 namespace Infrastructure.Queries.Users
 {
@@ -16,11 +18,11 @@ namespace Infrastructure.Queries.Users
     {
         public async Task<IReadOnlyList<UserSimpleDto>> GetAllAsync(GetUsersListRequest request)
         {
-            StringBuilder query = new($@"
+            StringBuilder query = new($"""
                 SELECT {string.Join(", ", UserSelects.Simple)} 
                 FROM {UserSchema.TableName}
                 WHERE 1=1
-            ");
+                """);
 
             List<MySqlParameter> parameters = [];
 
@@ -117,13 +119,9 @@ namespace Infrastructure.Queries.Users
 
         public async Task<UserInfoDto?> GetByIdAsync(int id)
         {
-            var query = $@"
-                SELECT {string.Join(", ", UserSelects.Info)} 
-                FROM {UserSchema.TableName}
-                WHERE {UserSchema.Id} = @id;
-            ";
+            var query = SqlQuery.Select(UserSchema.TableName, UserSelects.Info, [UserSchema.Id]);
 
-            MySqlParameter[] parameters = [new("id", id)];
+            MySqlParameter[] parameters = [UserSchema.Id.ToMysqlParameter(id)];
 
             Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Length);
 
@@ -135,7 +133,7 @@ namespace Infrastructure.Queries.Users
             if (await reader.ReadAsync())
             {
                 result = new(
-                    reader.GetInt32(UserSchema.Id),
+                    id,
                     reader.GetString(UserSchema.Username),
                     reader.GetString(UserSchema.FullName),
                     reader.GetString(UserSchema.Email),

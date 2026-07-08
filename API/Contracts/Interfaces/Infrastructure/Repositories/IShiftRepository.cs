@@ -1,12 +1,13 @@
 ﻿using Domain.Models.Shifts;
+using Domain.ValueObjects.Shifts;
 
 namespace Contracts.Interfaces.Infrastructure.Repositories
 {
     public interface IShiftRepository
     {
-        Task<int> AddAsync(Shift shift);
-        Task DeleteAsync(int id);
+        Task<ShiftId> AddAsync(Shift shift);
+        Task<bool> DeleteAsync(ShiftId id);
+        Task<Shift?> GetAsync(ShiftId id);
         Task UpdateAsync(Shift shift);
-        Task<Shift?> GetAsync(int id);
     }
 }

@@ -45,7 +45,13 @@ create table ticket_shifts (
 
 create table car_shifts (
     shift_id int primary key,
+    park_id int not null,
 
+    foreign key (park_id)
+        references parks(id)
+        on delete restrict
+        on update cascade,
+        
     foreign key (shift_id)
         references shifts(id)
         on delete cascade

@@ -1,59 +1,64 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using Domain.ValueObjects.Shifts;
 
 namespace Domain.Models.Shifts
 {
-    public partial class Shift : INotifyPropertyChanged
+    public partial class Shift
     {
-        // fields
-
-        private int _id;
-
-        private string _type;
-
-        private string _status;
-
-
-        // proprs
-
-        public int Id { get => _id; private set => _id = value; }
-
-        public string Type
+        public ShiftId? Id
         {
-            get => _type;
-            [MemberNotNull(nameof(_type))]
+            get;
             set
             {
-                if (_type == value)
+                if (field == value)
                     return;
 
-                ValidateType(value);
-
-                _type = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Status
+        public ShiftType Type
         {
-            get => _status;
-            [MemberNotNull(nameof(_status))]
+            get;
             set
             {
-                if (_status == value)
+                if (field == value)
                     return;
 
-                ValidateStatus(value);
-
-                _status = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public DateTime CreatedAt { get; private set; }
+        public ShiftStatus Status
+        {
+            get;
+            set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+
+                OnPropertyChanged();
+            }
+        }
+
+        public DateTime CreatedAt
+        {
+            get;
+            private set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+
+                OnPropertyChanged();
+            }
+        }
 
         public DateTime UpdatedAt { get; private set; }
 
@@ -62,31 +67,12 @@ namespace Domain.Models.Shifts
             get;
             private set
             {
+                if (field == value)
+                    return;
+
                 field = value;
+
                 OnPropertyChanged();
-            }
-        }
-
-
-        // events
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-
-        // logic
-
-        public void SetClosed()
-        {
-            Status = "closed";
-            ClosedAt = DateTime.Now;
-        }
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (_initialized)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                UpdatedAt = DateTime.Now;
             }
         }
     }

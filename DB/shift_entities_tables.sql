@@ -16,3 +16,10 @@ create table cars (
 
     constraint unique_idx_cars_name unique (`name`)
 );
+
+create table parks (
+	id int primary key auto_increment,
+    `name` varchar(25) not null,
+    
+    constraint unique_idx_parks_name unique (`name`)
+);

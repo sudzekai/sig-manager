@@ -2,7 +2,7 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Cars.Update;
-using Contracts.Objects.Dtos.Car;
+using Domain.ValueObjects.Cars;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Cars.Update
@@ -11,37 +11,37 @@ namespace Application.CommandHandlers.Cars.Update
     {
         public async Task<Unit> HandleAsync(CarInfoUpdateCommand command)
         {
-            var existing = await repository.GetAsync(command.Id)
+            var existing = await repository.GetAsync(CarId.FromValue(command.Id))
                 ?? throw NotFoundException.CarWithId(command.Id);
 
             if (!string.IsNullOrWhiteSpace(command.Dto.Name))
             {
-                if (await IsNameExistsAsync(command.Dto.Name, command.Id))
+                if (await IsNameExistsAsync(CarName.FromValue(command.Dto.Name), command.Id))
                     throw ConflictException.CarName;
 
-                existing.Name = command.Dto.Name;
+                existing.Name = CarName.FromValue(command.Dto.Name);
             }
 
             if (command.Dto.Id != default)
             {
-                if (await IsIdExistsAsync(command.Dto.Id, command.Id))
+                if (await IsIdExistsAsync(CarId.FromValue(command.Dto.Id), command.Id))
                     throw ConflictException.CarId;
 
-                existing.Id = command.Dto.Id;
+                existing.Id = CarId.FromValue(command.Dto.Id);
             }
 
             if (!string.IsNullOrWhiteSpace(command.Dto.Plate))
-                existing.Plate = command.Dto.Plate;
+                existing.Plate = CarPlate.FromValue(command.Dto.Plate);
 
             await repository.UpdateAsync(existing);
 
             return Unit.Value;
         }
 
-        private async Task<bool> IsNameExistsAsync(string name, int excludedId)
-            => await repository.GetIdByNameAsync(name) is var id && id is not null && id != excludedId;
+        private async Task<bool> IsNameExistsAsync(CarName name, int excludedId)
+            => await repository.GetIdByNameAsync(name) is var id && id is not null && id.Value != excludedId;
 
-        private async Task<bool> IsIdExistsAsync(int id, int excludedId)
-            => await repository.GetAsync(id) is var entity && entity is not null && entity.Id != excludedId;
+        private async Task<bool> IsIdExistsAsync(CarId id, int excludedId)
+            => await repository.GetAsync(id) is var entity && entity is not null && entity.Id.Value != excludedId;
     }
 }

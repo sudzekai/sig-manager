@@ -1,35 +1,23 @@
-﻿using Domain.Models.InfoShifts;
-using Domain.Models.Shifts;
-using Domain.Models.TicketShifts;
+﻿using Domain.Models.Base;
+using Domain.ValueObjects.Parks;
+using Domain.ValueObjects.Shifts;
 
 namespace Domain.Models.CarShifts
 {
-    public partial class CarShift
+    public partial class CarShift : DomainModelBase
     {
-        private CarShift(int firstTicket, decimal ticketPrice)
+        private CarShift(ShiftId shiftId, ParkId parkId)
         {
-            _shift = Shift.Create("cars");
-            _ticketShift = TicketShift.Create(firstTicket, ticketPrice);
+            ShiftId = shiftId;
+            ParkId = parkId;
 
             _initialized = true;
         }
 
-        private CarShift(int shiftId, Shift shift, InfoShift? infoShift, TicketShift ticketShift)
-        {
-            _shiftId = shiftId;
-            _shift = shift;
-            _ticketShift = ticketShift;
-            _infoShift = infoShift;
+        public static CarShift Restore(ShiftId shiftId, ParkId parkId)
+            => new(shiftId, parkId);
 
-            _initialized = true;
-        }
-
-        public static CarShift Restore(int shiftId, Shift shift, InfoShift? infoShift, TicketShift ticketShift)
-            => new(shiftId, shift, infoShift, ticketShift);
-
-        public static CarShift Create(int firstTicket, decimal ticketPrice)
-            => new(firstTicket, ticketPrice);
-
-        private readonly bool _initialized = false;
+        public static CarShift Create(ShiftId shiftId, ParkId parkId)
+            => new(shiftId, parkId);
     }
 }

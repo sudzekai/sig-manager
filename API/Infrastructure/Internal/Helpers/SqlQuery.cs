@@ -1,7 +1,9 @@
 ﻿namespace Infrastructure.Internal.Helpers
 {
-    internal class SqlQuery
+    internal static class SqlQuery
     {
+        public const string SelectLastInsertId = "SELECT LAST_INSERT_ID()"; 
+
         public static string Select(string tableName, IEnumerable<string> columns)
         {
             if (string.IsNullOrWhiteSpace(tableName))

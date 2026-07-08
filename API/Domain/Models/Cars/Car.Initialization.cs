@@ -1,33 +1,34 @@
-﻿namespace Domain.Models.Cars
+﻿using Domain.Models.Base;
+using Domain.ValueObjects.Cars;
+
+namespace Domain.Models.Cars
 {
-    public partial class Car
+    public partial class Car : DomainModelBase
     {
-        private Car(int id, string name, string plate, string status)
-        {
-            _id = id;
-            _name = name;
-            _plate = plate;
-            _status = status;
-
-            _initialized = true;
-        }
-
-        private Car(int id, string name, string plate)
+        private Car(CarId id, CarName name, CarPlate plate, CarStatus status)
         {
             Id = id;
             Name = name;
             Plate = plate;
-            Status = "working";
+            Status = status;
 
             _initialized = true;
         }
 
-        internal static Car Restore(int id, string name, string plate, string status)
+        private Car(CarId id, CarName name, CarPlate plate)
+        {
+            Id = id;
+            Name = name;
+            Plate = plate;
+            Status = CarStatus.Working;
+
+            _initialized = true;
+        }
+
+        internal static Car Restore(CarId id, CarName name, CarPlate plate, CarStatus status)
             => new(id, name, plate, status);
 
-        public static Car Create(int id, string name, string plate)
+        public static Car Create(CarId id, CarName name, CarPlate plate)
             => new(id, name, plate);
-
-        private bool _initialized = false;
     }
 }

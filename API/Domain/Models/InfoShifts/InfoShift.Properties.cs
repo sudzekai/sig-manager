@@ -1,75 +1,76 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Domain.ValueObjects.Shifts;
+using Domain.ValueObjects.Shifts.Info;
+using System.ComponentModel;
 
 namespace Domain.Models.InfoShifts
 {
     public partial class InfoShift : INotifyPropertyChanged
     {
-        private int _shiftId;
-        private decimal? _cash;
-        private decimal? _cashLess;
-        private string? _receiptPhotoFileName;
-
-        public int ShiftId
+        public ShiftId? ShiftId
         {
-            get => _shiftId; 
-            set => _shiftId = value;
-        }
-
-        public decimal? Cash
-        {
-            get => _cash;
-            private set
+            get;
+            set
             {
-                if (_cash == value)
+                if (field == value)
                     return;
 
-                ValidateCash(value);
-
-                _cash = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public decimal? CashLess
+        public ShiftCash? Cash
         {
-            get => _cashLess;
+            get;
             private set
             {
-                if (_cashLess == value)
+                if (field == value)
                     return;
 
-                ValidateCashLess(value);
-
-                _cashLess = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string? ReceiptPhotoFileName
+        public ShiftCashLess? CashLess
         {
-            get => _receiptPhotoFileName;
+            get;
             private set
             {
-                if (_receiptPhotoFileName == value)
+                if (field == value)
                     return;
 
-                ValidateReceiptPhotoFileName(value);
-
-                _receiptPhotoFileName = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        public ShiftReceiptPhotoFileName? ReceiptPhotoFileName
         {
-            if (_initialized)
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get;
+            private set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+
+                OnPropertyChanged();
+            }
+        }
+
+        public decimal? Total
+        {
+            get
+            {
+                if (Cash is not null && CashLess is not null)
+                    return Cash.Value + CashLess.Value;
+
+                return null;
+            }
         }
     }
 }

@@ -1,24 +1,28 @@
 ﻿using Contracts.Interfaces.Infrastructure.Context;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Infrastructure.Databse.Context
 {
     public sealed partial class SiGManagerDB : IDbContext, IAsyncDisposable
     {
+        private readonly ILogger<IDbContext> _logger;
         private readonly string _connectionString;
         private readonly Regex _connectionStringPattern = ConnectionStringPattern();
 
         private MySqlConnection _connection;
         private MySqlTransaction? _transaction;
 
-        public SiGManagerDB(string connectionString)
+        public SiGManagerDB(string connectionString, ILogger<IDbContext> logger)
         {
             if (!_connectionStringPattern.IsMatch(connectionString))
                 throw new ArgumentException("Invalid connection string format.");
 
+            _logger = logger;
             _connectionString = connectionString;
 
             _connection = new MySqlConnection(connectionString);
@@ -33,13 +37,23 @@ namespace Infrastructure.Databse.Context
         public async Task<DbCommand> CreateCommandAsync(string query, DbParameter[]? parameters = null)
         {
             await EnsureConnectedAsync();
-            
+
             MySqlCommand command = _transaction is null
                         ? new(query, _connection)
                         : new(query, _connection, _transaction);
 
+            _logger.LogDebug("{query}", query);
+
             if (parameters is not null)
+            {
                 command.Parameters.AddRange(parameters);
+
+                StringBuilder sb = new();
+                foreach (var param in parameters)
+                    sb.Append($"\n[{param.ParameterName}] = \"{param.Value}\"");
+                _logger.LogDebug(sb.ToString().Trim());
+            }
+                
 
             return command;
         }

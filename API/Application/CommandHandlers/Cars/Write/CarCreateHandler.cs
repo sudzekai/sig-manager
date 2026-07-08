@@ -4,6 +4,7 @@ using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Commands.Cars.Write;
 using Contracts.Objects.Dtos.Car;
 using Domain.Models.Cars;
+using Domain.ValueObjects.Cars;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Cars.Write
@@ -12,24 +13,26 @@ namespace Application.CommandHandlers.Cars.Write
     {
         public async Task<CarInfoDto> HandleAsync(CarCreateCommand command)
         {
-            if (await IsNameExistsAsync(command.Dto.Name))
+            var name = CarName.FromValue(command.Dto.Name);
+
+            if (repository.GetIdByNameAsync(name) is not null)
                 throw ConflictException.CarName;
 
-            if (await IsIdExistsAsync(command.Dto.Id))
+            var id = CarId.FromValue(command.Dto.Id);
+
+            if (await repository.GetAsync(id) is not null)
                 throw ConflictException.CarId;
 
-            Car car = Car.Create(command.Dto.Id, command.Dto.Name, command.Dto.Plate);
+            Car car = Car.Create(
+                id,
+                name,
+                CarPlate.FromValue(command.Dto.Plate)
+            );
 
-            var id = await repository.AddAsync(car);
+            await repository.AddAsync(car);
 
-            return await query.GetByIdAsync(id) 
-                ?? throw NotFoundException.CarWithId(id);
+            return await query.GetByIdAsync(id.Value) 
+                ?? throw NotFoundException.CarWithId(id.Value);
         }
-
-        private async Task<bool> IsNameExistsAsync(string name)
-            => await repository.GetIdByNameAsync(name) is not null;
-
-        private async Task<bool> IsIdExistsAsync(int id)
-            => await repository.GetAsync(id) is not null;
     }
 }

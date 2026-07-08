@@ -1,5 +1,6 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models.Users;
+using Domain.ValueObjects.Users;
 using Microsoft.Extensions.Logging;
 using Shared.Extensions;
 using Shared.OpenTelemetry;
@@ -8,7 +9,7 @@ namespace Infrastructure.Repositories.Users
 {
     public class UserRepositoryDecorator(IUserRepository inner, ILogger<IUserRepository> logger) : IUserRepository
     {
-        public async Task<int> AddAsync(User user)
+        public async Task<UserId> AddAsync(User user)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("user", "create");
 
@@ -17,15 +18,50 @@ namespace Infrastructure.Repositories.Users
             return await inner.AddAsync(user);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(UserId id)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("user", "delete");
 
-            logger.LogInformation("Удаление записи о пользователе с id {id}", id);
+            logger.LogInformation("Удаление записи о пользователе с id {id}", id.Value);
 
-            await inner.DeleteAsync(id);
+            return await inner.DeleteAsync(id);
         }
 
+        public async Task<UserId?> GetIdByUsernameAsync(Username username)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_username");
+
+            logger.LogInformation("Поиск записи о пользователе с username {username}", username.Value);
+
+            return await inner.GetIdByUsernameAsync(username);
+        }
+
+        public async Task<UserId?> GetIdByEmailAsync(UserEmail email)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_email");
+
+            logger.LogInformation("Поиск записи о пользователе с email {email}", email.Value);
+
+            return await inner.GetIdByEmailAsync(email);
+        }
+
+        public async Task<UserId?> GetIdByPhoneNumberAsync(UserPhoneNumber phoneNumber)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_phoneNumber");
+
+            logger.LogInformation("Поиск записи о пользователе с phoneNumber {phoneNumber}", phoneNumber.Value);
+
+            return await inner.GetIdByPhoneNumberAsync(phoneNumber);
+        }
+
+        public async Task<User?> GetAsync(UserId id)
+        {
+            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get");
+
+            logger.LogInformation("Восстановление записи о пользователе с id {id}", id.Value);
+
+            return await inner.GetAsync(id);
+        }
         public async Task UpdateAsync(User user)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("user", "update");
@@ -33,42 +69,6 @@ namespace Infrastructure.Repositories.Users
             logger.LogInformation("Обновление записи о пользователе c id {id}", user.Id);
 
             await inner.UpdateAsync(user);
-        }
-
-        public async Task<User?> GetAsync(int id)
-        {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get");
-
-            logger.LogInformation("Восстановление записи о пользователе с id {id}", id);
-
-            return await inner.GetAsync(id);
-        }
-
-        public async Task<int?> GetIdByUsernameAsync(string username)
-        {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_username");
-
-            logger.LogInformation("Поиск записи о пользователе с username {username}", username);
-
-            return await inner.GetIdByUsernameAsync(username);
-        }
-
-        public async Task<int?> GetIdByEmailAsync(string email)
-        {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_email");
-
-            logger.LogInformation("Поиск записи о пользователе с email {email}", email);
-
-            return await inner.GetIdByEmailAsync(email);
-        }
-
-        public async Task<int?> GetIdByPhoneNumberAsync(string phoneNumber)
-        {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("user", "get_id_by_phoneNumber");
-
-            logger.LogInformation("Поиск записи о пользователе с phoneNumber {phoneNumber}", phoneNumber);
-
-            return await inner.GetIdByPhoneNumberAsync(phoneNumber);
         }
     }
 }

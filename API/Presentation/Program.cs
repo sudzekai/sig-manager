@@ -1,10 +1,10 @@
 using CompositionRoot;
-using Presentation.Api.Filters;
-using Presentation.Api.Middlewares;
 using Presentation.Configuration;
 using Presentation.DI;
-using Presentation.Utilities.ExceptionsHandler;
-using Presentation.Utilities.Extensions;
+using Presentation.Filters;
+using Presentation.Internal.Utilities.ExceptionsHandler;
+using Presentation.Internal.Utilities.Extensions;
+using Presentation.Middlewares;
 using Scalar.AspNetCore;
 using Shared.App;
 using System.Text;

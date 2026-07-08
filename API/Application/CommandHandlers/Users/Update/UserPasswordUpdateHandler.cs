@@ -3,6 +3,7 @@ using Contracts.Interfaces.Application.Services;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Users.Update;
+using Domain.ValueObjects.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Update
@@ -11,12 +12,12 @@ namespace Application.CommandHandlers.Users.Update
     {
         public async Task<Unit> HandleAsync(UserPasswordUpdateCommand command)
         {
-            var user = await repository.GetAsync(command.Id)
+            var user = await repository.GetAsync(UserId.FromValue(command.Id))
                 ?? throw NotFoundException.UserWithId(command.Id);
 
             string passwordHash = hashService.HashString(command.Dto.Password);
 
-            user.PasswordHash = passwordHash;
+            user.PasswordHash = UserPasswordHash.FromValue(passwordHash);
 
             await repository.UpdateAsync(user);
 

@@ -1,166 +1,117 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using Domain.ValueObjects.Roles;
+using Domain.ValueObjects.Users;
 
 namespace Domain.Models.Users
 {
-    public partial class User : INotifyPropertyChanged
+    public partial class User
     {
-        private int _id;
-        private int _roleId;
-        private string _username;
-        private string _fullName;
-        private string _email;
-        private string _phoneNumber;
-        private string _passwordHash;
-        private string _phoneNumberLastFour;
-        private string _verificationCode;
-        private DateTime _createdAt;
-        private DateTime _updatedAt;
-
-        public int Id
+        public UserId? Id
         {
-            get => _id;
-            private set
-            {
-                if (_id == value)
-                    return;
-
-                _id = value;
-            }
-        }
-
-        public int RoleId
-        {
-            get => _roleId;
+            get;
             set
             {
-                if (_roleId == value)
+                if (field == value)
                     return;
 
-                ValidateRoleId(value);
-
-                _roleId = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Username
+        public RoleId RoleId
         {
-            get => _username;
-            [MemberNotNull(nameof(_username))]
+            get;
             set
             {
-                if (_username == value)
+                if (field == value)
                     return;
 
-                ValidateUsername(value);
-
-                _username = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string FullName
+        public Username Username
         {
-            get => _fullName;
-            [MemberNotNull(nameof(_fullName))]
+            get;
             set
             {
-                if (_fullName == value)
+                if (field == value)
                     return;
 
-                ValidateFullName(value);
-
-                _fullName = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Email
+        public UserFullName FullName
         {
-            get => _email;
-            [MemberNotNull(nameof(_email))]
+            get;
             set
             {
-                if (_email == value)
+                if (field == value)
                     return;
 
-                ValidateEmail(value);
-
-                _email = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string PhoneNumber
+        public UserEmail Email
         {
-            get => _phoneNumber;
-            [MemberNotNull(nameof(_phoneNumber), nameof(_phoneNumberLastFour))]
+            get;
             set
             {
-                if (value is not null
-                    && _phoneNumber == value
-                    && _phoneNumberLastFour == value[^4..])
+                if (field == value)
                     return;
 
-                ValidatePhoneNumber(value);
-
-                _phoneNumber = value;
-                PhoneNumberLastFour = value[^4..];
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string PasswordHash
+        public UserPhoneNumber PhoneNumber
         {
-            get => _passwordHash;
-            [MemberNotNull(nameof(_passwordHash))]
+            get;
             set
             {
-                if (_passwordHash == value)
+                if (field == value)
                     return;
 
-                ValidatePasswordHash(value);
-
-                _passwordHash = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string PhoneNumberLastFour
+        public UserPasswordHash PasswordHash
         {
-            get => _phoneNumberLastFour;
-            [MemberNotNull(nameof(_phoneNumberLastFour))]
-            private set
+            get;
+            set
             {
-                if (_phoneNumberLastFour == value)
+                if (field == value)
                     return;
 
-                _phoneNumberLastFour = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string VerificationCode
+        public UserVerificationCode VerificationCode
         {
-            get => _verificationCode;
-            [MemberNotNull(nameof(_verificationCode))]
+            get;
             set
             {
-                if (_verificationCode == value)
+                if (field == value)
                     return;
 
-                ValidateVerificationCode(value);
-
-                _verificationCode = value;
+                field = value;
 
                 OnPropertyChanged();
             }
@@ -168,37 +119,29 @@ namespace Domain.Models.Users
 
         public DateTime CreatedAt
         {
-            get => _createdAt;
+            get;
             private set
             {
-                if (_createdAt == value)
+                if (field == value)
                     return;
 
-                _createdAt = value;
+                field = value;
+
+                OnPropertyChanged();
             }
         }
 
         public DateTime UpdatedAt
         {
-            get => _updatedAt;
+            get;
             private set
             {
-                if (_updatedAt == value)
+                if (field == value)
                     return;
 
-                _updatedAt = value;
-            }
-        }
+                field = value;
 
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (_initialized)
-            {
-                UpdatedAt = DateTime.Now;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                OnPropertyChanged();
             }
         }
     }

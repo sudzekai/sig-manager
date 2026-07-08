@@ -15,12 +15,15 @@ namespace CompositionRoot
     {
         public static async Task<IServiceCollection> AddDatabase(this IServiceCollection services, string connectionString)
         {
-            var database = new SiGManagerDB(connectionString);
+            var database = new SiGManagerDB(connectionString, null);
             await database.TestConnectionAsync();
             await database.DisposeAsync();
 
-            services.AddScoped<IDbContext>(_ =>
-                new SiGManagerDB(connectionString));
+            services.AddScoped<IDbContext>(sp =>
+            {
+                var logger = sp.GetRequiredService<ILogger<SiGManagerDB>>();
+                return new SiGManagerDB(connectionString, logger);
+            });
 
             return services;
         }

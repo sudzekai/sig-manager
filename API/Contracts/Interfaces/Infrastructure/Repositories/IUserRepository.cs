@@ -1,16 +1,16 @@
 ﻿using Domain.Models.Users;
+using Domain.ValueObjects.Users;
 
 namespace Contracts.Interfaces.Infrastructure.Repositories
 {
     public interface IUserRepository
     {
-        Task<User?> GetAsync(int id);
-        Task<int> AddAsync(User user);
-        Task DeleteAsync(int id);
+        Task<UserId> AddAsync(User user);
+        Task<bool> DeleteAsync(UserId id);
+        Task<User?> GetAsync(UserId id);
+        Task<UserId?> GetIdByUsernameAsync(Username username);
+        Task<UserId?> GetIdByEmailAsync(UserEmail email);
+        Task<UserId?> GetIdByPhoneNumberAsync(UserPhoneNumber phoneNumber);
         Task UpdateAsync(User user);
-
-        Task<int?> GetIdByUsernameAsync(string username);
-        Task<int?> GetIdByEmailAsync(string email);
-        Task<int?> GetIdByPhoneNumberAsync(string phoneNumber);
     }
 }

@@ -2,6 +2,8 @@
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects;
 using Contracts.Objects.Commands.Users.Update;
+using Domain.ValueObjects.Roles;
+using Domain.ValueObjects.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Update
@@ -10,10 +12,10 @@ namespace Application.CommandHandlers.Users.Update
     {
         public async Task<Unit> HandleAsync(UserRoleUpdateCommand command)
         {
-            var user = await repository.GetAsync(command.Id)
+            var user = await repository.GetAsync(UserId.FromValue(command.Id))
                 ?? throw NotFoundException.UserWithId(command.Id);
 
-            user.RoleId = command.Dto.RoleId;
+            user.RoleId = RoleId.FromValue(command.Dto.RoleId);
 
             await repository.UpdateAsync(user);
 

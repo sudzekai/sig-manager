@@ -1,6 +1,7 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models;
 using Domain.Models.InfoShifts;
+using Domain.ValueObjects.Shifts;
 using Microsoft.Extensions.Logging;
 using Shared.Extensions;
 using Shared.OpenTelemetry;
@@ -9,40 +10,24 @@ namespace Infrastructure.Repositories.InfoShifts
 {
     public class InfoShiftRepositoryDecorator(IInfoShiftRepository inner, ILogger<IInfoShiftRepository> logger) : IInfoShiftRepository
     {
-        public async Task<int> AddAsync(InfoShift infoShift)
+        public Task<ShiftId> AddAsync(InfoShift infoShift)
         {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("infoShift", "create");
-
-            logger.LogInformation("Создание записи об информационной смене");
-
-            return await inner.AddAsync(infoShift);
+            throw new NotImplementedException();
         }
 
-        public async Task DeleteAsync(int shiftId)
+        public Task<bool> DeleteAsync(ShiftId id)
         {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("infoShift", "delete");
-
-            logger.LogInformation("Удаление записи об информационной смене с shift_id {shift_id}", shiftId);
-
-            await inner.DeleteAsync(shiftId);
+            throw new NotImplementedException();
         }
 
-        public async Task<InfoShift?> GetAsync(int shiftId)
+        public Task<InfoShift?> GetAsync(ShiftId id)
         {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("infoShift", "get");
-
-            logger.LogInformation("Восстановление записи об информационной смене с shift_id {shift_id}", shiftId);
-
-            return await inner.GetAsync(shiftId);
+            throw new NotImplementedException();
         }
 
-        public async Task UpdateAsync(InfoShift infoShift)
+        public Task UpdateAsync(InfoShift infoShift)
         {
-            using var activity = Telemetry.Repository.StartRepositoryActivity("infoShift", "update");
-
-            logger.LogInformation("Обновление записи об информационной смене с shift_id {shift_id}", infoShift.ShiftId);
-
-            await inner.UpdateAsync(infoShift);
+            throw new NotImplementedException();
         }
     }
 }

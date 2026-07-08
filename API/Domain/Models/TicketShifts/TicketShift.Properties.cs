@@ -1,90 +1,75 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Domain.ValueObjects.Shifts;
+using Domain.ValueObjects.Shifts.Ticket;
 
 namespace Domain.Models.TicketShifts
 {
-    public partial class TicketShift : INotifyPropertyChanged
+    public partial class TicketShift
     {
-        private int _shiftId;
-
-        private int _firstTicket;
-
-        private int? _lastTicket;
-
-        private decimal _ticketPrice;
-
-
-        public int ShiftId
+        public ShiftId? ShiftId
         {
-            get => _shiftId;
+            get;
             set
             {
-                if (_shiftId == value)
+                if (field == value)
                     return;
 
-                ValidateShiftId(value);
-
-                _shiftId = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public int FirstTicket
+        public ShiftFirstTicket FirstTicket
         {
-            get => _firstTicket;
+            get;
             set
             {
-                if (_firstTicket == value)
+                if (field == value)
                     return;
 
-                ValidateFirstTicket(value);
-
-                _firstTicket = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public int? LastTicket
+        public ShiftLastTicket? LastTicket
         {
-            get => _lastTicket;
+            get;
             set
             {
-                if (_lastTicket == value)
+                if (field == value)
                     return;
 
-                ValidateLastTicket(value);
-
-                _lastTicket = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public decimal TicketPrice
+        public ShiftTicketPrice TicketPrice
         {
-            get => _ticketPrice;
+            get;
             set
             {
-                if (_ticketPrice == value)
+                if (field == value)
                     return;
 
-                ValidateTicketPrice(value);
-
-                _ticketPrice = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        public int? TotalTickets
         {
-            if (_initialized)
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get
+            {
+                if (LastTicket is not null)
+                    return LastTicket.Value - FirstTicket.Value;
+
+                return null;
+            }
         }
     }
 }

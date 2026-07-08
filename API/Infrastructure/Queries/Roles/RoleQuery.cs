@@ -9,6 +9,7 @@ using Infrastructure.Schema.RoleRight;
 using MySql.Data.MySqlClient;
 using Shared.Extensions;
 using System.Diagnostics;
+using System.Data;
 
 namespace Infrastructure.Queries.Roles
 {

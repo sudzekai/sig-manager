@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Presentation.Api.Filters;
-using Presentation.Api.Middlewares;
+using Presentation.Filters;
+using Presentation.Middlewares;
 
 namespace Presentation.DI
 {

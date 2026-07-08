@@ -12,7 +12,7 @@ namespace Contracts.Objects.Dtos.Requests
 
         public string SearchTerm { get; set; } = string.Empty;
 
-        public abstract string OrderBy { get; set; }
+        public virtual string OrderBy { get; set; } = string.Empty;
 
         [RegularExpression(@"^?(asc|desc|)$", ErrorMessage = "OrderDirection должен быть asc или desc")]
         public string OrderDirection { get; set; } = "desc";

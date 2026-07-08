@@ -5,6 +5,8 @@ using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Commands.Users.Write;
 using Contracts.Objects.Dtos.User;
 using Domain.Models.Users;
+using Domain.ValueObjects.Roles;
+using Domain.ValueObjects.Users;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Write
@@ -13,32 +15,35 @@ namespace Application.CommandHandlers.Users.Write
     {
         public async Task<UserInfoDto> HandleAsync(UserCreateCommand command)
         {
-            if (await IsUsernameExistsAsync(command.Dto.Username))
+            var username = Username.FromValue(command.Dto.Username);
+
+            if (await repository.GetIdByUsernameAsync(username) is not null)
                 throw ConflictException.UserUsername;
 
-            if (await IsEmailExistsAsync(command.Dto.Email))
+            var email = UserEmail.FromValue(command.Dto.Email);
+            
+            if (await repository.GetIdByEmailAsync(email) is not null)
                 throw ConflictException.UserEmail;
 
-            if (await IsPhoneNumberExistsAsync(command.Dto.PhoneNumber))
+            var phoneNumber = UserPhoneNumber.FromValue(command.Dto.Username);
+           
+            if (repository.GetIdByPhoneNumberAsync(phoneNumber) is not null)
                 throw ConflictException.UserPhoneNumber;
 
             string passwordHash = hashService.HashString(command.Dto.Password);
 
-            User user = User.Create(command.Dto.Username, command.Dto.FullName, command.Dto.Email, command.Dto.PhoneNumber, passwordHash, 1);
+            User user = User.Create(
+                username, 
+                UserFullName.FromValue(command.Dto.FullName), 
+                email, 
+                phoneNumber, 
+                UserPasswordHash.FromValue(passwordHash),
+                RoleId.FromValue(1));
 
             var id = await repository.AddAsync(user);
 
-            return await query.GetByIdAsync(id)
-                ?? throw NotFoundException.UserWithId(id);
+            return await query.GetByIdAsync(id.Value)
+                ?? throw NotFoundException.UserWithId(id.Value);
         }
-
-        private async Task<bool> IsUsernameExistsAsync(string username)
-            => await repository.GetIdByUsernameAsync(username) is not null;
-
-        private async Task<bool> IsEmailExistsAsync(string email)
-            => await repository.GetIdByEmailAsync(email) is not null;
-
-        private async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber)
-            => await repository.GetIdByPhoneNumberAsync(phoneNumber) is not null;
     }
 }

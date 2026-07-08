@@ -1,93 +1,62 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using Domain.ValueObjects.Cars;
 
 namespace Domain.Models.Cars
 {
-    public partial class Car : INotifyPropertyChanged
+    public partial class Car
     {
-        private int _id;
-        private string _name;
-        private string _plate;
-        private string _status;
-
-        public int Id
+        public CarId Id
         {
-            get => _id;
+            get;
             set
             {
-                if (_id == value)
+                if (field == value)
                     return;
 
-                ValidateId(value);
-
-                _id = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Name
+        public CarName Name
         {
-            get => _name;
-
-            [MemberNotNull(nameof(_name))]
+            get;
             set
             {
-                if (_name == value)
+                if (field == value)
                     return;
 
-                ValidateName(value);
-
-                _name = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Plate
+        public CarPlate Plate
         {
-            get => _plate;
-
-            [MemberNotNull(nameof(_plate))]
+            get;
             set
             {
-                if (_plate == value)
+                if (field == value)
                     return;
 
-                ValidatePlate(value);
-
-                _plate = value;
+                field = value;
 
                 OnPropertyChanged();
             }
         }
 
-        public string Status
+        public CarStatus Status
         {
-            get => _status;
-
-            [MemberNotNull(nameof(_status))]
+            get;
             set
             {
-                if (_status == value)
+                if (field == value)
                     return;
 
-                ValidateStatus(value);
-
-                _status = value;
+                field = value;
 
                 OnPropertyChanged();
-            }
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (_initialized)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models;
 using Domain.Models.Shifts;
+using Domain.ValueObjects.Shifts;
 using Microsoft.Extensions.Logging;
 using Shared.Extensions;
 using Shared.OpenTelemetry;
@@ -9,7 +10,7 @@ namespace Infrastructure.Repositories.Shifts
 {
     internal class ShiftRepositoryDecorator(IShiftRepository inner, ILogger<IShiftRepository> logger) : IShiftRepository
     {
-        public async Task<int> AddAsync(Shift shift)
+        public async Task<ShiftId> AddAsync(Shift shift)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("shift", "create");
 
@@ -18,20 +19,20 @@ namespace Infrastructure.Repositories.Shifts
             return await inner.AddAsync(shift);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(ShiftId id)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("shift", "delete");
 
-            logger.LogInformation("Удаление записи о смене с id {id}", id);
+            logger.LogInformation("Удаление записи о смене с id {id}", id.Value);
 
-            await inner.DeleteAsync(id);
+            return await inner.DeleteAsync(id);
         }
 
-        public async Task<Shift?> GetAsync(int id)
+        public async Task<Shift?> GetAsync(ShiftId id)
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("shift", "get");
 
-            logger.LogInformation("Восстановление записи о смене с id {id}", id);
+            logger.LogInformation("Восстановление записи о смене с id {id}", id.Value);
 
             return await inner.GetAsync(id);
         }
@@ -40,7 +41,7 @@ namespace Infrastructure.Repositories.Shifts
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("shift", "update");
 
-            logger.LogInformation("Обновление записи о смене с id {id}", shift.Id);
+            logger.LogInformation("Обновление записи о смене с id {id}", shift.Id.Value);
 
             await inner.UpdateAsync(shift);
         }
