@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Domain.Exceptions;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Presentation.Internal.Objects.Responses;
 using Presentation.Internal.Utilities.Extensions;
 using Shared.Extensions;
@@ -31,6 +32,36 @@ namespace Presentation.Filters
                     context.HttpContext.Items["error.type"] = "business";
                 else
                     context.HttpContext.Items["error.type"] = "internal";
+
+                context.HttpContext.Items["error.occurred"] = true;
+
+                return;
+            }
+
+            if (ex is NotImplementedException notImplemented)
+            {
+                context.Result = ResponseEnvelope.NotImplementedError.ToErroredObjectResult();
+                _logger.LogError("{Type}: {Message}\n{Full}", ex.GetType().ToString().Split(".").Last(), ex.Message, ex.ToString());
+
+                activity?.SetTag("error.message", ex.Message);
+                activity?.SetTag("error", ex.ToString());
+
+                context.HttpContext.Items["error.type"] = "internal";
+
+                context.HttpContext.Items["error.occurred"] = true;
+
+                return;
+            }
+
+            if (ex is DataValidationException domainException)
+            {
+                context.Result = ResponseEnvelope.FromError(domainException).ToErroredObjectResult();
+                _logger.LogError("{Type}: {Message}\n{Full}", ex.GetType().ToString().Split(".").Last(), ex.Message, ex.ToString());
+
+                activity?.SetTag("error.message", ex.Message);
+                activity?.SetTag("error", ex.ToString());
+
+                context.HttpContext.Items["error.type"] = "internal";
 
                 context.HttpContext.Items["error.occurred"] = true;
 

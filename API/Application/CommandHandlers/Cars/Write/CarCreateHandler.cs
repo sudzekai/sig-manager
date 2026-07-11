@@ -16,12 +16,12 @@ namespace Application.CommandHandlers.Cars.Write
             var name = CarName.FromValue(command.Dto.Name);
 
             if (repository.GetIdByNameAsync(name) is not null)
-                throw ConflictException.CarName;
+                throw ConflictException.CarName();
 
             var id = CarId.FromValue(command.Dto.Id);
 
             if (await repository.GetAsync(id) is not null)
-                throw ConflictException.CarId;
+                throw ConflictException.CarId();
 
             Car car = Car.Create(
                 id,

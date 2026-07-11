@@ -16,10 +16,12 @@ namespace Application.CommandHandlers.Users.Update
 
             if (command.Dto.Username != null)
             {
-                if (await IsUsernameExistsAsync(command.Dto.Username, command.Id))
-                    throw ConflictException.UserUsername;
+                var username = Username.FromValue(command.Dto.Username);
 
-                user.Username = Username.FromValue(command.Dto.Username);
+                if (await repository.GetIdByUsernameAsync(username) is not null)
+                    throw ConflictException.UserEmail();
+
+                user.Username = username;
             }
 
             if (command.Dto.FullName != null)
@@ -27,33 +29,27 @@ namespace Application.CommandHandlers.Users.Update
 
             if (command.Dto.Email != null)
             {
-                if (await IsEmailExistsAsync(command.Dto.Email, command.Id))
-                    throw ConflictException.UserEmail;
+                var email = UserEmail.FromValue(command.Dto.Email);
 
-                user.Email = UserEmail.FromValue(command.Dto.Email);
+                if (await repository.GetIdByEmailAsync(email) is not null)
+                    throw ConflictException.UserEmail();
+
+                user.Email = email;
             }
 
             if (command.Dto.PhoneNumber != null)
             {
-                if (await IsPhoneNumberExistsAsync(command.Dto.PhoneNumber, command.Id))
-                    throw ConflictException.UserPhoneNumber;
+                var phoneNumber = UserPhoneNumber.FromValue(command.Dto.PhoneNumber);
 
-                user.PhoneNumber = UserPhoneNumber.FromValue(command.Dto.PhoneNumber);
+                if (await repository.GetIdByPhoneNumberAsync(phoneNumber) is not null)
+                    throw ConflictException.UserPhoneNumber();
 
+                user.PhoneNumber = phoneNumber;
             }
 
             await repository.UpdateAsync(user);
 
             return Unit.Value;
         }
-
-        private async Task<bool> IsUsernameExistsAsync(string username, int excludedId)
-            => await repository.GetIdByUsernameAsync(Username.FromValue(username)) is var id && id is not null && id.Value != excludedId;
-
-        private async Task<bool> IsEmailExistsAsync(string email, int excludedId)
-            => await repository.GetIdByEmailAsync(UserEmail.FromValue(email)) is var id && id is not null && id.Value != excludedId;
-
-        private async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int excludedId)
-           => await repository.GetIdByPhoneNumberAsync(UserPhoneNumber.FromValue(phoneNumber)) is var id && id is not null && id.Value != excludedId;
     }
 }

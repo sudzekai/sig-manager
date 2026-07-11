@@ -1,12 +1,19 @@
 ﻿using Domain.Exceptions;
+using Shared.App;
 
 namespace Domain.ValueObjects.Users
 {
     public record UserPhoneNumber
     {
         public readonly string Value;
+        public readonly string LastFour;
 
-        private UserPhoneNumber(string value) => Value = value;
+
+        private UserPhoneNumber(string value)
+        {
+            Value = value;
+            LastFour = value[^4..];
+        } 
 
         public static UserPhoneNumber FromValue(string value)
         {

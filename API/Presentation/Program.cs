@@ -32,7 +32,9 @@ namespace Presentation
             // infrastructure
 
             await builder.Services.AddDatabase(GetConnectionString(builder.Configuration));
+            builder.Services.AddUnitOfWork();
             builder.Services.AddRepositories();
+            builder.Services.AddQueries();
 
             // application
             

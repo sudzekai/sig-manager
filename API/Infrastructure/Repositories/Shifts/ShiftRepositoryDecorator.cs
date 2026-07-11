@@ -1,5 +1,4 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
-using Domain.Models;
 using Domain.Models.Shifts;
 using Domain.ValueObjects.Shifts;
 using Microsoft.Extensions.Logging;
@@ -8,7 +7,7 @@ using Shared.OpenTelemetry;
 
 namespace Infrastructure.Repositories.Shifts
 {
-    internal class ShiftRepositoryDecorator(IShiftRepository inner, ILogger<IShiftRepository> logger) : IShiftRepository
+    public class ShiftRepositoryDecorator(IShiftRepository inner, ILogger<IShiftRepository> logger) : IShiftRepository
     {
         public async Task<ShiftId> AddAsync(Shift shift)
         {

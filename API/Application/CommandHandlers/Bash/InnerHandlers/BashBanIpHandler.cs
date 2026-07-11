@@ -55,7 +55,7 @@ namespace Application.CommandHandlers.Bash.InnerHandlers
                 }
             }
 
-            throw new BadRequestException("некорректный ввод", "banip command invalid input");
+            throw new BadRequestException("некорректный ввод", "banip command invalid command");
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Domain.Models.CarShifts
 {
     public partial class CarShift
     {
-        public ShiftId? ShiftId
+        public ShiftId ShiftId
         {
             get;
             set

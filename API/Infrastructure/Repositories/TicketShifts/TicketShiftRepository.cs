@@ -5,7 +5,7 @@ using Domain.ValueObjects.Shifts;
 
 namespace Infrastructure.Repositories.TicketShifts
 {
-    internal class TicketShiftsRepository(IDbContext db) : ITicketShiftRepository
+    public class TicketShiftsRepository(IDbContext db) : ITicketShiftRepository
     {
         public Task<ShiftId> AddAsync(TicketShift ticketShift)
         {

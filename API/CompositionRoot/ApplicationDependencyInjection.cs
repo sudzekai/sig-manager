@@ -2,6 +2,7 @@
 using Application.CommandHandlers.Bash;
 using Application.CommandHandlers.Cars.Update;
 using Application.CommandHandlers.Cars.Write;
+using Application.CommandHandlers.CarShifts;
 using Application.CommandHandlers.Users.Update;
 using Application.CommandHandlers.Users.Write;
 using Application.QueryHandlers.Cars;
@@ -15,9 +16,11 @@ using Contracts.Objects;
 using Contracts.Objects.Commands.Bash;
 using Contracts.Objects.Commands.Cars.Update;
 using Contracts.Objects.Commands.Cars.Write;
+using Contracts.Objects.Commands.CarShifts;
 using Contracts.Objects.Commands.Users.Update;
 using Contracts.Objects.Commands.Users.Write;
 using Contracts.Objects.Dtos.Car;
+using Contracts.Objects.Dtos.CarShift;
 using Contracts.Objects.Dtos.User;
 using Contracts.Objects.Queries.Cars;
 using Contracts.Objects.Queries.Users;
@@ -45,7 +48,8 @@ namespace CompositionRoot
 
             services.AddBashHandlers()
                     .AddUserHandlers()
-                    .AddCarHandlers();
+                    .AddCarHandlers()
+                    .AddCarShiftHandlers();
 
             return services;
         }
@@ -56,18 +60,18 @@ namespace CompositionRoot
 
         private static IServiceCollection AddUserHandlers(this IServiceCollection services)
         =>  // get
-            services.AddScoped<IQueryHandler<UserGetAllQuery, IReadOnlyList<UserSimpleDto>>, 
+            services.AddScoped<IQueryHandler<UserGetAllQuery, IReadOnlyList<UserSimpleDto>>,
                                UserGetAllHandler>()
-                    .AddScoped<IQueryHandler<UserGetQuery, UserInfoDto>, 
+                    .AddScoped<IQueryHandler<UserGetQuery, UserInfoDto>,
                                UserGetHandler>()
-            // update
+                    // update
                     .AddScoped<ICommandHandler<UserInfoUpdateCommand, Unit>,
                                UserInfoUpdateHandler>()
                     .AddScoped<ICommandHandler<UserRoleUpdateCommand, Unit>,
                                UserRoleUpdateHandler>()
                     .AddScoped<ICommandHandler<UserPasswordUpdateCommand, Unit>,
                                UserPasswordUpdateHandler>()
-            // write
+                    // write
                     .AddScoped<ICommandHandler<UserDeleteCommand, Unit>,
                                UserDeleteHandler>()
                     .AddScoped<ICommandHandler<UserCreateCommand, UserInfoDto>,
@@ -75,19 +79,28 @@ namespace CompositionRoot
 
         private static IServiceCollection AddCarHandlers(this IServiceCollection services)
         =>  // get
-            services.AddScoped<IQueryHandler<CarGetAllQuery, IReadOnlyList<CarSimpleDto>>, 
+            services.AddScoped<IQueryHandler<CarGetAllQuery, IReadOnlyList<CarSimpleDto>>,
                                CarGetAllHandler>()
-                    .AddScoped<IQueryHandler<CarGetQuery, CarInfoDto>, 
+                    .AddScoped<IQueryHandler<CarGetQuery, CarInfoDto>,
                                CarGetHandler>()
-            // update
+                    // update
                     .AddScoped<ICommandHandler<CarInfoUpdateCommand, Unit>,
                                CarInfoUpdateHandler>()
                     .AddScoped<ICommandHandler<CarStatusUpdateCommand, Unit>,
                                CarStatusUpdateHandler>()
-            // write
+                    // write
                     .AddScoped<ICommandHandler<CarDeleteCommand, Unit>,
                                CarDeleteHandler>()
                     .AddScoped<ICommandHandler<CarCreateCommand, CarInfoDto>,
                                CarCreateHandler>();
+
+        private static IServiceCollection AddCarShiftHandlers(this IServiceCollection services)
+        =>  // get
+            services
+                    // update
+                    .AddScoped<ICommandHandler<CarShiftOpenCommand, CarShiftInfoDto>,
+                               CarShiftOpenHandler>()
+                    .AddScoped<ICommandHandler<CarShiftCloseCommand, CarShiftInfoDto>,
+                               CarShiftCloseHandler>();
     }
 }

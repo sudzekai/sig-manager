@@ -4,5 +4,5 @@ using Contracts.Objects.Dtos.Requests;
 
 namespace Contracts.Objects.Queries.CarShifts
 {
-    public record CarShiftGetAllQuery(GetShiftRequest Request) : IQuery<List<CarShiftSimpleDto>>;
+    public record CarShiftGetAllQuery(GetCarShiftsListRequest Request) : IQuery<IReadOnlyList<CarShiftSimpleDto>>;
 }

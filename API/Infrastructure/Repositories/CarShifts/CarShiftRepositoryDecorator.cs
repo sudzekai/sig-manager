@@ -1,29 +1,48 @@
 ﻿using Contracts.Interfaces.Infrastructure.Repositories;
 using Domain.Models.CarShifts;
 using Domain.ValueObjects.Shifts;
+using Microsoft.Extensions.Logging;
+using Shared.Extensions;
+using Shared.OpenTelemetry;
 
 namespace Infrastructure.Repositories.CarShifts
 {
-    public class CarShiftRepositoryDecorator : ICarShiftRepository
+    public class CarShiftRepositoryDecorator(ICarShiftRepository inner, ILogger<ICarShiftRepository> logger) : ICarShiftRepository
     {
-        public Task<ShiftId> AddAsync(CarShift carShift)
+        public async Task<ShiftId> AddAsync(CarShift carShift)
         {
-            throw new NotImplementedException();
+            using var activity = Telemetry.Repository.StartRepositoryActivity("car_shift", "create");
+
+            logger.LogInformation("Создание записи о смене машинок");
+
+            return await inner.AddAsync(carShift);
         }
 
-        public Task<bool> DeleteAsync(ShiftId id)
+        public async Task<bool> DeleteAsync(ShiftId id)
         {
-            throw new NotImplementedException();
+            using var activity = Telemetry.Repository.StartRepositoryActivity("car_shift", "delete");
+
+            logger.LogInformation("Удаление записи о смене машинок с id {id}", id);
+
+            return await inner.DeleteAsync(id);
         }
 
-        public Task<CarShift?> GetAsync(ShiftId id)
+        public async Task<CarShift?> GetAsync(ShiftId id)
         {
-            throw new NotImplementedException();
+            using var activity = Telemetry.Repository.StartRepositoryActivity("car_shift", "get");
+
+            logger.LogInformation("Восстановление записи о смене машинок с id {id}", id);
+
+            return await inner.GetAsync(id);
         }
 
-        public Task UpdateAsync(CarShift carShift)
+        public async Task UpdateAsync(CarShift carShift)
         {
-            throw new NotImplementedException();
+            using var activity = Telemetry.Repository.StartRepositoryActivity("car_shift", "update");
+
+            logger.LogInformation("Обновление записи о смене машинок с id {id}", carShift.ShiftId.Value);
+
+            await inner.UpdateAsync(carShift);
         }
     }
 }

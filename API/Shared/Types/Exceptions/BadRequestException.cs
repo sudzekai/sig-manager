@@ -1,6 +1,10 @@
-﻿namespace Shared.Types.Exceptions
+﻿using System.Runtime.CompilerServices;
+
+namespace Shared.Types.Exceptions
 {
-    public class BadRequestException(string businessMessage, string message, Exception? inner = null) : ApplicationException (businessMessage, message, inner)
+    public class BadRequestException
+        (string businessMessage, string message, Exception? inner = null, [CallerFilePath] string filePath = "") 
+        : ApplicationException(businessMessage, $"{Path.GetFileNameWithoutExtension(filePath)}: {message}", inner)
     {
         public override int Code => 400;
     }
