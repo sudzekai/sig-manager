@@ -1,16 +1,14 @@
+# Сборка
 FROM node:22-alpine AS build
 
 WORKDIR /app
 
-RUN npm config set registry https://registry.npmmirror.com
-
 COPY package*.json ./
 
-RUN npm install --prefer-offline --no-audit --no-fund
+RUN npm ci
 
 COPY . .
 
-# Собираем проект
 RUN npm run build
 
 FROM nginx:alpine
