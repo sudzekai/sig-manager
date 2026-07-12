@@ -7,7 +7,7 @@ COPY API.slnx .
 
 COPY Presentation/Presentation.csproj Presentation/
 COPY Application/Application.csproj Application/
-COPY CompositionRoot/CompositionRoot.csproj Composition/
+COPY CompositionRoot/CompositionRoot.csproj CompositionRoot/
 COPY Contracts/Contracts.csproj Contracts/
 COPY Domain/Domain.csproj Domain/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
