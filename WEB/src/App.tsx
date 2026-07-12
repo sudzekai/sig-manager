@@ -6,6 +6,8 @@ import NotFound from "./pages/NotFound";
 import CarShiftOpenPage from "./pages/carShift/Open";
 import UsersPage from "./pages/users/Users";
 import UserPage from "./pages/users/User";
+import CarShiftClosePage from "./pages/carShift/Close";
+import CarShiftInfoPage from "./pages/carShift/Info";
 
 export default function App() {
     return (
@@ -13,7 +15,11 @@ export default function App() {
             <Route element={<MainLayout />}>
                 <Route index element={<Home />} />
                 <Route path="*" element={<NotFound />} />
+
+                <Route path="/shifts/cars/:id" element={<CarShiftInfoPage />} />
+                <Route path="/shifts/cars/:id/close" element={<CarShiftClosePage />} />
                 <Route path="/shifts/cars/open" element={<CarShiftOpenPage />} />
+
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/users/:id" element={<UserPage />} />
             </Route>

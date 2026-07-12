@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.form-control {
+    @apply flex ring-1 rounded-xl px-2 py-1;
+}

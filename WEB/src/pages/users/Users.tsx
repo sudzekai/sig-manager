@@ -21,23 +21,27 @@ export default function UsersPage() {
     }, []);
 
     return (
-        <table className="ring-1">
-            <thead>
-                <tr>
-                    <th>Имя пользователя</th>
-                    <th>ФИО</th>
-                </tr>
-            </thead>
-            <tbody>
-                {users?.map((user, i) => (
-                    <tr key={user.id || i} 
-                        onClick={() => navigate(`/users/${user.id}`)}
-                        className=" cursor-pointer">
-                        <td>{user.username}</td>
-                        <td>{user.fullName}</td>
+        <div className="flex flex-col gap-2">
+            <label className="doc-header">Пользователи</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Имя пользователя</th>
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {users?.map((user, i) => (
+                        <tr key={user.id || i}
+                            onClick={() => navigate(`/users/${user.id}`)}
+                            className=" cursor-pointer">
+                            <td>{user.fullName}</td>
+                            <td className="max-w-[100px] truncate">{user.username}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
     )
 }

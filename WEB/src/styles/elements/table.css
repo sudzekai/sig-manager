@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "../resources.css";
+
+table {
+    
+}
+
+td, th {
+    @apply ring-1 p-2 ;
+}
+
+tr:hover {
+    @apply bg-(--background-primary)/50;
+}
+tr:active {
+    @apply bg-(--background-primary)/30;
+}

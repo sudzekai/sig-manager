@@ -4,8 +4,8 @@ export type CarShiftInfoDto = {
     id: number;
     parkId: number;
     status: string;
-    createdAt: Date;
-    closedAt?: Date;
+    createdAt: string;
+    closedAt?: string;
     cash?: number;
     cashLess?: number;
     total?: number;

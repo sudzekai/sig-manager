@@ -28,7 +28,7 @@ namespace Application.CommandHandlers.CarShifts
 
             var shift = await shifts.GetAsync(shiftId);
 
-            if (shift is null || shift.Type != ShiftType.Car || shift.Status != ShiftStatus.Closed)
+            if (shift is null || shift.Type != ShiftType.Car || shift.Status == ShiftStatus.Closed)
                 throw NotFoundException.ShiftWithId(command.Id);
 
             var ticketShift = await tickets.GetAsync(shiftId)
