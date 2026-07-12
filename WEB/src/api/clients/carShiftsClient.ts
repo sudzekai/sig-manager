@@ -4,7 +4,7 @@ import { client } from "./base";
 
 export const carShiftsClient = {
     open: async (body: CarShiftOpenDto): Promise<CarShiftInfoDto> => {
-        var response = await client.get<CarShiftInfoDto>("shifts/cars");
+        var response = await client.post<CarShiftInfoDto>("shifts/cars", body);
         return response;
     }
 }

@@ -11,7 +11,7 @@ export default function CarShiftOpenPage() {
         users: []
     });
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const onSubmit = async (e: React.SubmitEvent, dto: CarShiftOpenDto) => {
         e.preventDefault();
