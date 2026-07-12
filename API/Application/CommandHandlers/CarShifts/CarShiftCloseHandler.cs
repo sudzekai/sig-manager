@@ -1,5 +1,6 @@
 ﻿using Contracts.Interfaces.Application.Commands;
 using Contracts.Interfaces.Infrastructure;
+using Contracts.Interfaces.Infrastructure.Queries;
 using Contracts.Interfaces.Infrastructure.Repositories;
 using Contracts.Objects.Commands.CarShifts;
 using Contracts.Objects.Dtos.CarShift;
@@ -7,7 +8,6 @@ using Domain.Models.InfoShifts;
 using Domain.ValueObjects.Shifts;
 using Domain.ValueObjects.Shifts.Info;
 using Domain.ValueObjects.Shifts.Ticket;
-using Shared.App;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.CarShifts
@@ -16,7 +16,8 @@ namespace Application.CommandHandlers.CarShifts
         IInfoShiftRepository infos,
         IShiftRepository shifts,
         ITicketShiftRepository tickets,
-        IUnitOfWork uow
+        IUnitOfWork uow,
+        ICarShiftQuery query
         ) : ICommandHandler<CarShiftCloseCommand, CarShiftInfoDto>
     {
         public async Task<CarShiftInfoDto> HandleAsync(CarShiftCloseCommand command)
@@ -27,20 +28,20 @@ namespace Application.CommandHandlers.CarShifts
 
             var shift = await shifts.GetAsync(shiftId);
 
-            if (shift is null || shift.Type != ShiftType.Car)
+            if (shift is null || shift.Type != ShiftType.Car || shift.Status != ShiftStatus.Closed)
                 throw NotFoundException.ShiftWithId(command.Id);
 
             var ticketShift = await tickets.GetAsync(shiftId)
                 ?? throw NotFoundException.ShiftWithId(command.Id);
 
-            shift.Status = ShiftStatus.Closed;
+            shift.Close();
 
-            ticketShift.LastTicket = ShiftLastTicket.FromValue(command.Dto.LastTicket);
+            ticketShift.LastTicket = ShiftLastTicket.FromValue(command.Dto.LastTicket, ticketShift.FirstTicket);
 
             var info = InfoShift.Create(
                 shiftId,
                 ShiftCash.FromValue(command.Dto.Cash),
-                ShiftCashLess.FromValue(command.Dto.CashLess),
+                ShiftCashless.FromValue(command.Dto.Cashless),
                 ShiftReceiptPhotoFileName.FromValue("test")
             );
 
@@ -50,7 +51,8 @@ namespace Application.CommandHandlers.CarShifts
 
             await uow.CommitAsync();
 
-            throw AppConstants.TODO();
+            return await query.GetByIdAsync(shiftId.Value)
+                ?? throw NotFoundException.ShiftWithId(shiftId.Value);
         }
     }
 }

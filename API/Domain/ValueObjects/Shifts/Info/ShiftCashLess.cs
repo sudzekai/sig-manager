@@ -2,18 +2,20 @@
 
 namespace Domain.ValueObjects.Shifts.Info
 {
-    public record ShiftCashLess
+    public record ShiftCashless
     {
         public readonly decimal Value;
 
-        private ShiftCashLess(decimal value) => Value = value;
-
-        public static ShiftCashLess FromValue(decimal value)
+        private ShiftCashless(decimal value) => Value = value;
+        
+        public static ShiftCashless FromValue(decimal value)
         {
             if (value < 0)
                 throw new DataValidationException("Сумма безналичной оплаты смены не может быть меньше 0");
 
             return new(value);
         }
+
+        public static readonly ShiftCashless Empty = new(0);
     }
 }

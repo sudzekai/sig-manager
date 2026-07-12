@@ -4,7 +4,7 @@ namespace Domain.Models.Shifts
 {
     public partial class Shift
     {
-        public ShiftId? Id
+        public ShiftId Id
         {
             get;
             set
@@ -74,6 +74,12 @@ namespace Domain.Models.Shifts
 
                 OnPropertyChanged();
             }
+        }
+
+        public void Close()
+        {
+            ClosedAt = DateTime.Now;
+            Status = ShiftStatus.Closed;
         }
     }
 }

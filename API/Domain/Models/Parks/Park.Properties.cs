@@ -4,7 +4,7 @@ namespace Domain.Models.Parks
 {
     public partial class Park
     {
-        public ParkId? Id
+        public ParkId Id
         {
             get;
             set

@@ -6,6 +6,7 @@ using Application.CommandHandlers.CarShifts;
 using Application.CommandHandlers.Users.Update;
 using Application.CommandHandlers.Users.Write;
 using Application.QueryHandlers.Cars;
+using Application.QueryHandlers.CarShifts;
 using Application.QueryHandlers.Users;
 using Application.Services;
 using Contracts.Interfaces.Application.Commands;
@@ -23,6 +24,7 @@ using Contracts.Objects.Dtos.Car;
 using Contracts.Objects.Dtos.CarShift;
 using Contracts.Objects.Dtos.User;
 using Contracts.Objects.Queries.Cars;
+using Contracts.Objects.Queries.CarShifts;
 using Contracts.Objects.Queries.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -96,7 +98,8 @@ namespace CompositionRoot
 
         private static IServiceCollection AddCarShiftHandlers(this IServiceCollection services)
         =>  // get
-            services
+            services.AddScoped<IQueryHandler<CarShiftGetQuery, CarShiftInfoDto>,
+                                             CarShiftGetQueryHandler>()
                     // update
                     .AddScoped<ICommandHandler<CarShiftOpenCommand, CarShiftInfoDto>,
                                CarShiftOpenHandler>()

@@ -1,6 +1,4 @@
-﻿using Infrastructure.Schema.InfoShift;
-
-namespace Infrastructure.Schema.CarShift
+﻿namespace Infrastructure.Schema.CarShift
 {
     internal class CarShiftSelects
     {

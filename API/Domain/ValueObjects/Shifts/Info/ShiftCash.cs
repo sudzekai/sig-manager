@@ -15,5 +15,7 @@ namespace Domain.ValueObjects.Shifts.Info
 
             return new(value);
         }
+
+        public static readonly ShiftCash Empty = new(0);
     }
 }

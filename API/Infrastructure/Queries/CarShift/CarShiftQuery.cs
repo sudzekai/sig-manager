@@ -1,119 +1,135 @@
-﻿using Contracts.Objects.Dtos.CarShift;
+﻿using Contracts.Interfaces.Infrastructure.Context;
+using Contracts.Interfaces.Infrastructure.Queries;
+using Contracts.Objects.Dtos.CarShift;
 using Contracts.Objects.Dtos.Requests;
-using Contracts.Objects.Dtos.User;
-using Infrastructure.Schema.User;
+using Contracts.Objects.Dtos.UserPosition;
+using Infrastructure.Internal.Extensions;
+using Infrastructure.Schema.CarShift;
+using Infrastructure.Schema.InfoShift;
+using Infrastructure.Schema.Shift;
+using Infrastructure.Schema.TicketShift;
+using Infrastructure.Schema.UserShift;
 using MySql.Data.MySqlClient;
-using Shared.Types.Enums;
-using System.Diagnostics;
-using System.Text;
-using Shared.Extensions;
-using Contracts.Interfaces.Infrastructure.Context;
-
+using Shared.App;
+using System.Data;
 
 namespace Infrastructure.Queries.CarShift
 {
-    public class CarShiftQuery(IDbContext db)
+    public class CarShiftQuery(IDbContext db) : ICarShiftQuery
     {
-        public async Task<IReadOnlyList<CarShiftSimpleDto>> GetAllAsync(GetUsersListRequest request)
+        public async Task<IReadOnlyList<CarShiftSimpleDto>> GetAllAsync(GetCarShiftsListRequest request)
         {
-            StringBuilder query = new($@"
-                SELECT {string.Join(", ", UserSelects.Simple)} 
-                FROM {UserSchema.TableName}
-                WHERE 1=1
-            ");
+            throw AppConstants.TODO();
+        }
 
-            List<MySqlParameter> parameters = [];
+        public async Task<CarShiftInfoDto?> GetByIdAsync(int id)
+        {
+            var query = $"""
+                SELECT 
+                	shift.{ShiftSchema.Id} as {ShiftSchema.Id},
+                    carShift.{CarShiftSchema.ParkId} as {CarShiftSchema.ParkId},
+                    shift.{ShiftSchema.Status} as {ShiftSchema.Status},
+                    shift.{ShiftSchema.CreatedAt} as {ShiftSchema.CreatedAt},
+                    shift.{ShiftSchema.ClosedAt} as {ShiftSchema.ClosedAt}, -- nullable
+                    infoShift.{InfoShiftSchema.Cash} as {InfoShiftSchema.Cash}, -- nullable
+                    infoShift.{InfoShiftSchema.Cashless} as {InfoShiftSchema.Cashless}, -- nullable
+                    infoShift.{InfoShiftSchema.ReceiptPhotoFileName} as {InfoShiftSchema.ReceiptPhotoFileName}, -- nullable
+                    ticketShift.{TicketShiftSchema.FirstTicket} as {TicketShiftSchema.FirstTicket},
+                    ticketShift.{TicketShiftSchema.LastTicket} as {TicketShiftSchema.LastTicket}, -- nullable
+                    ticketShift.{TicketShiftSchema.TicketPrice} as {TicketShiftSchema.TicketPrice}
+                FROM {CarShiftSchema.TableName} carShift
+                	INNER JOIN {ShiftSchema.TableName} shift
+                		ON shift.{ShiftSchema.Id} = carShift.{CarShiftSchema.ShiftId}	
+                	LEFT JOIN {InfoShiftSchema.TableName} infoShift
+                		ON infoShift.{InfoShiftSchema.ShiftId} = shift.{ShiftSchema.Id}
+                	LEFT JOIN {TicketShiftSchema.TableName} ticketShift
+                		ON ticketShift.{TicketShiftSchema.ShiftId} = shift.{ShiftSchema.Id}
+                WHERE shift.{ShiftSchema.Id} = @{ShiftSchema.Id}
+                """;
 
-            if (request.RoleId.HasValue)
+            MySqlParameter[] parameters = [
+                ShiftSchema.Id.ToMysqlParameter(id)
+                ];
+
+            CarShiftInfoDto? result = null;
+
+
+            await using (var command = await db.CreateCommandAsync(query, parameters))
             {
-                query.Append($"\nAND {UserSchema.RoleId} = @roleId");
-                parameters.Add(new("roleId", request.RoleId.Value));
-            }
+                await using var reader = await command.ExecuteReaderAsync();
 
-            if (request.CreatedAtStart != default)
-            {
-                query.Append($"\nAND {UserSchema.CreatedAt} > @createdAtStart");
-                parameters.Add(new("createdAtStart", request.CreatedAtStart));
-            }
-
-            if (request.CreatedAtEnd != default)
-            {
-                query.Append($"\nAND {UserSchema.CreatedAt} < @createdAtEnd");
-                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
-            }
-
-            if (request.UpdatedAtStart != default)
-            {
-                query.Append($"\nAND {UserSchema.UpdatedAt} > @updatedAtStart");
-                parameters.Add(new("updatedAtStart", request.UpdatedAtStart));
-            }
-
-            if (request.UpdatedAtEnd != default)
-            {
-                query.Append($"\nAND {UserSchema.UpdatedAt} < @updatedAtEnd");
-                parameters.Add(new("updatedAtEnd", request.UpdatedAtEnd));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-            {
-                query.Append(@$"
-                    AND ({UserSchema.Username} LIKE @searchTerm 
-                    OR {UserSchema.FullName} LIKE @searchTerm 
-                    OR {UserSchema.Email} LIKE @searchTerm 
-                    OR {UserSchema.PhoneNumberLastFour} LIKE @searchTerm)
-                ");
-
-                parameters.Add(new("searchTerm", $"{request.SearchTerm}%"));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-            {
-                var orderBy = request.OrderBy.ToLower() switch
+                if (await reader.ReadAsync())
                 {
-                    "username" => UserSchema.Username,
-                    "fullname" => UserSchema.FullName,
-                    "role" => UserSchema.RoleId,
-                    "createdate" => UserSchema.CreatedAt,
-                    "updatedate" => UserSchema.UpdatedAt,
-                    _ => UserSchema.Id
-                };
+                    var closedAt = reader.GetNullableDateTime(ShiftSchema.ClosedAt);
 
-                var orderDirection = request.OrderDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                    ? "ASC"
-                    : "DESC";
+                    var cash = reader.GetNullableDecimal(InfoShiftSchema.Cash);
+                    var cashless = reader.GetNullableDecimal(InfoShiftSchema.Cashless);
+                    var receiptPhotoFileName = reader.GetNullableString(InfoShiftSchema.ReceiptPhotoFileName);
 
-                query.Append($"\nORDER BY {orderBy} {orderDirection}");
+                    var firstTicket = reader.GetInt32(TicketShiftSchema.FirstTicket);
+                    var lastTicket = reader.GetNullableInt32(TicketShiftSchema.LastTicket);
+                    var ticketPrice = reader.GetDecimal(TicketShiftSchema.TicketPrice);
+
+                    decimal? total = (cash.HasValue && cashless.HasValue) ? cashless.Value + cash.Value : null;
+                    int? totalTickets = lastTicket.HasValue ? lastTicket.Value - firstTicket : null;
+                    decimal? difference = (total.HasValue && totalTickets.HasValue) ? total - totalTickets * ticketPrice : null;
+
+                    result = new(
+                        id,
+                        reader.GetInt32(CarShiftSchema.ParkId),
+                        reader.GetString(ShiftSchema.Status),
+                        reader.GetDateTime(ShiftSchema.CreatedAt),
+                        closedAt,
+                        cash,
+                        cashless,
+                        total,
+                        difference,
+                        receiptPhotoFileName,
+                        firstTicket,
+                        lastTicket,
+                        totalTickets,
+                        ticketPrice,
+                        []
+                    );
+                }
+                else
+                    return null;
             }
 
-            query.Append($"\nLIMIT @limit OFFSET @offset;");
+            query = $"""
+                SELECT {UserShiftSchema.UserId}, {UserShiftSchema.PositionId}
+                FROM {UserShiftSchema.TableName}
+                WHERE {UserShiftSchema.ShiftId} = @{UserShiftSchema.ShiftId}
+                """;
 
-            parameters.Add(new("limit", request.Limit));
-            parameters.Add(new("offset", request.Offset));
+            parameters = [
+                UserShiftSchema.ShiftId.ToMysqlParameter(id)
+                ];
 
-            Activity.Current?.SetSqlTag(DbOperation.SELECT, parameters.Count);
+            List<UserPositionDto> users = [];
 
-            List<UserSimpleDto> result = [];
-
-            await using var command = await db.CreateCommandAsync(query.ToString(), [..parameters]);
-
-            await using var reader = await command.ExecuteReaderAsync();
-
-            var idOrdinal = reader.GetOrdinal(UserSchema.Id);
-            var usernameOrdinal = reader.GetOrdinal(UserSchema.Username);
-            var fullNameOrdinal = reader.GetOrdinal(UserSchema.FullName);
-
-            while (await reader.ReadAsync())
+            await using (var command = await db.CreateCommandAsync(query, parameters))
             {
-                result.Add(
-                    new(
-                        reader.GetInt32(idOrdinal),
-                        reader.GetString(usernameOrdinal),
-                        reader.GetString(fullNameOrdinal)
-                    )
-                );
+                await using var reader = await command.ExecuteReaderAsync();
+
+                var idOrdinal = reader.GetOrdinal(UserShiftSchema.UserId);
+                var positionIdOrdinal = reader.GetOrdinal(UserShiftSchema.PositionId);
+
+                while (await reader.ReadAsync())
+                {
+                    users.Add(
+                        new()
+                        {
+                            Id = reader.GetInt32(idOrdinal),
+                            PositionId = reader.GetInt32(positionIdOrdinal)
+                        }
+                    );
+                }
             }
 
-            throw new NotImplementedException();
+            result.Users = [..users];
+
+            return result;
         }
     }
 }

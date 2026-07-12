@@ -8,7 +8,6 @@
         ];
 
         public static readonly IReadOnlyList<string> Full = [
-            PositionSchema.Id,
             PositionSchema.Name,
             PositionSchema.PricePerHour
         ];

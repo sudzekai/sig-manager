@@ -22,7 +22,7 @@ namespace Infrastructure.Repositories.Parks
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("park", "delete");
 
-            logger.LogInformation("Удаление записи о парке с id {id}", id);
+            logger.LogInformation("Удаление записи о парке с id {id}", id.Value);
 
             return await inner.DeleteAsync(id);
         }
@@ -31,7 +31,7 @@ namespace Infrastructure.Repositories.Parks
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("park", "get");
 
-            logger.LogInformation("Восстановление записи о парке с id {id}", id);
+            logger.LogInformation("Восстановление записи о парке с id {id}", id.Value);
 
             return await inner.GetAsync(id);
         }
@@ -40,7 +40,7 @@ namespace Infrastructure.Repositories.Parks
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("park", "get_id_by_name");
 
-            logger.LogInformation("Поиск записи о парке с name {name}", name);
+            logger.LogInformation("Поиск записи о парке с name {name}", name.Value);
 
             return await inner.GetIdByNameAsync(name);
         }
@@ -49,7 +49,7 @@ namespace Infrastructure.Repositories.Parks
         {
             using var activity = Telemetry.Repository.StartRepositoryActivity("park", "update");
 
-            logger.LogInformation("Обновление записи о парке с id {id}", park.Id);
+            logger.LogInformation("Обновление записи о парке с id {id}", park.Id.Value);
 
             await inner.UpdateAsync(park);
         }

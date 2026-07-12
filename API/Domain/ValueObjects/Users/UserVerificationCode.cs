@@ -10,6 +10,9 @@ namespace Domain.ValueObjects.Users
 
         public static UserVerificationCode FromValue(string value)
         {
+            if (value == Empty.Value)
+                return Empty;
+
             if (string.IsNullOrWhiteSpace(value))
                 throw new DataValidationException("Код подтверждения не может быть пустым");
 
@@ -19,6 +22,6 @@ namespace Domain.ValueObjects.Users
             return new(value);
         }
 
-        public static readonly UserVerificationCode Empty = new("");
+        public static readonly UserVerificationCode Empty = new("empty");
     }
 }

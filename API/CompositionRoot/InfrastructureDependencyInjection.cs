@@ -5,13 +5,16 @@ using Contracts.Interfaces.Infrastructure.Repositories;
 using Infrastructure;
 using Infrastructure.Databse.Context;
 using Infrastructure.Queries.Cars;
+using Infrastructure.Queries.CarShift;
 using Infrastructure.Queries.Users;
 using Infrastructure.Repositories.Cars;
 using Infrastructure.Repositories.CarShifts;
 using Infrastructure.Repositories.InfoShifts;
+using Infrastructure.Repositories.Positions;
 using Infrastructure.Repositories.Shifts;
 using Infrastructure.Repositories.TicketShifts;
 using Infrastructure.Repositories.Users;
+using Infrastructure.Repositories.UserShifts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -51,6 +54,16 @@ namespace CompositionRoot
                 return new UserRepositoryDecorator(inner, logger);
             });
 
+            services.AddScoped<PositionRepository>();
+
+            services.AddScoped<IPositionRepository>(sp =>
+            {
+                var inner = sp.GetRequiredService<PositionRepository>();
+                var logger = sp.GetRequiredService<ILogger<PositionRepository>>();
+
+                return new PositionRepositoryDecorator(inner, logger);
+            });
+
             services.AddScoped<CarRepository>();
 
             services.AddScoped<ICarRepository>(sp =>
@@ -61,14 +74,14 @@ namespace CompositionRoot
                 return new CarRepositoryDecorator(inner, logger);
             });
 
-            services.AddScoped<CarShiftRepository>();
+            services.AddScoped<UserShiftRepository>();
 
-            services.AddScoped<ICarShiftRepository>(sp =>
+            services.AddScoped<IUserShiftRepository>(sp =>
             {
-                var inner = sp.GetRequiredService<CarShiftRepository>();
-                var logger = sp.GetRequiredService<ILogger<CarShiftRepository>>();
+                var inner = sp.GetRequiredService<UserShiftRepository>();
+                var logger = sp.GetRequiredService<ILogger<UserShiftRepository>>();
 
-                return new CarShiftRepositoryDecorator(inner, logger);
+                return new UserShiftRepositoryDecorator(inner, logger);
             });
 
             services.AddScoped<ShiftRepository>();
@@ -79,6 +92,16 @@ namespace CompositionRoot
                 var logger = sp.GetRequiredService<ILogger<ShiftRepository>>();
 
                 return new ShiftRepositoryDecorator(inner, logger);
+            });
+
+            services.AddScoped<CarShiftRepository>();
+
+            services.AddScoped<ICarShiftRepository>(sp =>
+            {
+                var inner = sp.GetRequiredService<CarShiftRepository>();
+                var logger = sp.GetRequiredService<ILogger<CarShiftRepository>>();
+
+                return new CarShiftRepositoryDecorator(inner, logger);
             });
 
             services.AddScoped<InfoShiftRepository>();
@@ -100,6 +123,8 @@ namespace CompositionRoot
 
                 return new TicketShiftRepositoryDecorator(inner, logger);
             });
+
+ 
 
             return services;
         }
@@ -124,6 +149,16 @@ namespace CompositionRoot
                 var logger = sp.GetRequiredService<ILogger<CarQuery>>();
 
                 return new CarQueryDecorator(inner, logger);
+            });
+
+            services.AddScoped<CarShiftQuery>();
+
+            services.AddScoped<ICarShiftQuery>(sp =>
+            {
+                var inner = sp.GetRequiredService<CarShiftQuery>();
+                var logger = sp.GetRequiredService<ILogger<CarShiftQuery>>();
+
+                return new CarShiftQueryDecorator(inner, logger);
             });
 
             return services;

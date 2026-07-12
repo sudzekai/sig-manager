@@ -1,12 +1,11 @@
 ﻿using Domain.ValueObjects.Shifts;
 using Domain.ValueObjects.Shifts.Info;
-using System.ComponentModel;
 
 namespace Domain.Models.InfoShifts
 {
-    public partial class InfoShift : INotifyPropertyChanged
+    public partial class InfoShift
     {
-        public ShiftId? ShiftId
+        public ShiftId ShiftId
         {
             get;
             set
@@ -34,7 +33,7 @@ namespace Domain.Models.InfoShifts
             }
         }
 
-        public ShiftCashLess? CashLess
+        public ShiftCashless? Cashless
         {
             get;
             private set
@@ -66,8 +65,8 @@ namespace Domain.Models.InfoShifts
         {
             get
             {
-                if (Cash is not null && CashLess is not null)
-                    return Cash.Value + CashLess.Value;
+                if (Cash is not null && Cashless is not null)
+                    return Cash.Value + Cashless.Value;
 
                 return null;
             }

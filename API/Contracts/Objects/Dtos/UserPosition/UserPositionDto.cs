@@ -2,7 +2,7 @@
 {
     public class UserPositionDto
     {
-        public int UserId { get; set; }
+        public int Id { get; set; }
         public int PositionId { get; set; }
     }
 }

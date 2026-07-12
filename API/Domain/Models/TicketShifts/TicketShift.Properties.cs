@@ -5,7 +5,7 @@ namespace Domain.Models.TicketShifts
 {
     public partial class TicketShift
     {
-        public ShiftId? ShiftId
+        public ShiftId ShiftId
         {
             get;
             set

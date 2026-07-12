@@ -8,7 +8,7 @@ namespace Contracts.Interfaces.Infrastructure.Repositories
         Task<PositionId> AddAsync(Position position);
         Task<bool> DeleteAsync(PositionId id);
         Task<Position?> GetAsync(PositionId id);
-        Task<PositionId?> GetIdByName(PositionName name);
+        Task<PositionId?> GetIdByNameAsync(PositionName name);
         Task UpdateAsync(Position position);
     }
 }
