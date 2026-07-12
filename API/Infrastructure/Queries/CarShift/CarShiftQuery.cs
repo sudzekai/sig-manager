@@ -72,7 +72,7 @@ namespace Infrastructure.Queries.CarShift
 
                     decimal? total = (cash.HasValue && cashless.HasValue) ? cashless.Value + cash.Value : null;
                     int? totalTickets = lastTicket.HasValue ? lastTicket.Value - firstTicket : null;
-                    decimal? difference = (total.HasValue && totalTickets.HasValue) ? total - totalTickets * ticketPrice : null;
+                    decimal? difference = (cash.HasValue && totalTickets.HasValue) ? cash - totalTickets * ticketPrice : null;
 
                     result = new(
                         id,

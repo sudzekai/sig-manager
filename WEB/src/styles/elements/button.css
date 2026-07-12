@@ -15,11 +15,19 @@
 }
 
 .btn.btn-primary {
-    @apply ring-2 bg-(--primary-color) text-(--foreground-alternative);
+    @apply ring-2  ring-(--primary-color) bg-(--primary-color) text-(--foreground-alternative);
 }
 
 .btn.btn-primary:hover {
     @apply ring-(--primary-color) bg-(--primary-color)/0 text-(--foreground);
+}
+
+.btn.btn-danger {
+    @apply ring-2 ring-red-600 bg-red-600 text-(--foreground);
+}
+
+.btn.btn-danger:hover {
+    @apply ring-red-600 bg-red-600/0 text-(--foreground);
 }
 
 .btn.btn-primary-outline {
