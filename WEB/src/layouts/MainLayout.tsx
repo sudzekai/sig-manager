@@ -1,4 +1,4 @@
-import { HomeIcon, PlusIcon } from "@heroicons/react/16/solid"
+import { HomeIcon, PlusIcon, UsersIcon } from "@heroicons/react/16/solid"
 import { Link, Outlet } from "react-router"
 
 export default function MainLayout() {
@@ -10,14 +10,14 @@ export default function MainLayout() {
                 </label>
             </header>
 
-            <main className="flex flex-1 p-3">
+            <main className="fixed top-2 bottom-2 left-2 right-2">
                 <Outlet />
             </main>
 
             <footer className="md:hidden fixed bottom-2 left-2 right-2 rounded-xl py-1 px-2 text-alt bg-primary flex flex-row justify-center">
                 <Link className="btn btn-link text-alt" 
-                    to={"/"}>
-                    <HomeIcon className="size-8"></HomeIcon>
+                    to={"/users"}>
+                    <UsersIcon className="size-8"></UsersIcon>
                 </Link>
                 <Link className="btn btn-link text-alt" 
                     to={"/"}>
