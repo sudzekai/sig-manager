@@ -1,0 +1,12 @@
+# .dockerignore - обязательно добавить:
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.git/
+.env.local
+*.log
+Dockerfile
+.dockerignore
+README.md
