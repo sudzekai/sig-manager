@@ -57,7 +57,7 @@ namespace Presentation
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
-
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             var pathBase = builder.Configuration.TryGetString("API_PATH_BASE");
 
             app.UseAppLifetimeLogging();
