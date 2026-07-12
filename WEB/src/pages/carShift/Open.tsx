@@ -1,7 +1,6 @@
 import { useState } from "react"
 import type { CarShiftOpenDto } from "../../api/types/dtos/carShifts/CarShiftOpenDto"
 import { carShiftsClient } from "../../api/clients/carShiftsClient";
-import { useNavigate } from "react-router";
 
 export default function CarShiftOpenPage() {
     const [shift, setShift] = useState<CarShiftOpenDto>({
