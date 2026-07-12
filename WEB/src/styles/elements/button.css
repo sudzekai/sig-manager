@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "../resources.css";
+
+.btn {
+    @apply p-1 px-2 rounded-xl transition-all justify-center flex;
+}
+
+.btn:hover {
+    @apply ring-2;
+}
+
+.btn:active {
+    @apply scale-90;
+
+}
+
+.btn.btn-primary-outline {
+    @apply ring-2 ring-[var(--primary-color)];
+}
+
+.btn.btn-primary-outline:hover {
+    @apply bg-[var(--primary-color)] ring-[var(--primary-color)] text-[var(--foreground-alternative)];
+}
+
+
+.btn.btn-link {
+    @apply ring-0;
+}

@@ -1,0 +1,18 @@
+@import "../resources.css";
+@import "tailwindcss";
+
+.bg-primary {
+    @apply bg-[var(--background-primary)];
+}
+
+.bg-main {
+    @apply bg-[var(--background)];
+}
+
+.fg-primary {
+    @apply text-[var(--foreground-primary)];
+}
+
+.text-alt {
+    @apply text-[var(--foreground-alternative)];
+}

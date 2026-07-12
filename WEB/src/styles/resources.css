@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Montserrat", sans-serif;
+}
+
+:root {
+    --foreground: #000000;
+    --foreground-alternative: #ffffff;
+}
+
+.dark {
+    --primary-color: #B2D5E5;
+
+    --background: #020202;
+    --background-alternative: #ffffff;
+    --background-primary: var(--primary-color);
+    --background-secondary: #474747;
+
+    --foreground: #ffffff;
+    --foreground-alternative: #020202;
+    --foreground-primary: var(--primary-color);
+    --foreground-secondary: #474747;
+}
