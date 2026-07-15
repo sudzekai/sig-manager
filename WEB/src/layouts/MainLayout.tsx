@@ -56,7 +56,7 @@ export default function MainLayout() {
     );
 
     const sideBar = (
-        <div className={`transition-all duration-200 w-0 ${isSideBarOpened ? "w-1/2 md:w-2/10 md:px-2" : "p-0"} fixed top-0 overflow-hidden z-20 h-1/1 frame rounded-none p-0 py-2`}>
+        <div className={`transition-all duration-200 w-0 ${isSideBarOpened ? "w-8/12 md:w-2/12 md:px-2" : "p-0"} fixed top-0 overflow-hidden z-20 h-1/1 frame rounded-none p-0 py-2`}>
             <div className="flex flex-col gap-2">
                 <label className="text-2xl md:text-3xl font-bold px-3">SiG Manager</label>
                 

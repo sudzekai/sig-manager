@@ -21,7 +21,7 @@ export default function UsersPage() {
     }, []);
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="page">
             <div className="frame frame-header">
                 Пользователи
             </div>
@@ -40,7 +40,7 @@ export default function UsersPage() {
                                 onClick={() => navigate(`/users/${user.id}`)}
                                 className=" cursor-pointer">
                                 <td>{user.fullName}</td>
-                                <td className="max-w-[100px] truncate">{user.username}</td>
+                                <td className="max-w-25 truncate">{user.username}</td>
                             </tr>
                         ))}
                     </tbody>

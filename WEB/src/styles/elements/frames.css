@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @layer components {
+    .page {
+        @apply flex flex-col gap-3;
+    }
+
     .frame {
         @apply rounded-2xl p-2;
 
