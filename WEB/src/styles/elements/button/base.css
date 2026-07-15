@@ -48,4 +48,12 @@
     .btn-outline:active {
         @apply bg-(--button-bg)/60 scale-[0.95];
     }
+
+    .btn.text-start {
+        @apply justify-start;
+    }
+
+    .btn.btn-lg {
+        @apply text-xl;
+    }
 }
