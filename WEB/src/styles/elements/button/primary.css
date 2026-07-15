@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn.btn-primary {
+        @apply ring-inset ring-0;
+        color: var(--button-primary-fg);
+        background: var(--button-primary-bg);
+    }
+
+    .btn.btn-primary:hover {
+        @apply ring-inset ring-2;
+        color: var(--button-primary-bg);
+        background: transparent;
+    }
+
+    .btn.btn-primary:active {
+        @apply ring-inset ring-0;
+        color: color-mix(in srgb, var(--button-primary-fg) 75%, transparent);
+        background: color-mix(in srgb, var(--button-primary-bg) 75%, transparent);
+    }
+
+
+    .btn.btn-primary-outline {
+        @apply ring-inset ring-2;
+        color: var(--button-primary-bg);
+        background: transparent;
+    }
+
+    .btn.btn-primary-outline:hover {
+        @apply ring-inset ring-0;
+        color: var(--button-primary-fg);
+        background: var(--button-primary-bg);
+    }
+
+    .btn.btn-primary-outline:active {
+        color: color-mix(in srgb, var(--button-primary-bg) 75%, transparent);
+        background: color-mix(in srgb, transparent 85%, var(--button-primary-bg));
+    }
+}

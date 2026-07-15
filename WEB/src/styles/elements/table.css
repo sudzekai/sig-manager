@@ -1,17 +1,48 @@
 @import "tailwindcss";
 @import "../resources.css";
 
-table {
-    
-}
+@layer components {
+    table {
+        @apply w-full border-separate border-spacing-0 overflow-hidden rounded-xl;
+        border: 1px solid var(--border-primary);
+        background: rgb(255 255 255 / 0.02);
+    }
 
-td, th {
-    @apply ring-1 p-2 ;
-}
+    thead {
+        @apply bg-(--background-primary)/40;
+    }
 
-tr:hover {
-    @apply bg-(--background-primary)/50;
-}
-tr:active {
-    @apply bg-(--background-primary)/30;
+    th {
+        @apply p-3 text-left font-semibold;
+        border-bottom: 1px solid var(--border-primary);
+    }
+
+    td {
+        @apply p-3;
+        border-bottom: 1px solid var(--border-secondary);
+    }
+
+    th:not(:last-child),
+    td:not(:last-child) {
+        border-right: 1px solid var(--border-secondary);
+    }
+
+    tbody tr {
+        @apply cursor-pointer;
+        transition:
+            background-color .15s ease,
+            color .15s ease;
+    }
+
+    tbody tr:hover {
+        @apply bg-(--background-primary)/50;
+    }
+
+    tbody tr:active {
+        @apply bg-(--background-primary)/30;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
 }

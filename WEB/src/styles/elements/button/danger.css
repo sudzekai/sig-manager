@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn.btn-danger {
+        @apply ring-inset ring-0;
+        color: var(--button-danger-fg);
+        background: var(--button-danger-bg);
+    }
+
+    .btn.btn-danger:hover {
+        @apply ring-inset ring-2;
+        color: var(--button-danger-bg);
+        background: transparent;
+    }
+
+    .btn.btn-danger:active {
+        @apply ring-inset ring-0;
+        color: color-mix(in srgb, var(--button-danger-fg) 75%, transparent);
+        background: color-mix(in srgb, var(--button-danger-bg) 75%, transparent);
+    }
+
+
+    .btn.btn-danger-outline {
+        @apply ring-inset ring-2;
+        color: var(--button-danger-bg);
+        background: transparent;
+    }
+
+    .btn.btn-danger-outline:hover {
+        @apply ring-inset ring-0;
+        color: var(--button-danger-fg);
+        background: var(--button-danger-bg);
+    }
+
+    .btn.btn-danger-outline:active {
+        color: color-mix(in srgb, var(--button-danger-bg) 75%, transparent);
+        background: color-mix(in srgb, transparent 85%, var(--button-danger-bg));
+    }
+}

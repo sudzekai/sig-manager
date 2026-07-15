@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center
+               px-4 py-2
+               rounded-2xl
+               font-medium
+               transition-all duration-200
+               cursor-pointer
+               select-none
+               disabled:opacity-50
+               disabled:cursor-not-allowed;
+
+        background-color: transparent;
+        color: var(--button-bg);
+    }
+
+    .btn:hover {
+        @apply text-(--button-fg) bg-(--button-bg);
+    }
+
+    .btn:active {
+        @apply bg-(--button-bg)/60 scale-[0.95];
+    }
+
+    .btn-outline {
+        @apply inline-flex items-center justify-center
+               px-4 py-2
+               rounded-2xl
+               font-medium
+               transition-all duration-200
+               cursor-pointer
+               select-none
+               disabled:opacity-50
+               disabled:cursor-not-allowed
+               ring-inset ring-2;
+
+        background-color: transparent;
+        color: var(--button-bg);
+    }
+
+    
+    .btn-outline:hover {
+        @apply ring-inset ring-0 text-(--button-fg) bg-(--button-bg);
+    }
+
+    .btn-outline:active {
+        @apply bg-(--button-bg)/60 scale-[0.95];
+    }
+}

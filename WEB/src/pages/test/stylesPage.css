@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.body {
+    @apply flex flex-col gap-1 ring-1 p-2 rounded-xl;
+}
+
+.body-content {
+    @apply flex flex-wrap gap-1;
+}
