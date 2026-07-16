@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn.btn-icon {
+        @apply flex flex-col px-1 p-0 font-bold;
+        font-size: 12px;
+    }
+
+    .btn.btn-icon > i {
+        font-size: 25px;
+    }
+}

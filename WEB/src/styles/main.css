@@ -1,15 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
 
 @import "./elements/button/base.css";
+@import "./elements/button/icon.css";
 @import "./elements/button/primary.css";
 @import "./elements/button/secondary.css";
 @import "./elements/button/danger.css";
 @import "./elements/button/success.css";
 @import "./elements/button/info.css";
+
 @import "./elements/frames.css";
 
 @import "./elements/text.css";
+
 @import "./elements/table.css";
+
 @import "./elements/all.css";
 
 @layer base {
@@ -26,5 +30,5 @@ body {
 
 body {
     background: var(--background-gradient);
-    background-size: 100vw 100vh;
+    background-size: 100vw 105vh;
 }

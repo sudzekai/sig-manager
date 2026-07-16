@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router";
-import { carShiftsClient } from "../../api/clients/carShiftsClient";
-import type { CarShiftCloseDto } from "../../api/types/dtos/carShifts/CarShiftCloseDto";
 import { useState } from "react";
+import type { CarShiftCloseDto } from "../../../api/types/dtos/carShifts/CarShiftCloseDto";
+import { carShiftsClient } from "../../../api/clients/carShiftsClient";
 
 export default function CarShiftClosePage() {
     const { id } = useParams<{ id: string }>();

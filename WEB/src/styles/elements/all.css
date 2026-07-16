@@ -1,5 +1,40 @@
 @import "tailwindcss";
 
-.form-control {
-    @apply flex ring-1 rounded-xl px-2 py-1;
+@layer components {
+    .form-control {
+        @apply w-full rounded-xl px-3 py-2 bg-(--background-primary)/30 ring-inset ring-1 ring-(--border-primary);
+
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-control:hover {
+        @apply bg-(--background-primary)/40 ring-inset ring-1 ring-(--border-primary)/80;
+        border-color: var(--border-secondary);
+    }
+
+    .form-control:focus {
+        @apply ring-inset ring-2 ring-(--accent-primary);
+        outline: none;
+    }
+
+    .form-control:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+    .form-control:read-only {
+        @apply bg-(--background-primary)/30;
+    }
+
+    select.form-control:read-only {
+        @apply bg-(--background-primary)/30;
+    }
+
+    .form-control::selection {
+        @apply bg-(--accent-primary)/50;
+    }
 }

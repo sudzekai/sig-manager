@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer components {
+    .rs__control {
+        @apply ring-inset ring-1 ring-(--border-primary);
+    }
+}

@@ -2,7 +2,7 @@
 
 @layer components {
     .btn {
-        @apply inline-flex items-center justify-center
+        @apply flex flex-row items-center justify-center
                px-4 py-2
                rounded-2xl
                font-medium

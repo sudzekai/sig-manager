@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import type { CarShiftInfoDto } from "../../api/types/dtos/carShifts/CarShiftInfoDto";
-import { carShiftsClient } from "../../api/clients/carShiftsClient";
-import { usersClient } from "../../api/clients/usersClient";
-import type { UserInfoDto } from "../../api/types/dtos/users/UserInfoDto";
+import { usersClient } from "../../../api/clients/usersClient";
+import { carShiftsClient } from "../../../api/clients/carShiftsClient";
+import type { CarShiftInfoDto } from "../../../api/types/dtos/carShifts/CarShiftInfoDto";
+import type { UserInfoDto } from "../../../api/types/dtos/users/UserInfoDto";
 
 export default function CarShiftInfoPage() {
     const { id } = useParams<{ id: string }>();

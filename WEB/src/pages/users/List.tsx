@@ -3,7 +3,7 @@ import type { UserSimpleDto } from "../../api/types/dtos/users/UserSimpleDto";
 import { usersClient } from "../../api/clients/usersClient";
 import { useNavigate } from "react-router";
 
-export default function UsersPage() {
+export default function UserListPage() {
     const [users, setUsers] = useState<UserSimpleDto[]>();
     const navigate = useNavigate();
 
