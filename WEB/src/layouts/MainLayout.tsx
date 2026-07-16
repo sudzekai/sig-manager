@@ -28,7 +28,7 @@ export default function MainLayout() {
     };
 
     const navi = (
-        <nav className="fixed frame bottom-2 left-2 right-2 md:right-auto md:top-2 z-10 h-[65]">
+        <nav className="fixed frame bottom-2 left-2 right-2 md:right-auto md:top-2 z-10">
             <div className="flex flex-row md:flex-col gap-2">
                 <button onClick={() => setIsSideBarOpened(!isSideBarOpened)} className="btn btn-icon flex-1">
                     <i className="bi-list"></i>

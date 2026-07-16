@@ -16,7 +16,7 @@ export function CustomSelect<Option, IsMulti extends boolean = false>(
                      ring-inset ring-1 
                      ${state.isFocused ? "ring-2 ring-(--accent-primary)" : "ring-(--border-primary) hover:ring-(--border-primary)/80"}`,
                 valueContainer: () => "bg-(--background-primary)/0 flex flex-wrap gap-1",
-                menuList: () => `bg-(--background-primary)/90 rounded-xl`,
+                menuList: () => `bg-(--background-primary)/90 rounded-xl ring-1 ring-(--border-primary)`,
                 option: (state) => `
                 w-full flex flex-row px-3 py-2 hover:bg-(--accent-primary)/60 cursor-pointer
                 ${state.isSelected ? "bg-(--accent-primary)/90 font-semibold" : ""}`,
@@ -28,10 +28,13 @@ export function CustomSelect<Option, IsMulti extends boolean = false>(
                 control: () => ({}),
                 menu: (base) => ({
                     ...base,
+                    boxShadow: "none",
+                    border: "none",
                     background: "transparent"
                 }),
                 menuList: (base) => ({
                     ...base,
+                    border: "none",
                     maxHeight: '250px'
                 }),
                 input: (base) => ({

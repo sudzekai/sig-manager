@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import type { CarShiftOpenDto } from "../../../api/types/dtos/carShifts/CarShiftOpenDto";
 import type { UserSimpleDto } from "../../../api/types/dtos/users/UserSimpleDto";
 import type { UserPositionDto } from "../../../api/types/dtos/UserPositionDto";
@@ -73,6 +73,7 @@ export default function CarShiftOpenPage() {
                             placeholder="Сотрудники"
                             getOptionLabel={(u) => u.fullName}
                             getOptionValue={(u) => u.id.toString()}
+                            isOptionDisabled={() => selectedUsers.length >= 2}
                             onChange={(selected) => {
                                 setSelectedUsers(
                                     selected.map(u => ({
@@ -148,9 +149,9 @@ export default function CarShiftOpenPage() {
                         <button type="submit" className="btn btn-primary w-2/3">
                             Открыть смену
                         </button>
-                        <button type="submit" className="btn btn-secondary w-1/3">
+                        <Link to={"/shifts/router"} className="btn btn-secondary w-1/3">
                             Отмена
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

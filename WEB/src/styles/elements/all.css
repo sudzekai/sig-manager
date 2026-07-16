@@ -37,4 +37,8 @@
     .form-control::selection {
         @apply bg-(--accent-primary)/50;
     }
+
+    .quote {
+        @apply border-s-3 border-(--accent-primary) ps-2;
+    }
 }

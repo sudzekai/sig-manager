@@ -22,37 +22,43 @@ export default function CarShiftClosePage() {
     }
 
     return (
-        <form className="flex flex-col gap-2"
+        <form className="page"
             onSubmit={(e) => onSubmit(e, shift)}>
-            <label className="doc-header">
+
+            <div className="frame frame-header">
                 Закрытие смены машинок #{id}
-            </label>
-
-            <div className="flex flex-col">
-                <label>Номер последнего билета:</label>
-                <input type="number" className="form-control"
-                    value={shift.lastTicket}
-                    onChange={(e) => setShift({ ...shift, lastTicket: Number(e.target.value) })}
-                    placeholder="Номер последнего билета..." />
-            </div>
-            <div className="flex flex-col">
-                <label>Сумма наличных:</label>
-                <input type="number" className="form-control"
-                    value={shift.cash}
-                    onChange={(e) => setShift({ ...shift, cash: Number(e.target.value) })}
-                    placeholder="Сумма наличных..." />
             </div>
 
-            <div className="flex flex-col">
-                <label>Сумма безнал:</label>
-                <input type="number" className="form-control"
-                    value={shift.cashless}
-                    onChange={(e) => setShift({ ...shift, cashless: Number(e.target.value) })}
-                    placeholder="Сумма безнал..." />
+            <div className="frame">
+                <div className="flex flex-col gap-1">
+                    <label>Номер последнего билета:</label>
+                    <input type="number" className="form-control"
+                        value={shift.lastTicket}
+                        onChange={(e) => setShift({ ...shift, lastTicket: Number(e.target.value) })}
+                        placeholder="Номер последнего билета..." />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label>Сумма наличных:</label>
+                    <input type="number" className="form-control"
+                        value={shift.cash}
+                        onChange={(e) => setShift({ ...shift, cash: Number(e.target.value) })}
+                        placeholder="Сумма наличных..." />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                    <label>Сумма безнал:</label>
+                    <input type="number" className="form-control"
+                        value={shift.cashless}
+                        onChange={(e) => setShift({ ...shift, cashless: Number(e.target.value) })}
+                        placeholder="Сумма безнал..." />
+                </div>
+                
+                <hr className="mt-2 mx-2"/>
+
+                <button type="submit" className="btn btn-primary mt-2 w-1/1">
+                    Закрыть смену
+                </button>
             </div>
-            <button type="submit" className="btn btn-primary mt-2">
-                Закрыть смену
-            </button>
         </form>
     )
 }
