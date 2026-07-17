@@ -48,7 +48,7 @@ export default function MainLayout() {
                 </Link>
 
                 <Link className="btn btn-icon flex-1"
-                    to={"/shifts/router"}>
+                    to={"/shifts/open/router"}>
                     <i className="bi-plus-lg"></i>
                     Смена
                 </Link>
@@ -73,6 +73,12 @@ export default function MainLayout() {
                     to={"/users"} onClick={() => setIsSideBarOpened(false)}>
                     <i className="bi-people-fill me-1"></i>
                     Пользователи
+                </Link>
+
+                <Link className="btn text-start btn-lg"
+                    to={"/shifts/router"} onClick={() => setIsSideBarOpened(false)}>
+                    <i className="bi-clipboard me-1"></i>
+                    Смены
                 </Link>
 
                 <hr className="mx-2" />

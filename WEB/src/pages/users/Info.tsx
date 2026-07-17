@@ -10,7 +10,7 @@ export default function UserInfoPage() {
     useEffect(() => {
         async function getUser(id: number) {
             const user = await usersClient.getById(id);
-            setUser(user);
+            setUser(user.data);
         }
 
         getUser(Number(id));
@@ -23,22 +23,39 @@ export default function UserInfoPage() {
             </div>
 
             <div className="frame">
-                <div className="flex flex-col gap-2">
-                    <label>ФИО: {user?.fullName}</label>
-                    <label>Имя пользователя: {user?.username}</label>
-                    <label>Эл. почта: {user?.email}</label>
-                    <label>Телефон: {user?.phoneNumber}</label>
+                <div className="flex flex-col gap-1">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colSpan={2} className="text-center">{user?.username}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ФИО</td>
+                                <td>{user?.fullName}</td>
+                            </tr>
+                            <tr>
+                                <td>Эл. почта</td>
+                                <td>{user?.email}</td>
+                            </tr>
+                            <tr>
+                                <td>Телефон</td>
+                                <td>{user?.phoneNumber}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div className="flex flex-row gap-2">
-                <a href={`tel:${user?.phoneNumber}`} className="btn btn-primary-outline w-1/2">
-                    <i className=" bi-telephone me-1"></i>
-                    Позвонить
-                </a>
-                <a href={`tg://resolve?domain=${user?.username}`} className="btn btn-primary-outline w-1/2">
-                    <i className="bi-telegram me-1"></i>
-                    Написать
-                </a>
+                <div className="flex flex-row gap-2 mt-2">
+                    <a href={`tel:${user?.phoneNumber}`} className="btn btn-primary-outline w-1/2">
+                        <i className=" bi-telephone me-1"></i>
+                        Позвонить
+                    </a>
+                    <a href={`tg://resolve?domain=${user?.username}`} className="btn btn-primary-outline w-1/2">
+                        <i className="bi-telegram me-1"></i>
+                        Написать
+                    </a>
+                </div>
             </div>
         </div>
     )

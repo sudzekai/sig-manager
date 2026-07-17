@@ -7,7 +7,6 @@ using Contracts.Objects.Dtos.User;
 using Domain.Models.Users;
 using Domain.ValueObjects.Roles;
 using Domain.ValueObjects.Users;
-using Microsoft.Extensions.Logging;
 using Shared.Types.Exceptions;
 
 namespace Application.CommandHandlers.Users.Write
@@ -22,22 +21,22 @@ namespace Application.CommandHandlers.Users.Write
                 throw ConflictException.UserUsername();
 
             var email = UserEmail.FromValue(command.Dto.Email);
-            
+
             if (await repository.GetIdByEmailAsync(email) is not null)
                 throw ConflictException.UserEmail();
 
             var phoneNumber = UserPhoneNumber.FromValue(command.Dto.PhoneNumber);
-           
-            if (repository.GetIdByPhoneNumberAsync(phoneNumber) is not null)
+
+            if (await repository.GetIdByPhoneNumberAsync(phoneNumber) is not null)
                 throw ConflictException.UserPhoneNumber();
 
             string passwordHash = hashService.HashString(command.Dto.Password);
 
             User user = User.Create(
-                username, 
-                UserFullName.FromValue(command.Dto.FullName), 
-                email, 
-                phoneNumber, 
+                username,
+                UserFullName.FromValue(command.Dto.FullName),
+                email,
+                phoneNumber,
                 UserPasswordHash.FromValue(passwordHash),
                 RoleId.FromValue(1));
 

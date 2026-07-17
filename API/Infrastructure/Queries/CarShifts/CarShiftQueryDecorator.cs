@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Shared.Extensions;
 using Shared.OpenTelemetry;
 
-namespace Infrastructure.Queries.CarShift
+namespace Infrastructure.Queries.CarShifts
 {
     public class CarShiftQueryDecorator(ICarShiftQuery inner, ILogger<ICarShiftQuery> logger) : ICarShiftQuery
     {

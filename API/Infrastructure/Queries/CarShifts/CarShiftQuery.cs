@@ -8,18 +8,126 @@ using Infrastructure.Schema.CarShift;
 using Infrastructure.Schema.InfoShift;
 using Infrastructure.Schema.Shift;
 using Infrastructure.Schema.TicketShift;
+using Infrastructure.Schema.User;
 using Infrastructure.Schema.UserShift;
 using MySql.Data.MySqlClient;
-using Shared.App;
 using System.Data;
+using System.Text;
 
-namespace Infrastructure.Queries.CarShift
+namespace Infrastructure.Queries.CarShifts
 {
     public class CarShiftQuery(IDbContext db) : ICarShiftQuery
     {
         public async Task<IReadOnlyList<CarShiftSimpleDto>> GetAllAsync(GetCarShiftsListRequest request)
         {
-            throw AppConstants.TODO();
+            StringBuilder query = new($"""
+                SELECT 
+                    shift.{ShiftSchema.Id} as {ShiftSchema.Id},
+                    shift.{ShiftSchema.CreatedAt} as {ShiftSchema.CreatedAt},
+                    shift.{ShiftSchema.ClosedAt} as {ShiftSchema.ClosedAt},
+                    ticketShift.{TicketShiftSchema.FirstTicket} as {TicketShiftSchema.FirstTicket},
+                    ticketShift.{TicketShiftSchema.LastTicket} as {TicketShiftSchema.LastTicket}
+                FROM {CarShiftSchema.TableName} carShift
+                    INNER JOIN {ShiftSchema.TableName} shift
+                        ON shift.{ShiftSchema.Id} = carShift.{CarShiftSchema.ShiftId}
+                    LEFT JOIN {TicketShiftSchema.TableName} ticketShift
+                        ON ticketShift.{TicketShiftSchema.ShiftId} = carShift.{CarShiftSchema.ShiftId}
+                WHERE 
+                    1=1
+                """);
+
+            List<MySqlParameter> parameters = [];
+
+            if (request.CreatedAtStart != default)
+            {
+                query.Append($"\nAND {ShiftSchema.CreatedAt} >= @createdAtStart");
+                parameters.Add(new("createdAtStart", request.CreatedAtStart));
+            }
+
+            if (request.CreatedAtEnd != default)
+            {
+                query.Append($"\nAND {ShiftSchema.CreatedAt} <= @createdAtEnd");
+                parameters.Add(new("createdAtEnd", request.CreatedAtEnd));
+            }
+
+            if (request.ClosedAtStart != default)
+            {
+                query.Append($"\nAND {ShiftSchema.ClosedAt} >= @closedAtStart");
+                parameters.Add(new("closedAtStart", request.ClosedAtStart));
+            }
+
+            if (request.ClosedAtEnd != default)
+            {
+                query.Append($"\nAND {ShiftSchema.ClosedAt} <= @closedAtEnd");
+                parameters.Add(new("closedAtEnd", request.ClosedAtEnd));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Status))
+            {
+                var status = string.Empty;
+
+                if (request.Status.Equals("opened", StringComparison.OrdinalIgnoreCase))
+                    status = "opened";
+
+                else if (request.Status.Equals("closed", StringComparison.OrdinalIgnoreCase))
+                    status = "closed";
+
+                if (status != string.Empty)
+                {
+                    query.Append($"\nAND {ShiftSchema.Status} = @{ShiftSchema.Status}");
+
+                    parameters.Add(ShiftSchema.Status.ToMysqlParameter(status));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            {
+                var orderBy = request.OrderBy.ToLower() switch
+                {
+                    "status" => ShiftSchema.Status,
+                    "closedat" => ShiftSchema.ClosedAt,
+                    "openedat" => ShiftSchema.CreatedAt,
+                    _ => ShiftSchema.Id
+                };
+
+                var direction = request.OrderDirection.ToLower() switch
+                {
+                    "asc" => "ASC",
+                    _ => "DESC"
+                };
+
+                query.Append($"\nORDER BY {orderBy} {direction}");
+            }
+            else
+            {
+                query.Append($"\nORDER BY {ShiftSchema.Id} DESC");
+            }
+
+            query.Append($"\nLIMIT {request.Limit} OFFSET {request.Offset}");
+
+            await using var command = await db.CreateCommandAsync(query.ToString(), [.. parameters]);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            List<CarShiftSimpleDto> result = [];
+
+            var idOrdinal = reader.GetOrdinal(ShiftSchema.Id);
+            var createdAtOrdinal = reader.GetOrdinal(ShiftSchema.CreatedAt);
+            var closedAtOrdinal = reader.GetOrdinal(ShiftSchema.ClosedAt);
+            var firstTicketOrdinal = reader.GetOrdinal(TicketShiftSchema.FirstTicket);
+            var lastTicketOrdinal = reader.GetOrdinal(TicketShiftSchema.LastTicket);
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(new(
+                    reader.GetInt32(idOrdinal),
+                    reader.GetDateTime(createdAtOrdinal),
+                    reader.GetNullableDateTime(closedAtOrdinal),
+                    reader.GetInt32(firstTicketOrdinal),
+                    reader.GetNullableInt32(lastTicketOrdinal)
+                ));
+            }
+
+            return result;
         }
 
         public async Task<CarShiftInfoDto?> GetByIdAsync(int id)
@@ -127,7 +235,7 @@ namespace Infrastructure.Queries.CarShift
                 }
             }
 
-            result.Users = [..users];
+            result.Users = [.. users];
 
             return result;
         }

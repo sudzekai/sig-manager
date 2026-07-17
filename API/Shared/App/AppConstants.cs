@@ -6,22 +6,11 @@ namespace Shared.App
 {
     public static class AppConstants
     {
-        public const string CurrentVersion = "v0.3.0";
+        public const string CurrentVersion = "v0.3.1";
 
         public const string ChangeLog =
             """
-            Реализация CarShift, UserShift, Position и новых DTO
-
-            - Добавлены интерфейсы и реализации репозиториев/запросов для CarShift, UserShift, Position, InfoShift, TicketShift
-            - Реализованы декораторы для логирования и трассировки
-            - Внедрён функционал открытия/закрытия смены машинок с валидацией и транзакциями
-            - Расширены и переработаны DTO для CarShift, добавлены пользователи и позиции
-            - Методы репозиториев теперь реализованы полностью
-            - Добавлены команды и запросы для ролей и парков
-            - В контроллере CarShiftsController добавлена валидация моделей
-            - Исправлены ошибки в наименованиях и типах (CashLess → Cashless)
-            - Добавлены новые исключения NotFoundException
-            - Проведён рефакторинг: команды и запросы по ролям и паркам вынесены в отдельные пространства имён
+            Реализован метод получения списка смен машин
             """;
 
         public static TextWriter StandartWriter { get; set; } = Console.Out;

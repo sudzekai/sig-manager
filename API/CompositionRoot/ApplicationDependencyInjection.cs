@@ -99,7 +99,9 @@ namespace CompositionRoot
         private static IServiceCollection AddCarShiftHandlers(this IServiceCollection services)
         =>  // get
             services.AddScoped<IQueryHandler<CarShiftGetQuery, CarShiftInfoDto>,
-                                             CarShiftGetQueryHandler>()
+                                             CarShiftGetHandler>()
+                    .AddScoped<IQueryHandler<CarShiftGetAllQuery, IReadOnlyList<CarShiftSimpleDto>>,
+                                             CarShiftGetAllHandler>()
                     // update
                     .AddScoped<ICommandHandler<CarShiftOpenCommand, CarShiftInfoDto>,
                                CarShiftOpenHandler>()

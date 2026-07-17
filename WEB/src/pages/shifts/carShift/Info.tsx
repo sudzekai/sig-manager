@@ -15,13 +15,15 @@ export default function CarShiftInfoPage() {
 
     useEffect(() => {
         async function loadData() {
-            const shiftData = await carShiftsClient.getById(Number(id));
+            const response = await carShiftsClient.getById(Number(id));
+            const shiftData = response.data;
             setShift(shiftData);
 
             if (shiftData.users && shiftData.users.length > 0) {
                 const usersPromises = shiftData.users.map(async (userRef) => {
-                    return await usersClient.getById(userRef.id);
+                    return (await usersClient.getById(userRef.id)).data;
                 });
+
                 const usersData = await Promise.all(usersPromises);
                 setShiftUsers(usersData);
             }

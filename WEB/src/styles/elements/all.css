@@ -30,6 +30,10 @@
         @apply bg-(--background-primary)/30;
     }
 
+    .form-control.invalid {
+        @apply ring-(--danger) text-(--danger);
+    }
+
     select.form-control:read-only {
         @apply bg-(--background-primary)/30;
     }
@@ -40,5 +44,29 @@
 
     .quote {
         @apply border-s-3 border-(--accent-primary) ps-2;
+    }
+
+    .bg-secondary {
+        @apply bg-(--background-secondary);
+    }
+
+    .bg-primary {
+        @apply bg-(--background-primary);
+    }
+
+    .bg-danger {
+        @apply bg-(--danger);
+    }
+
+    .bg-success {
+        @apply bg-(--success);
+    }
+
+    .border-primary {
+        @apply border-(--border-primary);
+    }
+
+    .border-secondary {
+        @apply border-(--border-secondary);
     }
 }

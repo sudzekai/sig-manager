@@ -8,9 +8,10 @@ export function CustomSelect<Option, IsMulti extends boolean = false>(
             classNamePrefix="rs"
             isSearchable
             {...props}
+            className="flex-1"
             classNames={{
                 control: (state) =>
-                    `rounded-xl flex flex-row min-h-[40px] px-2 p-1
+                    `rounded-2xl flex flex-row min-h-[40px] px-2 p-1
                      bg-(--background-primary)/30
                      hover:bg-(--background-primary)/40
                      ring-inset ring-1 
@@ -35,7 +36,7 @@ export function CustomSelect<Option, IsMulti extends boolean = false>(
                 menuList: (base) => ({
                     ...base,
                     border: "none",
-                    maxHeight: '250px'
+                    maxHeight: '250px',
                 }),
                 input: (base) => ({
                     ...base,

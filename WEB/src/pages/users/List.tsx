@@ -11,7 +11,7 @@ export default function UserListPage() {
         async function getUsers() {
             try {
                 const users = await usersClient.getAll();
-                setUsers(users);
+                setUsers(users.data);
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
             }

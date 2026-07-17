@@ -6,7 +6,7 @@ using Shared.Types.Exceptions;
 
 namespace Application.QueryHandlers.CarShifts
 {
-    public class CarShiftGetQueryHandler(ICarShiftQuery shifts) : IQueryHandler<CarShiftGetQuery, CarShiftInfoDto>
+    public class CarShiftGetHandler(ICarShiftQuery shifts) : IQueryHandler<CarShiftGetQuery, CarShiftInfoDto>
     {
         public async Task<CarShiftInfoDto> HandleAsync(CarShiftGetQuery query)
         {

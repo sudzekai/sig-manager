@@ -18,9 +18,17 @@ body {
 }
 
 .text-muted {
-    @apply text-[var(--foreground-secondary)];
+    @apply text-[var(--text-muted)];
 }
 
 .doc-header {
     @apply text-2xl font-semibold;
+}
+
+.text-danger {
+    @apply text-(--danger);
+}
+
+.text-accent {
+    @apply text-(--accent-primary);
 }

@@ -5,7 +5,7 @@ using Contracts.Interfaces.Infrastructure.Repositories;
 using Infrastructure;
 using Infrastructure.Databse.Context;
 using Infrastructure.Queries.Cars;
-using Infrastructure.Queries.CarShift;
+using Infrastructure.Queries.CarShifts;
 using Infrastructure.Queries.Users;
 using Infrastructure.Repositories.Cars;
 using Infrastructure.Repositories.CarShifts;

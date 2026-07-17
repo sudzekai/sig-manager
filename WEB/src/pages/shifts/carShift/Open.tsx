@@ -6,6 +6,7 @@ import type { UserPositionDto } from "../../../api/types/dtos/UserPositionDto";
 import { usersClient } from "../../../api/clients/usersClient";
 import { carShiftsClient } from "../../../api/clients/carShiftsClient";
 import { CustomSelect } from "../../../elements/CustomSelect";
+import ErrorPopUp from "../../../elements/ErrorPopUp";
 
 export default function CarShiftOpenPage() {
     const [shift, setShift] = useState<CarShiftOpenDto>({
@@ -16,7 +17,8 @@ export default function CarShiftOpenPage() {
     });
 
     const [users, setUsers] = useState<UserSimpleDto[]>([]);
-    const [selectedUsers, setSelectedUsers] = useState<UserPositionDto[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<UserPositionDto[]>([]);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const positions = [
         { id: 1, name: "Стажёр" },
@@ -33,7 +35,7 @@ export default function CarShiftOpenPage() {
     useEffect(() => {
         async function loadUsers() {
             var users = await usersClient.getAll();
-            setUsers(users);
+            setUsers(users.data);
         }
 
         loadUsers()
@@ -41,22 +43,28 @@ export default function CarShiftOpenPage() {
 
     const navigate = useNavigate();
 
-    const onSubmit = async (e: React.SubmitEvent, dto: CarShiftOpenDto) => {
-        e.preventDefault();
-
-        const createDto = { ...dto, users: selectedUsers };
-
-        try {
-            const shift = await carShiftsClient.open(createDto)
-            navigate(`/shifts/cars/${shift.id}`)
-        } catch (e) {
-            console.log(e)
+    const onSubmit = async () => {
+        if (selectedUsers.length < 1)
+        {
+            setErrorMessage("Должен быть выбран хотябы один сотрудник");
+            return;
         }
+
+        const createDto = { ...shift, users: selectedUsers };
+
+        const response = await carShiftsClient.open(createDto)
+
+        if (response.success)
+            navigate(`/shifts/cars/${response.data.id}`)
+        else
+            setErrorMessage(response.error.message);
     }
 
     return (
-        <form className="page"
-            onSubmit={(e) => onSubmit(e, shift)}>
+        <div className="page">
+                {errorMessage && (
+                    <ErrorPopUp header="Ошибка" message={errorMessage} onExit={() => setErrorMessage("")}/>
+                )}
             <div className="frame frame-header">
                 Открытие смены машинок
             </div>
@@ -88,8 +96,8 @@ export default function CarShiftOpenPage() {
                             <>
                                 <label>Должности:</label>
                                 {selectedUsers.map((u, idx) => (
-                                    <>
-                                        <div key={idx} className="md:flex md:flex-row md:items-center">
+                                    <div key={idx}>
+                                        <div className="md:flex md:flex-row md:items-center">
                                             <span className="w-1/1 md:w-1/3">
                                                 <i className=" bi-dot"></i> {users.find((user) => user.id == u.id)?.fullName}
                                             </span>
@@ -109,8 +117,8 @@ export default function CarShiftOpenPage() {
                                                     );
                                                 }} />
                                         </div>
-                                        <hr className="my-1 mx-2" />
-                                    </>
+                                        <hr className="mt-2 mx-2" />
+                                    </div>
                                 ))}
                             </>
                         )}
@@ -146,7 +154,7 @@ export default function CarShiftOpenPage() {
                     <hr className="mx-2" />
 
                     <div className="flex flex-row gap-2">
-                        <button type="submit" className="btn btn-primary w-2/3">
+                        <button onClick={() => onSubmit()} className="btn btn-primary w-2/3">
                             Открыть смену
                         </button>
                         <Link to={"/shifts/router"} className="btn btn-secondary w-1/3">
@@ -155,6 +163,6 @@ export default function CarShiftOpenPage() {
                     </div>
                 </div>
             </div>
-        </form >
+        </div >
     )
 }
