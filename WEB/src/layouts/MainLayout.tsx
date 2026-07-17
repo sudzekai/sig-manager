@@ -76,6 +76,14 @@ export default function MainLayout() {
                 </Link>
 
                 <Link className="btn text-start btn-lg"
+                    to={"/register"} onClick={() => setIsSideBarOpened(false)}>
+                    <i className="bi-person-plus-fill me-1"></i>
+                    Регистрация
+                </Link>
+
+                <hr className="mx-2" />
+
+                <Link className="btn text-start btn-lg"
                     to={"/shifts/router"} onClick={() => setIsSideBarOpened(false)}>
                     <i className="bi-clipboard me-1"></i>
                     Смены
