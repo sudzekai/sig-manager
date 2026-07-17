@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories.Users
                 UserSchema.CreatedAt.ToMysqlParameter(user.CreatedAt),
                 UserSchema.UpdatedAt.ToMysqlParameter(user.UpdatedAt),
                 UserSchema.RoleId.ToMysqlParameter(user.RoleId.Value),
-                UserSchema.VerificationCode.ToMysqlParameter(UserVerificationCode.Empty)
+                UserSchema.VerificationCode.ToMysqlParameter(UserVerificationCode.Empty.Value)
                 ];
 
             await using var command = await db.CreateCommandAsync(query, parameters);
@@ -130,7 +130,7 @@ namespace Infrastructure.Repositories.Users
                 UserSchema.UpdatedAt.ToMysqlParameter(user.UpdatedAt),
                 UserSchema.RoleId.ToMysqlParameter(user.RoleId.Value),
                 UserSchema.VerificationCode.ToMysqlParameter(user.VerificationCode.Value),
-                UserSchema.Id.ToMysqlParameter(user.Id)
+                UserSchema.Id.ToMysqlParameter(user.Id.Value)
             ];
 
             await using var command = await db.CreateCommandAsync(query, parameters);

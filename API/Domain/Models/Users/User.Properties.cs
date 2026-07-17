@@ -5,7 +5,7 @@ namespace Domain.Models.Users
 {
     public partial class User
     {
-        public UserId? Id
+        public UserId Id
         {
             get;
             set
