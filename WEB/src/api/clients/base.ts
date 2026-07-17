@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig } from "axios";
 import type { ResponseEnvelope } from "../types/responses/ResponseEnvelope";
 
 export const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'http://webshvets.ru:8080/api',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
